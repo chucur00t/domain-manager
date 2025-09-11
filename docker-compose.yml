@@ -1,0 +1,54 @@
+# Konfigurasi Docker Compose untuk Lingkungan Produksi (Docker Swarm)
+# Gunakan dengan perintah: docker stack deploy -c docker-compose.yml <nama_stack>
+
+version: '3.8'
+
+services:
+  app:
+    image: domain-manager-app:latest # Pastikan Anda telah membangun image dengan tag ini
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      # Variabel lingkungan untuk koneksi ke database
+      # Praktik terbaik di Swarm adalah menggunakan Docker Secrets
+      - DATABASE_URL=postgresql://user:password@db:5432/mydb
+      - NEXT_PUBLIC_API_URL=http://localhost:3000/api
+    depends_on:
+      - db
+    deploy:
+      replicas: 3 # Jumlah replika yang diinginkan
+      update_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: on-failure
+
+  db:
+    image: postgres:15-alpine
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: mydb
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password # Ganti dengan password yang kuat atau gunakan Docker Secrets
+    deploy:
+      placement:
+        constraints: [node.role == manager] # Tempatkan database di node manager
+
+volumes:
+  db_data: # Volume untuk persistensi data database
+
+# Catatan:
+# 1. Keamanan: Untuk produksi, JANGAN letakkan password langsung di file ini.
+#    Gunakan Docker Secrets untuk mengelola informasi sensitif.
+#    Contoh:
+#    environment:
+#      - POSTGRES_PASSWORD_FILE=/run/secrets/db_password
+#    secrets:
+#      - db_password
+#
+# 2. Jaringan: Docker Swarm akan secara otomatis membuat jaringan overlay untuk stack ini,
+#    memungkinkan 'app' untuk berkomunikasi dengan 'db' menggunakan nama layanannya.
