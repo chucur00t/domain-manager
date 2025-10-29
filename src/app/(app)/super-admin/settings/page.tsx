@@ -24,7 +24,7 @@ import { Loader2, ShieldCheck, MoreVertical, KeyRound, GitBranch } from 'lucide-
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Checkbox } from '@/components/ui/checkbox';
 import { navItems } from '@/components/layout/main-nav';
-import type { UserRole } from '@/lib/types';
+import type { UserRole } from '@/backend/models/types';
 import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';

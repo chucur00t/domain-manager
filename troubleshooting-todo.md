@@ -1,0 +1,6 @@
+- [x] Check package.json to understand the project structure and dev command
+- [x] Run npm run dev to reproduce the error
+- [x] Analyze the error message and identify the root cause
+- [x] Check what process is using port 9002
+- [x] Kill the conflicting Node.js process
+- [x] Test that npm run dev works after killing the process

@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import { Toaster } from "@/components/ui/toaster";
-import { ThemeProvider } from "@/components/theme-provider";
+import { Toaster } from "@/frontend/components/ui/toaster";
+import { ThemeProvider } from "@/frontend/components/theme-provider";
 import { Inter } from 'next/font/google';
 
 const inter = Inter({

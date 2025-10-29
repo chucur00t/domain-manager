@@ -16,8 +16,8 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Loader2, PlusCircle, Search } from 'lucide-react';
 import Link from 'next/link';
-import type { User, HostingApplication } from '@/lib/types';
-import { MOCK_USERS } from '@/lib/mock-data';
+import type { User, HostingApplication } from '@/backend/models/types';
+import { MOCK_USERS } from '@/backend/utils/mock-data';
 
 type StatusFilter = 'all' | 'pending_review' | 'pending_approval' | 'approved' | 'rejected';
 

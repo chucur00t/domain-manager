@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(cat \"/d/Sarjana/Magang/domain-manager-master/domain-manager-master/README.md\")",
+      "Bash(cat \"/d/Sarjana/Magang/domain-manager-master/domain-manager-master/ARCHITECTURE.md\")"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

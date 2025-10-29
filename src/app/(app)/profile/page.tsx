@@ -11,7 +11,7 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { MOCK_USERS } from '@/lib/mock-data';
+import { MOCK_USERS } from '@/backend/utils/mock-data';
 import { useSearchParams } from 'next/navigation';
 import { Separator } from '@/components/ui/separator';
 import { Input } from '@/components/ui/input';
@@ -20,7 +20,7 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Info, Loader2, Upload } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
-import type { User } from '@/lib/types';
+import type { User } from '@/backend/models/types';
 import React from 'react';
 
 function ProfilePageContent() {

@@ -18,7 +18,7 @@ import { useSearchParams } from 'next/navigation';
 import React, { Suspense } from 'react';
 import { Loader2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import type { User } from '@/lib/types';
+import type { User } from '@/backend/models/types';
 
 
 function SettingsContent() {

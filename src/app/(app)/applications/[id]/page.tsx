@@ -1,11 +1,12 @@
 
 import { notFound } from 'next/navigation';
 import { ApplicationDetailClient } from '@/components/features/applications/application-detail-client';
-import { getApplicationById } from '@/lib/firebase/services';
+import { getApplication } from '@/lib/firebase/services';
 
 // This is now a Server Component
-export default async function ApplicationDetailPage({ params: { id } }: { params: { id: string } }) {
-  const application = await getApplicationById(id);
+export default async function ApplicationDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+  const application = await getApplication(id);
 
   if (!application) {
     notFound();

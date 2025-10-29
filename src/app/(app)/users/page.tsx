@@ -13,7 +13,7 @@ import { UsersTable } from '@/components/features/users/users-table';
 import { AddUserForm } from '@/components/features/users/add-user-form';
 import { Input } from '@/components/ui/input';
 import { Loader2, Search } from 'lucide-react';
-import type { User } from '@/lib/types';
+import type { User } from '@/backend/models/types';
 import { useSearchParams } from 'next/navigation';
 import { useRouter } from 'next/navigation';
 

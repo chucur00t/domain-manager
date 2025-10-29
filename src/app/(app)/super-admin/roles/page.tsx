@@ -8,14 +8,14 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { MOCK_ROLES } from '@/lib/mock-data';
-import type { UserRole } from '@/lib/types';
+import { MOCK_ROLES } from '@/backend/utils/mock-data';
+import type { UserRole } from '@/backend/models/types';
 import { ArrowRight, UserCog, Shield, Eye, Users } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import React, { Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { cn } from '@/lib/utils';
+import { cn } from '@/utils/utils';
 
 const roleConfig = {
     'Super Admin': { icon: UserCog, description: 'Akses penuh ke seluruh fitur dan konfigurasi sistem.', className: 'text-sky-500' },

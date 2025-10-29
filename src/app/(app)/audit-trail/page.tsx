@@ -29,8 +29,8 @@ import {
 import { Calendar as CalendarIcon, Download, ListFilter, Loader2, Search } from 'lucide-react';
 import { Calendar } from '@/components/ui/calendar';
 import { format, subDays } from 'date-fns';
-import { cn } from '@/lib/utils';
-import type { AuditLog } from '@/lib/types';
+import { cn } from '@/utils/utils';
+import type { AuditLog } from '@/backend/models/types';
 import { Badge } from '@/components/ui/badge';
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 
@@ -92,9 +92,9 @@ function AuditTrailPageContent() {
         
       const isSearchMatch = 
         !searchTerm ||
-        log.user.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (log.user?.toLowerCase() || '').includes(searchTerm.toLowerCase()) ||
         log.action.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        log.details.toLowerCase().includes(searchTerm.toLowerCase());
+        (log.details?.toLowerCase() || '').includes(searchTerm.toLowerCase());
 
       return isDateInRange && isActionMatch && isSearchMatch;
     });
@@ -149,7 +149,7 @@ function AuditTrailPageContent() {
         `"${log.user}"`,
         `"${log.userRole}"`,
         `"${log.action}"`,
-        `"${log.details.replace(/"/g, '""')}"`
+        `"${log.details?.replace(/"/g, '""') || ''}"`
       ].join(','))
     ].join('\n');
 

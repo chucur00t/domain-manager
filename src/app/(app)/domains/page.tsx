@@ -13,8 +13,8 @@ import { DomainsTable } from '@/components/features/domains/domains-table';
 import { Input } from '@/components/ui/input';
 import { Loader2, Search } from 'lucide-react';
 import { useSearchParams, useRouter, usePathname } from 'next/navigation';
-import type { User, Domain } from '@/lib/types';
-import { MOCK_USERS } from '@/lib/mock-data';
+import type { User, Domain } from '@/backend/models/types';
+import { MOCK_USERS } from '@/backend/utils/mock-data';
 
 
 function DomainsPageContent() {

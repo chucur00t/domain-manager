@@ -2,7 +2,7 @@
 'use client';
 
 import type { ReactNode } from "react";
-import { Separator } from "@/components/ui/separator";
+import { Separator } from "@/frontend/components/ui/separator";
 import {
   Sidebar,
   SidebarBody,
@@ -12,17 +12,17 @@ import {
   SidebarInset,
   SidebarProvider,
   SidebarTrigger,
-} from "@/components/ui/sidebar";
-import { Logo } from "@/components/logo";
-import { MainNav } from "@/components/layout/main-nav";
-import { UserNav } from "@/components/layout/user-nav";
-import { ColorThemeNav } from "@/components/layout/color-theme-nav";
-import { NotificationNav } from "@/components/layout/notification-nav";
-import { LoginLogger } from "@/components/login-logger";
+} from "@/frontend/components/ui/sidebar";
+import { Logo } from "@/frontend/components/logo";
+import { MainNav } from "@/frontend/components/layout/main-nav";
+import { UserNav } from "@/frontend/components/layout/user-nav";
+import { ColorThemeNav } from "@/frontend/components/layout/color-theme-nav";
+import { NotificationNav } from "@/frontend/components/layout/notification-nav";
+import { LoginLogger } from "@/frontend/components/login-logger";
 import React from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { Skeleton } from "@/components/ui/skeleton";
+import { Skeleton } from "@/frontend/components/ui/skeleton";
 
 
 function AppLayoutContent({ children }: { children: ReactNode }) {

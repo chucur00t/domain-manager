@@ -2,7 +2,7 @@
 'use client';
 import React from 'react';
 import { useSearchParams } from 'next/navigation';
-import type { User } from '@/lib/types';
+import type { User } from '@/backend/models/types';
 import { SuperAdminDashboard } from '@/components/features/dashboard/super-admin-dashboard';
 import { KabidDashboard } from '@/components/features/dashboard/kabid-dashboard';
 import { Loader2 } from 'lucide-react';

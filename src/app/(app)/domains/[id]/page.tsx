@@ -3,12 +3,13 @@ import { notFound } from 'next/navigation';
 import { DomainDetailClient } from '@/components/features/domains/domain-detail-client';
 import { Loader2 } from 'lucide-react';
 import React from 'react';
-import { getDomainById } from '@/lib/firebase/services';
+import { getDomain } from '@/lib/firebase/services';
 
 
 // This is now a Server Component
-export default async function DomainDetailPage({ params: { id } }: { params: { id: string } }) {
-  const domain = await getDomainById(id);
+export default async function DomainDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+  const domain = await getDomain(id);
   
   if (!domain) {
     notFound();

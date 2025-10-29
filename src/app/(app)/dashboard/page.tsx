@@ -22,7 +22,7 @@ import {
 import { Pie, PieChart, Cell } from 'recharts';
 import { useSearchParams } from 'next/navigation';
 import React, { useMemo, useEffect, useState } from 'react';
-import type { User, SubdomainApplication, Domain } from '@/lib/types';
+import type { User, SubdomainApplication, Domain } from '@/backend/models/types';
 import { AuditorDashboard } from '@/components/features/dashboard/auditor-dashboard';
 import { Loader2 } from 'lucide-react';
 
@@ -107,7 +107,11 @@ function OperatorDashboard() {
   ].filter(item => item.value > 0), [applications, approvedCount, rejectedCount]);
 
   const recentApplications = [...applications]
-    .sort((a, b) => new Date(b.submittedDate).getTime() - new Date(a.submittedDate).getTime())
+    .sort((a, b) => {
+      const dateA = new Date(a.submittedDate || a.submissionDate || 0).getTime();
+      const dateB = new Date(b.submittedDate || b.submissionDate || 0).getTime();
+      return dateB - dateA;
+    })
     .slice(0, 5);
     
   if (isLoading) {
@@ -234,12 +238,16 @@ function DashboardContent() {
 }
 
 
+function DashboardWrapper() {
+  return <DashboardContent />;
+}
+
 export default function Dashboard() {
   return (
     <React.Suspense fallback={<div className="flex items-center justify-center h-full w-full">
         <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
     </div>}>
-      <DashboardContent />
+      <DashboardWrapper />
     </React.Suspense>
   )
 }

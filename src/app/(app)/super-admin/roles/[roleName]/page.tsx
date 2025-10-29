@@ -20,8 +20,8 @@ import {
 import { Checkbox } from '@/components/ui/checkbox';
 import { notFound, useRouter } from 'next/navigation';
 import { BackButton } from '@/components/shared/back-button';
-import { MOCK_ROLES } from '@/lib/mock-data';
-import type { UserRole, RolePermissions } from '@/lib/types';
+import { MOCK_ROLES } from '@/backend/utils/mock-data';
+import type { UserRole, RolePermissions } from '@/backend/models/types';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import { useState, useEffect } from 'react';
