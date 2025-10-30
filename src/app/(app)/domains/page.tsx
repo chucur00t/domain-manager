@@ -15,6 +15,7 @@ import { Loader2, Search } from 'lucide-react';
 import { useSearchParams, useRouter, usePathname } from 'next/navigation';
 import type { User, Domain } from '@/backend/models/types';
 import { MOCK_USERS } from '@/backend/utils/mock-data';
+import { Button } from '@/components/ui/button';
 
 
 function DomainsPageContent() {
@@ -29,7 +30,7 @@ function DomainsPageContent() {
   const [searchTerm, setSearchTerm] = useState(searchTermParam);
   const [isPending, startTransition] = useTransition();
 
-  const currentUser = MOCK_USERS.find(user => user.role === role);
+  const currentUser = MOCK_USERS.find(user => user.role === role) || null;
   const USER_OPD = currentUser?.opd;
   
   useEffect(() => {
@@ -52,7 +53,7 @@ function DomainsPageContent() {
   }, []);
 
   const allDomains = useMemo(() => {
-    if (role === 'Operator' && USER_OPD) {
+    if (currentUser?.role === 'Admin Daerah' && USER_OPD) {
       return domains.filter(domain => domain.opd === USER_OPD);
     }
     return domains;
@@ -110,7 +111,7 @@ function DomainsPageContent() {
                 <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
             </div>
          ) : (
-            <DomainsTable domains={filteredDomains} />
+            <DomainsTable domains={filteredDomains} currentUser={currentUser} />
          )}
       </CardContent>
     </Card>

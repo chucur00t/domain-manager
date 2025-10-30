@@ -52,17 +52,17 @@ import { Separator } from '@/components/ui/separator';
 const formSchema = z.object({
   name: z.string().min(3, { message: 'Nama minimal 3 karakter.' }),
   email: z.string().email({ message: 'Format email tidak valid.' }),
-  role: z.enum(['Super Admin', 'Administrator', 'Operator', 'Auditor'], {
+  role: z.enum(['Super Admin', 'Admin Daerah'], {
     required_error: 'Peran harus dipilih.',
   }),
   opd: z.string().optional(),
 }).refine(data => {
-    if ((data.role === 'Operator' || data.role === 'Administrator') && (!data.opd || data.opd.trim() === '')) {
+    if (data.role === 'Admin Daerah' && (!data.opd || data.opd.trim() === '')) {
       return false;
     }
     return true;
   }, {
-    message: 'OPD harus diisi untuk peran Operator atau Administrator.',
+    message: 'OPD harus diisi untuk peran Admin Daerah.',
     path: ['opd'],
   });
 
@@ -90,16 +90,16 @@ function EditUserFormContent({ user, currentUser, onFormAction, allOpds, isOpen,
     defaultValues: {
       name: user?.name || '',
       email: user?.email || '',
-      role: user?.role || 'Operator',
+      role: user?.role || 'Admin Daerah',
       opd: user?.opd || '',
     },
   });
 
   const selectedRole = form.watch('role');
-  const isAdministrator = currentUserRole === 'Administrator';
+  const isAdminDaerah = currentUserRole === 'Admin Daerah';
 
   useEffect(() => {
-    if (selectedRole !== 'Operator' && selectedRole !== 'Administrator') {
+    if (selectedRole !== 'Admin Daerah' && selectedRole !== 'Super Admin') {
         form.setValue('opd', '');
     }
   }, [selectedRole, form]);
@@ -123,11 +123,16 @@ function EditUserFormContent({ user, currentUser, onFormAction, allOpds, isOpen,
       formData.append('name', values.name);
       formData.append('email', values.email);
       formData.append('role', values.role);
-      if ((values.role === 'Operator' || values.role === 'Administrator') && values.opd) {
+      if ((values.role === 'Admin Daerah') && values.opd) {
           formData.append('opd', values.opd);
       }
       
-      const result = await updateUser(user!.id, currentUser!.id, formData);
+      const result = await updateUser(user!.id, {
+        name: values.name,
+        email: values.email,
+        role: values.role,
+        opd: values.opd
+      });
       
       if (result.success) {
         toast({
@@ -150,7 +155,7 @@ function EditUserFormContent({ user, currentUser, onFormAction, allOpds, isOpen,
         if (!user) return;
         
         startDeleteTransition(async () => {
-          const result = await deleteUser(user.id, currentUser!.id);
+          const result = await deleteUser(user.id);
 
           if (result.success) {
               toast({
@@ -174,7 +179,7 @@ function EditUserFormContent({ user, currentUser, onFormAction, allOpds, isOpen,
     if (!user) return;
     startStatusUpdateTransition(async () => {
         const newStatus = user.status === 'active' ? 'inactive' : 'active';
-        const result = await updateUserStatus(user.id, currentUser!.id, newStatus);
+        const result = await updateUserStatus(user.id, newStatus);
         if (result.success) {
             toast({
                 title: 'Status Diperbarui',
@@ -255,21 +260,19 @@ function EditUserFormContent({ user, currentUser, onFormAction, allOpds, isOpen,
                     render={({ field }) => (
                         <FormItem>
                         <FormLabel>Peran</FormLabel>
-                        <Select onValueChange={field.onChange} defaultValue={field.value} disabled={isAdministrator}>
+                        <Select onValueChange={field.onChange} defaultValue={field.value} disabled={currentUser?.role === 'Admin Daerah'}>
                             <FormControl>
                             <SelectTrigger>
                                 <SelectValue placeholder="Pilih peran pengguna" />
                             </SelectTrigger>
                             </FormControl>
                             <SelectContent>
-                            {isAdministrator ? (
-                                <SelectItem value="Operator">Operator</SelectItem>
+                            {isAdminDaerah ? (
+                                <SelectItem value="Admin Daerah">Admin Daerah</SelectItem>
                             ) : (
                                 <>
-                                <SelectItem value="Administrator">Administrator</SelectItem>
                                 <SelectItem value="Super Admin">Super Admin</SelectItem>
-                                <SelectItem value="Operator">Operator</SelectItem>
-                                <SelectItem value="Auditor">Auditor</SelectItem>
+                                <SelectItem value="Admin Daerah">Admin Daerah</SelectItem>
                                 </>
                             )}
                             </SelectContent>
@@ -278,14 +281,14 @@ function EditUserFormContent({ user, currentUser, onFormAction, allOpds, isOpen,
                         </FormItem>
                     )}
                     />
-                    {(selectedRole === 'Operator' || selectedRole === 'Administrator') && (
+                    {selectedRole === 'Admin Daerah' && (
                     <FormField
                         control={form.control}
                         name="opd"
                         render={({ field }) => (
                         <FormItem>
                             <FormLabel>Organisasi Perangkat Daerah (OPD)</FormLabel>
-                            <Select onValueChange={field.onChange} defaultValue={field.value} disabled={isAdministrator}>
+                            <Select onValueChange={field.onChange} defaultValue={field.value} disabled={isAdminDaerah}>
                                 <FormControl>
                                 <SelectTrigger>
                                     <SelectValue placeholder="Pilih OPD" />

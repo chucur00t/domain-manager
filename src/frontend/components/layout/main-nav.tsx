@@ -39,24 +39,24 @@ export const navItems: NavItem[] = [
   {
     href: (role) => {
       const roleQuery = `?role=${encodeURIComponent(role)}`;
-      if (role === 'Administrator' || role === 'Super Admin') {
+      if (role === 'Super Admin') {
           return `/super-admin/dashboard${roleQuery}`;
       }
       return `/dashboard${roleQuery}`;
     },
     label: 'Dashboard',
     icon: LayoutDashboard,
-    roles: ['Administrator', 'Operator', 'Auditor', 'Super Admin'],
+    roles: ['Super Admin', 'Admin Daerah'],
     exact: true,
   },
   { 
     href: (role) => '#',
     label: 'Permohonan', 
     icon: FolderKanban, 
-    roles: ['Operator', 'Super Admin'],
+    roles: ['Admin Daerah', 'Super Admin'],
     subItems: [
-        { href: (role) => `/applications?role=${encodeURIComponent(role)}`, label: 'Permohonan Domain', icon: FileText, roles: ['Operator', 'Super Admin'] },
-        { href: (role) => `/hosting?role=${encodeURIComponent(role)}`, label: 'Permohonan Hosting', icon: Server, roles: ['Operator', 'Super Admin'] },
+        { href: (role) => `/applications?role=${encodeURIComponent(role)}`, label: 'Permohonan Domain', icon: FileText, roles: ['Admin Daerah', 'Super Admin'] },
+        { href: (role) => `/hosting?role=${encodeURIComponent(role)}`, label: 'Permohonan Hosting', icon: Server, roles: ['Admin Daerah', 'Super Admin'] },
     ]
   },
    { 
@@ -71,18 +71,18 @@ export const navItems: NavItem[] = [
         { href: (role) => `/super-admin/hosting-registration?role=${encodeURIComponent(role)}`, label: 'Pendaftaran Hosting', icon: Server, roles: ['Super Admin'], exact: true },
     ]
   },
-  { href: (role) => `/applications?role=${encodeURIComponent(role)}`, label: 'Permohonan Domain', icon: FileText, roles: ['Administrator'] },
-  { href: (role) => `/hosting?role=${encodeURIComponent(role)}`, label: 'Permohonan Hosting', icon: Server, roles: ['Administrator'] },
-  { href: (role) => `/domains?role=${encodeURIComponent(role)}`, label: 'Manajemen Domain', icon: Globe, roles: ['Administrator', 'Operator', 'Super Admin', 'Auditor'] },
-  { href: (role) => `/users?role=${encodeURIComponent(role)}`, label: 'Manajemen Pengguna', icon: Users, roles: ['Administrator'] },
-  { href: (role) => `/audit-trail?role=${encodeURIComponent(role)}`, label: 'Audit Trail', icon: ShieldAlert, roles: ['Super Admin', 'Administrator', 'Auditor'] },
-  { href: (role) => `/settings?role=${encodeURIComponent(role)}`, label: 'Pengaturan', icon: Settings, roles: ['Super Admin', 'Administrator', 'Operator', 'Auditor'] },
+  { href: (role) => `/applications?role=${encodeURIComponent(role)}`, label: 'Permohonan Domain', icon: FileText, roles: ['Admin Daerah'] },
+  { href: (role) => `/hosting?role=${encodeURIComponent(role)}`, label: 'Permohonan Hosting', icon: Server, roles: ['Admin Daerah'] },
+  { href: (role) => `/domains?role=${encodeURIComponent(role)}`, label: 'Manajemen Domain', icon: Globe, roles: ['Admin Daerah', 'Super Admin'] },
+  { href: (role) => `/users?role=${encodeURIComponent(role)}`, label: 'Manajemen Pengguna', icon: Users, roles: ['Admin Daerah'] },
+  { href: (role) => `/audit-trail?role=${encodeURIComponent(role)}`, label: 'Audit Trail', icon: ShieldAlert, roles: ['Super Admin'] },
+  { href: (role) => `/settings?role=${encodeURIComponent(role)}`, label: 'Pengaturan', icon: Settings, roles: ['Super Admin', 'Admin Daerah'] },
 ];
 
 function NavLinks() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const role = (searchParams.get('role') as User['role']) || 'Administrator';
+  const role = (searchParams.get('role') as User['role']) || 'Admin Daerah';
 
   const getFilteredNavItems = (items: NavItem[]) => items.filter(item => item.roles.includes(role));
 

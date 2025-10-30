@@ -34,10 +34,8 @@ type UsersTableProps = {
 const ITEMS_PER_PAGE = 10;
 
 const roleConfig = {
-    'Administrator': { className: 'bg-rose-500 hover:bg-rose-600', level: 2 },
-    'Super Admin': { className: 'bg-sky-500 hover:bg-sky-600', level: 3 },
-    'Operator': { className: '', level: 1 }, 
-    'Auditor': { className: 'bg-amber-500 hover:bg-amber-600', level: 1 },
+    'Super Admin': { className: 'bg-sky-500 hover:bg-sky-600', level: 2 },
+    'Admin Daerah': { className: 'bg-rose-500 hover:bg-rose-600', level: 1 },
 };
 
 
@@ -51,7 +49,7 @@ function UsersTableContent({ users, onUserAction }: UsersTableProps) {
 
     const canManageUsers = useMemo(() => {
         if (!currentUserRole) return false;
-        return ['Super Admin', 'Administrator'].includes(currentUserRole);
+        return ['Super Admin', 'Admin Daerah'].includes(currentUserRole);
     }, [currentUserRole]);
     
     useEffect(() => {
@@ -63,14 +61,13 @@ function UsersTableContent({ users, onUserAction }: UsersTableProps) {
     const endIndex = startIndex + ITEMS_PER_PAGE;
     const currentUsers = users.slice(startIndex, endIndex);
 
-    const allOpds = [...new Set(users.map(u => u.opd).filter(Boolean as any))];
+    const allOpds = [...new Set(users.map(u => u.opd).filter((opd): opd is string => opd !== undefined && opd !== null))];
 
     const getRoleBadgeVariant = (role: User['role']) => {
         switch (role) {
-            case 'Administrator':
             case 'Super Admin':
                 return 'destructive';
-            case 'Auditor':
+            case 'Admin Daerah':
                 return 'default';
             default:
                 return 'secondary';
@@ -89,9 +86,9 @@ function UsersTableContent({ users, onUserAction }: UsersTableProps) {
             return userToEdit.id !== currentUser.id;
         }
 
-        if (currentUser.role === 'Administrator') {
-            // Administrator can only edit Operators in their own OPD
-            return userToEdit.opd === currentUser.opd && userToEdit.role === 'Operator';
+        if (currentUser.role === 'Admin Daerah') {
+            // Admin Daerah can only edit users in their own OPD
+            return userToEdit.opd === currentUser.opd;
         }
         return false;
     }

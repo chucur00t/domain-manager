@@ -42,17 +42,17 @@ import React from 'react';
 const formSchema = z.object({
   name: z.string().min(3, { message: 'Nama minimal 3 karakter.' }),
   email: z.string().email({ message: 'Format email tidak valid.' }),
-  role: z.enum(['Super Admin', 'Administrator', 'Operator', 'Auditor'], {
+  role: z.enum(['Super Admin', 'Admin Daerah'], {
     required_error: 'Peran harus dipilih.',
   }),
   opd: z.string().optional(),
 }).refine(data => {
-    if ((data.role === 'Operator' || data.role === 'Administrator') && (!data.opd || data.opd.trim() === '')) {
+    if (data.role === 'Admin Daerah' && (!data.opd || data.opd.trim() === '')) {
       return false;
     }
     return true;
   }, {
-    message: 'OPD harus diisi untuk peran Operator atau Administrator.',
+    message: 'OPD harus diisi untuk peran Admin Daerah.',
     path: ['opd'],
   });
 
@@ -83,11 +83,11 @@ function AddUserFormContent({ allOpds, allUsers, onUserAdded }: AddUserFormProps
   
   useEffect(() => {
     if(isOpen) {
-        if (currentUserRole === 'Administrator') {
+        if (currentUserRole === 'Admin Daerah') {
             form.reset({
                 name: '',
                 email: '',
-                role: 'Operator',
+                role: 'Admin Daerah',
                 opd: currentUser?.opd || '',
             });
         } else {
@@ -102,7 +102,7 @@ function AddUserFormContent({ allOpds, allUsers, onUserAdded }: AddUserFormProps
   }, [currentUserRole, currentUser, form, isOpen]);
 
   const selectedRole = form.watch('role');
-  const isAdministrator = currentUserRole === 'Administrator';
+  const isAdminDaerah = currentUserRole === 'Admin Daerah';
 
   function onSubmit(values: z.infer<typeof formSchema>) {
     if (!currentUser) {
@@ -119,12 +119,18 @@ function AddUserFormContent({ allOpds, allUsers, onUserAdded }: AddUserFormProps
       formData.append('name', values.name);
       formData.append('email', values.email);
       formData.append('role', values.role);
-      if ((values.role === 'Operator' || values.role === 'Administrator') && values.opd) {
+      if ((values.role === 'Admin Daerah') && values.opd) {
           formData.append('opd', values.opd);
       }
       formData.append('currentUserId', currentUser.id);
 
-      const result = await addUser(formData);
+      const userData = {
+        name: values.name,
+        email: values.email,
+        role: values.role,
+        opd: values.opd
+      };
+      const result = await addUser(userData);
       
       if (result.success) {
         toast({
@@ -192,21 +198,19 @@ function AddUserFormContent({ allOpds, allUsers, onUserAdded }: AddUserFormProps
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Peran</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value} disabled={isAdministrator}>
+                  <Select onValueChange={field.onChange} defaultValue={field.value} disabled={isAdminDaerah}>
                     <FormControl>
                       <SelectTrigger>
                         <SelectValue placeholder="Pilih peran pengguna" />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      {isAdministrator ? (
-                        <SelectItem value="Operator">Operator</SelectItem>
+                      {isAdminDaerah ? (
+                        <SelectItem value="Admin Daerah">Admin Daerah</SelectItem>
                       ) : (
                         <>
-                          <SelectItem value="Administrator">Administrator</SelectItem>
                           <SelectItem value="Super Admin">Super Admin</SelectItem>
-                          <SelectItem value="Operator">Operator</SelectItem>
-                          <SelectItem value="Auditor">Auditor</SelectItem>
+                          <SelectItem value="Admin Daerah">Admin Daerah</SelectItem>
                         </>
                       )}
                     </SelectContent>
@@ -215,14 +219,14 @@ function AddUserFormContent({ allOpds, allUsers, onUserAdded }: AddUserFormProps
                 </FormItem>
               )}
             />
-            {(selectedRole === 'Operator' || selectedRole === 'Administrator') && (
+            {selectedRole === 'Admin Daerah' && (
                <FormField
                 control={form.control}
                 name="opd"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Organisasi Perangkat Daerah (OPD)</FormLabel>
-                     <Select onValueChange={field.onChange} defaultValue={field.value} disabled={isAdministrator}>
+                     <Select onValueChange={field.onChange} defaultValue={field.value} disabled={currentUserRole === 'Admin Daerah'}>
                         <FormControl>
                         <SelectTrigger>
                             <SelectValue placeholder="Pilih OPD" />

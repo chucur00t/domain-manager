@@ -19,9 +19,7 @@ import { cn } from '@/utils/utils';
 
 const roleConfig = {
     'Super Admin': { icon: UserCog, description: 'Akses penuh ke seluruh fitur dan konfigurasi sistem.', className: 'text-sky-500' },
-    'Administrator': { icon: Shield, description: 'Mengelola pengguna, domain, dan permohonan.', className: 'text-rose-500' },
-    'Operator': { icon: Users, description: 'Mengajukan permohonan domain dan hosting.', className: 'text-primary' },
-    'Auditor': { icon: Eye, description: 'Memantau log aktivitas dan data untuk pengawasan.', className: 'text-amber-500' },
+    'Admin Daerah': { icon: Shield, description: 'Mengelola domain dan permohonan untuk OPD.', className: 'text-rose-500' },
 };
 
 function RoleManagementContent() {

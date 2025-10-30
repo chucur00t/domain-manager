@@ -67,7 +67,7 @@ function NotificationNavContent() {
             href: `/hosting/${app.id}${roleQuery}`,
           }));
           allNotifications = [...domainNotifications, ...hostingNotifications];
-        } else if (role === 'Administrator') {
+        } else if (role === 'Admin Daerah') {
           const domainNotifications = domainApps.filter(app => app.status === 'pending_approval').map(app => ({
             id: `d-${app.id}`,
             title: `Persetujuan Domain: ${app.domainName}`,
@@ -120,11 +120,8 @@ function NotificationNavContent() {
     if (role === 'Super Admin') {
         return `/applications?role=${role || ''}&status=pending_review`;
     }
-    if (role === 'Administrator') {
+    if (role === 'Admin Daerah') {
         return `/applications?role=${role || ''}&status=pending_approval`;
-    }
-    if (role === 'Operator') {
-        return `/applications?role=${role || ''}`;
     }
     return '#';
   }

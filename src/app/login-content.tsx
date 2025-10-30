@@ -8,13 +8,13 @@ import React, { useState, useEffect } from 'react';
 import type { User } from '@/backend/models/types';
 import { useSearchParams } from 'next/navigation';
 
-const ROLES: User['role'][] = ['Administrator', 'Super Admin', 'Operator', 'Auditor'];
+const ROLES: User['role'][] = ['Super Admin', 'Admin Daerah'];
 
 export default function LoginContent() {
   const searchParams = useSearchParams();
   const lastRole = searchParams.get('role') as User['role'];
   
-  const [selectedRole, setSelectedRole] = useState<User['role']>(lastRole || 'Administrator');
+  const [selectedRole, setSelectedRole] = useState<User['role']>(lastRole || 'Admin Daerah');
 
   useEffect(() => {
     // If a role is passed in the URL (e.g. after being logged out), set it.
@@ -25,7 +25,7 @@ export default function LoginContent() {
 
   const getDashboardLink = () => {
     const roleQuery = `?role=${encodeURIComponent(selectedRole)}`;
-    if (selectedRole === 'Administrator' || selectedRole === 'Super Admin') {
+    if (selectedRole === 'Super Admin') {
       return `/super-admin/dashboard${roleQuery}`;
     }
     return `/dashboard${roleQuery}`;

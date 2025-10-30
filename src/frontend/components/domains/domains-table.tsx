@@ -106,8 +106,8 @@ export function DomainsTable({ domains, showActions = true }: DomainsTableProps)
     startTransition(async () => {
       setProcessingId(selectedDomain.id);
       const result = actionType === 'activate'
-        ? await activateDomain(selectedDomain.id, 'Kepala Bidang')
-        : await deactivateDomain(selectedDomain.id, 'Kepala Bidang');
+        ? await activateDomain(selectedDomain.id, 'Admin Daerah')
+        : await deactivateDomain(selectedDomain.id, 'Admin Daerah');
 
       if (result.success) {
         toast({ title: 'Sukses', description: result.message });

@@ -1,4 +1,4 @@
-﻿export type UserRole = 'Super Admin' | 'Administrator' | 'Operator' | 'Admin Perangkat Daerah' | 'Admin Dinas Kominfo' | 'Auditor' | 'Kepala Bidang' | 'Pengelola Sistem';
+﻿export type UserRole = 'Super Admin' | 'Admin Daerah';
 export type UserStatus = 'active' | 'inactive' | 'blocked';
 
 export interface User {

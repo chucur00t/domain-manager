@@ -13,10 +13,10 @@ function SuperAdminDashboardContent() {
     
   const getDashboardForRole = () => {
     switch (role) {
-      case 'Administrator':
-        return <KabidDashboard />;
       case 'Super Admin':
         return <SuperAdminDashboard role={role} />;
+      case 'Admin Daerah':
+        return <KabidDashboard />;
       default:
         // Fallback or a generic dashboard
         return <div>Dashboard tidak tersedia untuk peran ini.</div>;

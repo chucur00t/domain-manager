@@ -23,7 +23,7 @@ import { Pie, PieChart, Cell } from 'recharts';
 import { useSearchParams } from 'next/navigation';
 import React, { useMemo, useEffect, useState } from 'react';
 import type { User, SubdomainApplication, Domain } from '@/backend/models/types';
-import { AuditorDashboard } from '@/components/features/dashboard/auditor-dashboard';
+import { DomainStatusMonitoring } from '@/frontend/components/features/domains/domain-status-monitoring';
 import { Loader2 } from 'lucide-react';
 
 
@@ -147,70 +147,77 @@ function OperatorDashboard() {
           description="Jumlah permohonan yang telah diajukan"
         />
         <StatCard
-          title="Permohonan Disetujui"
-          value={approvedCount}
+          title="Domain Aktif"
+          value={domains.filter(d => d.status === 'active').length}
           icon={<CheckCircle className="h-4 w-4 text-green-500" />}
-          description="Permohonan yang telah disetujui"
+          description="Jumlah domain yang aktif"
         />
          <StatCard
-          title="Menunggu Keputusan"
-          value={pendingCount}
-          icon={<Clock className="h-4 w-4 text-amber-500" />}
-          description="Permohonan yang menunggu keputusan"
+          title="Domain Kadaluarsa"
+          value={domains.filter(d => d.status === 'expired').length}
+          icon={<Clock className="h-4 w-4 text-red-500" />}
+          description="Jumlah domain yang kadaluarsa"
         />
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-         <Card className="animate-fade-in" style={{ animationDelay: '150ms' }}>
-          <CardHeader>
-            <CardTitle>Status Permohonan Saya</CardTitle>
-            <CardDescription>
-              Ringkasan status semua permohonan yang telah Anda ajukan.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            {chartData.length > 0 ? (
-                <ChartContainer config={applicationChartConfig} className="h-[250px] w-full">
-                <PieChart accessibilityLayer>
-                    <ChartTooltip
-                    cursor={false}
-                    content={<ChartTooltipContent hideLabel />}
-                    />
-                    <Pie
-                        data={chartData}
-                        dataKey="value"
-                        nameKey="name"
-                        innerRadius={60}
-                        strokeWidth={5}
-                    >
-                    {chartData.map((entry) => (
-                        <Cell key={entry.name} fill={entry.fill} />
-                    ))}
-                    </Pie>
-                    <ChartLegend
-                        content={<ChartLegendContent nameKey="name" />}
-                        className="-translate-y-[2rem] flex-wrap gap-2 [&>*]:basis-1/4 [&>*]:justify-center"
-                    />
-                </PieChart>
-                </ChartContainer>
-            ) : (
-                <div className="flex h-[250px] w-full items-center justify-center">
-                    <p className="text-muted-foreground">Belum ada data permohonan.</p>
-                </div>
-            )}
-          </CardContent>
-        </Card>
-        <Card className="animate-fade-in" style={{ animationDelay: '300ms' }}>
-          <CardHeader>
-            <CardTitle>Permohonan Terakhir Saya</CardTitle>
-            <CardDescription>
-              5 permohonan terakhir yang diajukan oleh {USER_OPD}.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-             <ApplicationsTable applications={recentApplications} />
-          </CardContent>
-        </Card>
+      <div className="space-y-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+           <Card className="animate-fade-in" style={{ animationDelay: '150ms' }}>
+            <CardHeader>
+              <CardTitle>Status Permohonan</CardTitle>
+              <CardDescription>
+                Ringkasan status semua permohonan yang telah diajukan.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              {chartData.length > 0 ? (
+                  <ChartContainer config={applicationChartConfig} className="h-[250px] w-full">
+                  <PieChart accessibilityLayer>
+                      <ChartTooltip
+                      cursor={false}
+                      content={<ChartTooltipContent hideLabel />}
+                      />
+                      <Pie
+                          data={chartData}
+                          dataKey="value"
+                          nameKey="name"
+                          innerRadius={60}
+                          strokeWidth={5}
+                      >
+                      {chartData.map((entry) => (
+                          <Cell key={entry.name} fill={entry.fill} />
+                      ))}
+                      </Pie>
+                      <ChartLegend
+                          content={<ChartLegendContent nameKey="name" />}
+                          className="-translate-y-[2rem] flex-wrap gap-2 [&>*]:basis-1/4 [&>*]:justify-center"
+                      />
+                  </PieChart>
+                  </ChartContainer>
+              ) : (
+                  <div className="flex h-[250px] w-full items-center justify-center">
+                      <p className="text-muted-foreground">Belum ada data permohonan.</p>
+                  </div>
+              )}
+            </CardContent>
+          </Card>
+          <Card className="animate-fade-in" style={{ animationDelay: '300ms' }}>
+            <CardHeader>
+              <CardTitle>Permohonan Terakhir</CardTitle>
+              <CardDescription>
+                5 permohonan terakhir yang diajukan oleh {USER_OPD}.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+               <ApplicationsTable applications={recentApplications} />
+            </CardContent>
+          </Card>
+        </div>
+        
+        {/* Domain Status Monitoring */}
+        <div className="animate-fade-in" style={{ animationDelay: '450ms' }}>
+          <DomainStatusMonitoring domains={domains} />
+        </div>
       </div>
     </div>
   );
@@ -221,14 +228,11 @@ function DashboardContent() {
   const role = searchParams.get('role') as User['role'];
   
   switch (role) {
-    case 'Auditor':
-      return <AuditorDashboard />;
-    case 'Operator':
+    case 'Super Admin':
+      return <OperatorDashboard />;
+    case 'Admin Daerah':
       return <OperatorDashboard />;
     default:
-      // This case handles roles like 'Administrator' and 'Super Admin' which have their own pages,
-      // or if the role is null/undefined. We can show a generic message or a default dashboard.
-      // For this app, the login page should prevent reaching here without a role.
       return (
         <div className="flex items-center justify-center h-full">
             <p className="text-muted-foreground">Pilih peran untuk melihat dasbor.</p>

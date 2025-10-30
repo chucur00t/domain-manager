@@ -115,7 +115,7 @@ function DomainDetailContent({ domain }: { domain: Domain }) {
   
   const { title, description, confirmText, variant } = getDialogContent();
   const isSuperAdmin = currentUserRole === 'Super Admin';
-  const isAdministrator = currentUserRole === 'Administrator';
+  const isAdministrator = currentUserRole === 'Admin Daerah';
 
   const ActionButton = () => {
     if (!isAdministrator) return null;

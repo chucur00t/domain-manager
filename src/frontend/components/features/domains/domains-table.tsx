@@ -13,24 +13,16 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
-import { Eye, Loader2, PlayCircle, Trash2 } from 'lucide-react';
-import { useState, useTransition, useEffect, Suspense } from 'react';
+import { Eye, Loader2 } from 'lucide-react';
+import { DomainActions } from './domain-actions';
+import { useState, Suspense, useEffect } from 'react';
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
+
 import { activateDomain, deactivateDomain } from '@/backend/actions/domains';
 import { useToast } from '@/hooks/use-toast';
 import { buttonVariants } from '@/components/ui/button';
@@ -39,9 +31,8 @@ import { cn } from '@/utils/utils';
 
 type DomainsTableProps = {
   domains: Domain[];
+  currentUser: User | null;
 };
-
-type ActionType = 'activate' | 'deactivate';
 
 import { DomainStatus } from '@/backend/models/types';
 
@@ -74,19 +65,12 @@ const statusConfig: Record<DomainStatus, {
 
 const ITEMS_PER_PAGE = 10;
 
-function DomainsTableContent({ domains }: DomainsTableProps) {
-  const { toast } = useToast();
+function DomainsTableContent({ domains, currentUser }: DomainsTableProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const currentUserRole = searchParams.get('role') as User['role'];
   const [currentPage, setCurrentPage] = useState(0);
-  const [isAlertOpen, setIsAlertOpen] = useState(false);
-  const [selectedDomain, setSelectedDomain] = useState<Domain | null>(null);
-  const [processingId, setProcessingId] = useState<string | null>(null);
-  const [actionType, setActionType] = useState<ActionType | null>(null);
-  const [isPending, startTransition] = useTransition();
 
-  const isAdministrator = currentUserRole === 'Administrator';
   const roleQuery = `?role=${currentUserRole || ''}`;
 
   useEffect(() => {
@@ -98,53 +82,7 @@ function DomainsTableContent({ domains }: DomainsTableProps) {
   const endIndex = startIndex + ITEMS_PER_PAGE;
   const currentDomains = domains.slice(startIndex, endIndex);
   
-  const handleActionClick = (domain: Domain, type: ActionType) => {
-    setSelectedDomain(domain);
-    setActionType(type);
-    setIsAlertOpen(true);
-  };
-  
-  const handleConfirmAction = async () => {
-    if (!selectedDomain || !actionType || !currentUserRole) return;
 
-    startTransition(async () => {
-      setProcessingId(selectedDomain.id);
-      const result = actionType === 'activate'
-        ? await activateDomain(selectedDomain.id, currentUserRole)
-        : await deactivateDomain(selectedDomain.id, currentUserRole);
-
-      if (result.success) {
-        toast({ title: 'Sukses', description: result.message });
-        router.refresh();
-      } else {
-        toast({ title: 'Error', description: result.message, variant: 'destructive' });
-      }
-
-      setIsAlertOpen(false);
-      setSelectedDomain(null);
-      setProcessingId(null);
-    });
-  };
-  
-  const getDialogContent = () => {
-    if (!selectedDomain || !actionType) return { title: '', description: '', confirmText: '', variant: 'default' as const };
-    if (actionType === 'activate') {
-      return {
-        title: 'Konfirmasi Aktivasi',
-        description: `Apakah Anda yakin ingin mengaktifkan domain "${selectedDomain.hostname}"?`,
-        confirmText: 'Ya, Aktifkan',
-        variant: 'default' as const,
-      };
-    }
-    return {
-      title: 'Konfirmasi Penonaktifan',
-      description: `Apakah Anda yakin ingin menonaktifkan domain "${selectedDomain.hostname}"?`,
-      confirmText: 'Ya, Nonaktifkan',
-      variant: 'destructive' as const,
-    };
-  };
-
-  const { title, description, confirmText, variant } = getDialogContent();
 
   return (
     <TooltipProvider>
@@ -176,50 +114,24 @@ function DomainsTableContent({ domains }: DomainsTableProps) {
                   </TableCell>
                   <TableCell>{domain.activationDate}</TableCell>
                     <TableCell>
-                      <div className="flex items-center justify-center gap-2">
-                        {processingId === domain.id ? (
-                           <Loader2 className="h-5 w-5 animate-spin" />
-                        ) : (
-                          <>
-                            <Tooltip>
-                              <TooltipTrigger asChild>
-                                <Link href={`/domains/${domain.id}${roleQuery}`}>
-                                    <Button variant="outline" size="icon" disabled={isPending}>
-                                      <Eye className="h-4 w-4" />
-                                      <span className="sr-only">Lihat Detail</span>
-                                    </Button>
-                                </Link>
-                              </TooltipTrigger>
-                              <TooltipContent><p>Lihat Detail</p></TooltipContent>
-                            </Tooltip>
-                            {isAdministrator && (
-                              <>
-                                {domain.status === 'active' && (
-                                  <Tooltip>
-                                    <TooltipTrigger asChild>
-                                      <Button variant="destructive" size="icon" onClick={() => handleActionClick(domain, 'deactivate')} disabled={isPending}>
-                                        <Trash2 className="h-4 w-4" />
-                                        <span className="sr-only">Nonaktifkan</span>
-                                      </Button>
-                                    </TooltipTrigger>
-                                    <TooltipContent><p>Nonaktifkan</p></TooltipContent>
-                                  </Tooltip>
-                                )}
-                                {(domain.status === 'inactive' || domain.status === 'pending') && (
-                                  <Tooltip>
-                                    <TooltipTrigger asChild>
-                                      <Button variant="secondary" size="icon" onClick={() => handleActionClick(domain, 'activate')} disabled={isPending}>
-                                        <PlayCircle className="h-4 w-4" />
-                                        <span className="sr-only">Aktifkan</span>
-                                      </Button>
-                                    </TooltipTrigger>
-                                    <TooltipContent><p>Aktifkan</p></TooltipContent>
-                                  </Tooltip>
-                                )}
-                              </>
-                            )}
-                          </>
-                        )}
+                      <div className="flex items-center justify-between gap-2">
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Link href={`/domains/${domain.id}${roleQuery}`}>
+                                <Button variant="outline" size="icon">
+                                  <Eye className="h-4 w-4" />
+                                  <span className="sr-only">Lihat Detail</span>
+                                </Button>
+                            </Link>
+                          </TooltipTrigger>
+                          <TooltipContent><p>Lihat Detail</p></TooltipContent>
+                        </Tooltip>
+                        
+                        <DomainActions 
+                          domain={domain} 
+                          currentUser={currentUser} 
+                          onAction={() => router.refresh()} 
+                        />
                       </div>
                     </TableCell>
                 </TableRow>
@@ -243,7 +155,7 @@ function DomainsTableContent({ domains }: DomainsTableProps) {
                 variant="outline"
                 size="sm"
                 onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 0))}
-                disabled={currentPage === 0 || isPending}
+                disabled={currentPage === 0}
                 >
                 Sebelumnya
                 </Button>
@@ -251,36 +163,22 @@ function DomainsTableContent({ domains }: DomainsTableProps) {
                 variant="outline"
                 size="sm"
                 onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages - 1))}
-                disabled={currentPage >= totalPages - 1 || isPending}
+                disabled={currentPage >= totalPages - 1}
                 >
                 Berikutnya
                 </Button>
             </div>
         )}
       </div>
-       <AlertDialog open={isAlertOpen} onOpenChange={setIsAlertOpen}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>{title}</AlertDialogTitle>
-            <AlertDialogDescription>{description}</AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel disabled={isPending}>Batal</AlertDialogCancel>
-            <AlertDialogAction onClick={handleConfirmAction} disabled={isPending} className={cn(buttonVariants({ variant: variant }))}>
-              {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              {confirmText}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+
     </TooltipProvider>
   );
 }
 
-export function DomainsTable({ domains }: DomainsTableProps) {
+export function DomainsTable({ domains, currentUser }: DomainsTableProps) {
     return (
         <Suspense fallback={<div className="flex justify-center items-center h-64"><Loader2 className="h-8 w-8 animate-spin" /></div>}>
-            <DomainsTableContent domains={domains} />
+            <DomainsTableContent domains={domains} currentUser={currentUser} />
         </Suspense>
     )
 }

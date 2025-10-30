@@ -122,9 +122,9 @@ export function ApplicationsTable({ applications, showActions = true }: Applicat
     startTransition(async () => {
       let result;
       if (actionType === 'approve') {
-        result = await approveApplication(selectedApplication.id, 'Kepala Bidang');
+        result = await approveApplication(selectedApplication.id, 'Admin Daerah');
       } else {
-        result = await rejectApplication(selectedApplication.id, rejectionReason, 'Kepala Bidang');
+        result = await rejectApplication(selectedApplication.id, rejectionReason, 'Admin Daerah');
       }
 
       if (result.success) {

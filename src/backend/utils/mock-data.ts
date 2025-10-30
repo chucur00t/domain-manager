@@ -2,11 +2,7 @@
 
 export const MOCK_ROLES = [
   'Super Admin',
-  'Administrator', 
-  'Operator',
-  'Admin Perangkat Daerah',
-  'Admin Dinas Kominfo',
-  'Auditor'
+  'Admin Daerah'
 ];
 
 export const MOCK_USERS: User[] = [
@@ -23,7 +19,7 @@ export const MOCK_USERS: User[] = [
     id: 'user2',
     name: 'Operator OPD',
     email: 'opd@example.com',
-    role: 'Admin Perangkat Daerah',
+    role: 'Admin Daerah',
     status: 'active',
     opd: 'Dinas XYZ',
     nip: 'NIP789012',
