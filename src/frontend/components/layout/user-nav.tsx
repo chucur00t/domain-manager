@@ -27,7 +27,7 @@ import { userLogout } from '@/backend/actions/users';
 function UserNavContent() {
     const searchParams = useSearchParams();
     const router = useRouter();
-    const role = (searchParams.get('role') || 'Administrator') as User['role'];
+    const role = (searchParams.get('role') || 'Super Admin') as User['role'];
     const roleQuery = `?role=${encodeURIComponent(role)}`;
 
     const currentUser = MOCK_USERS.find(user => user.role === role);

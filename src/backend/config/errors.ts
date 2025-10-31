@@ -15,6 +15,46 @@ export const sessionConfig = {
   store: null, // Will be initialized with MySQL session store
 };
 
+// Error response helpers
+export function badRequest(message: string) {
+  return new Response(
+    JSON.stringify({ 
+      status: 'error',
+      message 
+    }), 
+    { 
+      status: 400,
+      headers: { 'Content-Type': 'application/json' }
+    }
+  );
+}
+
+export function notFound(message: string) {
+  return new Response(
+    JSON.stringify({ 
+      status: 'error',
+      message 
+    }), 
+    { 
+      status: 404,
+      headers: { 'Content-Type': 'application/json' }
+    }
+  );
+}
+
+export function serverError(message: string) {
+  return new Response(
+    JSON.stringify({ 
+      status: 'error',
+      message 
+    }), 
+    { 
+      status: 500,
+      headers: { 'Content-Type': 'application/json' }
+    }
+  );
+}
+
 // Error messages configuration
 export const errorMessages = {
   auth: {

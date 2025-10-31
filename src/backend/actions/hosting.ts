@@ -2,7 +2,7 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
-import { logActivity } from '@/backend/services/audit.service';
+import { auditService } from '@/backend/services/audit.service';
 import { createHostingApplication, getHostingApplicationById, updateHostingApplication } from '@/backend/services';
 import type { HostingApplication, User, UserRole } from '@/backend/models/types';
 
@@ -41,7 +41,7 @@ export async function submitHostingApplication(formData: FormData): Promise<Acti
     
     const newApp = await createHostingApplication(newApplication);
     
-    await logActivity({
+    await auditService.logAction({
       action: 'SUBMIT_HOSTING_APP',
       resourceType: 'hosting',
       resourceId: newApp.id,
@@ -76,7 +76,7 @@ export async function forwardHostingForApproval(applicationId: string, currentUs
   
   await updateHostingApplication(applicationId, { status: 'pending' });
   
-  await logActivity({
+  await auditService.logAction({
     action: 'FORWARD_HOSTING_FOR_APPROVAL',
     resourceType: 'hosting',
     resourceId: applicationId,
@@ -94,7 +94,7 @@ export async function forwardHostingForApproval(applicationId: string, currentUs
 
 
 export async function approveHostingApplication(applicationId: string, currentUserRole: User['role']): Promise<{ success: boolean; message: string }> {
-   if (currentUserRole !== 'Admin Dinas Kominfo') {
+   if (currentUserRole !== 'Super Admin') {
     return { success: false, message: 'Anda tidak memiliki izin untuk melakukan tindakan ini.' };
   }
 
@@ -105,7 +105,7 @@ export async function approveHostingApplication(applicationId: string, currentUs
   
   await updateHostingApplication(applicationId, { status: 'approved' });
   
-  await logActivity({
+  await auditService.logAction({
     action: 'APPROVE_HOSTING_APP',
     resourceType: 'hosting',
     resourceId: applicationId,
@@ -122,7 +122,7 @@ export async function approveHostingApplication(applicationId: string, currentUs
 }
 
 export async function rejectHostingApplication(applicationId: string, reason: string, currentUserRole: User['role']): Promise<{ success: boolean; message: string }> {
-   const allowedRoles: UserRole[] = ['Admin Dinas Kominfo', 'Super Admin'];
+   const allowedRoles: UserRole[] = ['Super Admin', 'Admin Daerah'];
    if (!allowedRoles.includes(currentUserRole)) {
     return { success: false, message: 'Anda tidak memiliki izin untuk melakukan tindakan ini.' };
   }
@@ -135,7 +135,7 @@ export async function rejectHostingApplication(applicationId: string, reason: st
   await updateHostingApplication(applicationId, { status: 'rejected' });
   // Note: Reason handling should be done in a separate function or through a different mechanism
   
-  await logActivity({
+  await auditService.logAction({
     action: 'REJECT_HOSTING_APP',
     resourceType: 'hosting',
     resourceId: applicationId,

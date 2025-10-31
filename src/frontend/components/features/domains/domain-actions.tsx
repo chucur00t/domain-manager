@@ -41,6 +41,7 @@ export function DomainActions({ domain, currentUser, onAction }: DomainActionsPr
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'x-user-role': currentUser.role, // ✅ SECURITY: Include user role for backend validation
         },
         body: JSON.stringify({
           domainId: domain.id,
@@ -80,6 +81,7 @@ export function DomainActions({ domain, currentUser, onAction }: DomainActionsPr
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'x-user-role': currentUser.role, // ✅ SECURITY: Include user role for backend validation
         },
         body: JSON.stringify({
           domainId: domain.id,
@@ -108,11 +110,10 @@ export function DomainActions({ domain, currentUser, onAction }: DomainActionsPr
     }
   };
 
-  // Only Super Admin or Admin Daerah from the same OPD can manage domains
-  const canManageDomains = currentUser && (
-    currentUser.role === 'Super Admin' || 
-    (currentUser.role === 'Admin Daerah' && currentUser.opd === domain.opd)
-  );
+  // ✅ PERBAIKAN PERMISSION - Sesuai dengan SRS:
+  // Only Super Admin can manage domains (activate/deactivate/suspend)
+  // Admin Daerah can only submit applications
+  const canManageDomains = currentUser && currentUser.role === 'Super Admin';
 
   if (!canManageDomains) return null;
 

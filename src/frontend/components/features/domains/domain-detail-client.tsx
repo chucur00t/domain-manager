@@ -244,6 +244,10 @@ function DomainDetailContent({ domain }: { domain: Domain }) {
             </div>
           </CardContent>
         </Card>
+        
+        {/* Domain Health Card */}
+        <DomainHealthCard domainId={domain.id} />
+
         <div className="flex items-center gap-2 md:hidden mt-4">
             <ActionButton />
             <Link href={`/domains/${domain.id}/monitor${roleQuery}`} className="w-full">

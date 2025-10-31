@@ -25,6 +25,7 @@ import React, { useMemo, useEffect, useState } from 'react';
 import type { User, SubdomainApplication, Domain } from '@/backend/models/types';
 import { DomainStatusMonitoring } from '@/frontend/components/features/domains/domain-status-monitoring';
 import { Loader2 } from 'lucide-react';
+import { MOCK_USERS } from '@/backend/utils/mock-data';
 
 
 const applicationChartConfig = {
@@ -74,15 +75,18 @@ function OperatorDashboard() {
             const domainsData = await domainsRes.json();
             const usersData: User[] = await usersRes.json();
 
-            const user = usersData.find(u => u.role === role);
-            setCurrentUser(user || null);
+            // Cari user yang sesuai dengan role Admin Daerah dari data mock
+            const mockUser = MOCK_USERS.find((u: User) => u.role === role);
+            setCurrentUser(mockUser || null);
 
-            if (user?.opd) {
-                setApplications(appsData.filter((app: SubdomainApplication) => app.opd === user.opd));
-                setDomains(domainsData.filter((domain: Domain) => domain.opd === user.opd));
+            if (role === 'Admin Daerah' && mockUser?.opd) {
+                // Filter data berdasarkan OPD untuk Admin Daerah
+                setApplications(appsData.filter((app: SubdomainApplication) => app.opd === mockUser.opd));
+                setDomains(domainsData.filter((domain: Domain) => domain.opd === mockUser.opd));
             } else {
-                 setApplications(appsData);
-                 setDomains(domainsData);
+                // Untuk Super Admin, tampilkan semua data
+                setApplications(appsData);
+                setDomains(domainsData);
             }
 
         } catch (error) {

@@ -9,6 +9,16 @@ export async function POST(request: NextRequest) {
       return Response.json({ error: 'Missing required parameters' }, { status: 400 });
     }
 
+    // ✅ SECURITY FIX: Validate user role - Only Super Admin can manage domains
+    // Get user role from request headers or auth middleware
+    const userRole = request.headers.get('x-user-role') || 'Unknown';
+    
+    if (userRole !== 'Super Admin') {
+      return Response.json({ 
+        error: 'Unauthorized: Only Super Admin can manage domain activation/deactivation' 
+      }, { status: 403 });
+    }
+
     let result;
     switch (action) {
       case 'activate':

@@ -124,7 +124,7 @@ function HostingPageContent() {
                 Lihat dan kelola semua permohonan hosting yang masuk.
                 </CardDescription>
             </div>
-             {role === 'Operator' && (
+             {(role === 'Operator' || role === 'Admin Daerah') && (
               <Link href={`/hosting/new?role=${role || ''}`}>
                   <Button size="sm" className="gap-1 w-full sm:w-auto">
                       <PlusCircle className="size-3.5" />

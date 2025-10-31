@@ -20,6 +20,9 @@ export default function LoginContent() {
     // If a role is passed in the URL (e.g. after being logged out), set it.
     if (lastRole && ROLES.includes(lastRole)) {
       setSelectedRole(lastRole);
+    } else {
+      // Default to Super Admin if no valid role
+      setSelectedRole('Super Admin');
     }
   }, [lastRole]);
 

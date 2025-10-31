@@ -2,6 +2,7 @@
 'use client';
 
 import type { SubdomainApplication } from '@/backend/models/types';
+import type { ApplicationStatus } from '@/backend/models/types';
 import {
   Table,
   TableBody,
@@ -9,18 +10,23 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table';
-import { Badge } from '@/components/ui/badge';
+} from '@/frontend/components/ui/table';
+import { Badge } from '@/frontend/components/ui/badge';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import React from 'react';
-import { cn } from '@/utils/utils';
+import { cn } from '@/frontend/utils/utils';
 
-const statusConfig = {
-  pending_review: { text: 'Review Admin', variant: 'default' as const, className: "bg-amber-500 hover:bg-amber-600" },
-  pending_approval: { text: 'Persetujuan Kabid', variant: 'default' as const, className: "bg-amber-500 hover:bg-amber-600" },
-  approved: { text: 'Disetujui', variant: 'secondary' as const, className: "bg-green-500 hover:bg-green-600 text-secondary-foreground" },
-  rejected: { text: 'Ditolak', variant: 'destructive' as const },
+const statusConfig: Record<ApplicationStatus, {
+  text: string;
+  variant: 'default' | 'secondary' | 'destructive';
+  className?: string;
+}> = {
+  pending_review: { text: 'Review Admin', variant: 'default', className: "bg-amber-500 hover:bg-amber-600" },
+  pending_approval: { text: 'Persetujuan Kabid', variant: 'default', className: "bg-amber-500 hover:bg-amber-600" },
+  approved: { text: 'Disetujui', variant: 'secondary', className: "bg-green-500 hover:bg-green-600 text-secondary-foreground" },
+  rejected: { text: 'Ditolak', variant: 'destructive' },
+  pending: { text: 'Menunggu', variant: 'default', className: "bg-amber-500 hover:bg-amber-600" }
 };
 
 

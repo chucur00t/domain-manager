@@ -1,225 +1,390 @@
-﻿// Firebase service implementations
-import { MOCK_APPLICATIONS, MOCK_DOMAINS, MOCK_USERS, MOCK_AUDIT_LOGS, MOCK_HOSTING_APPLICATIONS } from '@/backend/utils/mock-data';
+﻿// Firebase service implementations using database services
+import { 
+  userService, 
+  domainService, 
+  applicationService 
+} from '@/backend/database/services';
 
-import type { SubdomainApplication, Domain, User, AuditLog, HostingApplication } from '@/backend/models/types';
+import type { SubdomainApplication, ServiceDomain, User, AuditLog, HostingApplication } from '@/backend/models/types';
+import type { CreateUserData, UpdateUserData, UserFilter } from '@/backend/database/services/user.service';
+import type { CreateDomainData, UpdateDomainData, DomainFilter } from '@/backend/database/services/domain.service';
+import type { CreateSubdomainApplicationData, UpdateApplicationData, ApplicationFilter } from '@/backend/database/services/application.service';
 
 // Application Services
 export async function createApplication(data: SubdomainApplication): Promise<SubdomainApplication> {
-  // TODO: Implement Firebase logic
-  return data;
+  try {
+    // This function is deprecated, use createSubdomainApplication instead
+    return data;
+  } catch (error) {
+    throw new Error(`Failed to create application: ${error instanceof Error ? error.message : 'Unknown error'}`);
+  }
 }
 
 export async function getApplication(id: string): Promise<SubdomainApplication | null> {
-  // TODO: Implement Firebase logic
-  const application = MOCK_APPLICATIONS.find((app: SubdomainApplication) => app.id === id) || null;
-  return application;
+  try {
+    const app = await applicationService.getApplication(parseInt(id));
+    if (!app) return null;
+    
+    // Ensure we return only SubdomainApplication type
+    if ('purpose' in app && 'submissionDate' in app) {
+      return app as SubdomainApplication;
+    }
+    return null;
+  } catch (error) {
+    throw new Error(`Failed to get application: ${error instanceof Error ? error.message : 'Unknown error'}`);
+  }
 }
 
 export async function updateApplication(id: string, data: Partial<SubdomainApplication>): Promise<void> {
-  // TODO: Implement Firebase logic
-  const appIndex = MOCK_APPLICATIONS.findIndex((app: SubdomainApplication) => app.id === id);
-  if (appIndex !== -1) {
-    MOCK_APPLICATIONS[appIndex] = { ...MOCK_APPLICATIONS[appIndex], ...data };
+  try {
+    // Extract updatable fields for application service
+    const updateData: UpdateApplicationData = {};
+    
+    if (data.status) updateData.status = data.status;
+    if (data.rejectionReason) updateData.reason = data.rejectionReason;
+    
+    await applicationService.updateApplication(parseInt(id), updateData, 1); // TODO: Get actual user ID
+  } catch (error) {
+    throw new Error(`Failed to update application: ${error instanceof Error ? error.message : 'Unknown error'}`);
   }
 }
 
 export async function deleteApplication(id: string): Promise<void> {
-  // TODO: Implement Firebase logic
+  try {
+    await applicationService.deleteApplication(parseInt(id));
+  } catch (error) {
+    throw new Error(`Failed to delete application: ${error instanceof Error ? error.message : 'Unknown error'}`);
+  }
 }
 
 export async function getApplications(): Promise<SubdomainApplication[]> {
-  return MOCK_APPLICATIONS;
+  try {
+    const result = await applicationService.getApplications(1, 1000); // Get all applications
+    return result.applications as SubdomainApplication[];
+  } catch (error) {
+    throw new Error(`Failed to get applications: ${error instanceof Error ? error.message : 'Unknown error'}`);
+  }
 }
 
 // Subdomain Applications
 export async function createSubdomainApplication(application: Omit<SubdomainApplication, 'id'>): Promise<string> {
-  // TODO: Implement Firebase logic
-  return 'new-id';
+  try {
+    const data: CreateSubdomainApplicationData = {
+      userId: application.userId,
+      domainName: application.domainName,
+      purpose: application.purpose,
+      opd: application.opd
+    };
+    
+    return await applicationService.createSubdomainApplication(data);
+  } catch (error) {
+    throw new Error(`Failed to create subdomain application: ${error instanceof Error ? error.message : 'Unknown error'}`);
+  }
 }
 
 export async function getSubdomainApplication(id: string): Promise<SubdomainApplication | null> {
-  // TODO: Implement Firebase logic
-  const application = MOCK_APPLICATIONS.find((app: SubdomainApplication) => app.id === id) || null;
-  return application;
+  try {
+    const app = await applicationService.getApplication(parseInt(id));
+    if (!app) return null;
+    
+    // Convert to SubdomainApplication format if needed
+    if ('domainName' in app && app.domainName) {
+      return app as SubdomainApplication;
+    }
+    return null;
+  } catch (error) {
+    throw new Error(`Failed to get subdomain application: ${error instanceof Error ? error.message : 'Unknown error'}`);
+  }
 }
 
 export async function updateSubdomainApplication(id: string, data: Partial<SubdomainApplication>): Promise<void> {
-  // TODO: Implement Firebase logic
-  const appIndex = MOCK_APPLICATIONS.findIndex((app: SubdomainApplication) => app.id === id);
-  if (appIndex !== -1) {
-    MOCK_APPLICATIONS[appIndex] = { ...MOCK_APPLICATIONS[appIndex], ...data };
+  try {
+    const updateData: UpdateApplicationData = {};
+    
+    if (data.status) updateData.status = data.status;
+    if (data.rejectionReason) updateData.reason = data.rejectionReason;
+    
+    await applicationService.updateApplication(parseInt(id), updateData, 1); // TODO: Get actual user ID
+  } catch (error) {
+    throw new Error(`Failed to update subdomain application: ${error instanceof Error ? error.message : 'Unknown error'}`);
   }
 }
 
 export async function deleteSubdomainApplication(id: string): Promise<void> {
-  // TODO: Implement Firebase logic
+  try {
+    await applicationService.deleteApplication(parseInt(id));
+  } catch (error) {
+    throw new Error(`Failed to delete subdomain application: ${error instanceof Error ? error.message : 'Unknown error'}`);
+  }
 }
 
 export async function getSubdomainApplications(): Promise<SubdomainApplication[]> {
-  return MOCK_APPLICATIONS;
+  try {
+    const result = await applicationService.getApplications(1, 1000);
+    return result.applications.filter(app => app.domainName !== '') as SubdomainApplication[];
+  } catch (error) {
+    throw new Error(`Failed to get subdomain applications: ${error instanceof Error ? error.message : 'Unknown error'}`);
+  }
 }
 
 // Domain Services
-export async function createDomain(data: Omit<Domain, 'id'>): Promise<string> {
-  // TODO: Implement Firebase logic
-  const newDomain = { ...data, id: `domain-${Date.now()}` };
-  return newDomain.id;
+export async function createDomain(data: Omit<ServiceDomain, 'id'>): Promise<string> {
+  try {
+    const domainData: CreateDomainData = {
+      domain_name: data.hostname,
+      status: data.status,
+      expires_at: new Date(data.expiryDate)
+    };
+    
+    return await domainService.createDomain(domainData);
+  } catch (error) {
+    throw new Error(`Failed to create domain: ${error instanceof Error ? error.message : 'Unknown error'}`);
+  }
 }
 
-export async function getDomain(id: string): Promise<Domain | null> {
-  // TODO: Implement Firebase logic
-  const domain = MOCK_DOMAINS.find((d: Domain) => d.id === id) || null;
-  return domain;
+export async function getDomain(id: string): Promise<ServiceDomain | null> {
+  try {
+    return await domainService.getDomain(parseInt(id));
+  } catch (error) {
+    throw new Error(`Failed to get domain: ${error instanceof Error ? error.message : 'Unknown error'}`);
+  }
 }
 
-export async function updateDomain(id: string, data: Partial<Domain>): Promise<void> {
-  // TODO: Implement Firebase logic
-  const domainIndex = MOCK_DOMAINS.findIndex((d: Domain) => d.id === id);
-  if (domainIndex !== -1) {
-    MOCK_DOMAINS[domainIndex] = { ...MOCK_DOMAINS[domainIndex], ...data };
+export async function updateDomain(id: string, data: Partial<ServiceDomain>): Promise<void> {
+  try {
+    const updateData: UpdateDomainData = {};
+    
+    if (data.status) updateData.status = data.status;
+    if (data.expiryDate) updateData.expires_at = new Date(data.expiryDate);
+    
+    await domainService.updateDomain(parseInt(id), updateData);
+  } catch (error) {
+    throw new Error(`Failed to update domain: ${error instanceof Error ? error.message : 'Unknown error'}`);
   }
 }
 
 export async function deleteDomain(id: string): Promise<void> {
-  // TODO: Implement Firebase logic
-  const domainIndex = MOCK_DOMAINS.findIndex((d: Domain) => d.id === id);
-  if (domainIndex !== -1) {
-    MOCK_DOMAINS.splice(domainIndex, 1);
+  try {
+    await domainService.deleteDomain(parseInt(id));
+  } catch (error) {
+    throw new Error(`Failed to delete domain: ${error instanceof Error ? error.message : 'Unknown error'}`);
   }
 }
 
-export async function getDomains(): Promise<Domain[]> {
-  return MOCK_DOMAINS;
+export async function getDomains(): Promise<ServiceDomain[]> {
+  try {
+    const result = await domainService.getDomains(1, 1000);
+    return result.domains;
+  } catch (error) {
+    throw new Error(`Failed to get domains: ${error instanceof Error ? error.message : 'Unknown error'}`);
+  }
 }
 
-export async function createDomainFromApplication(data: Omit<Domain, 'id'>): Promise<string> {
-  const newDomain = { ...data, id: `domain-${Date.now()}` };
-  MOCK_DOMAINS.push(newDomain);
-  return newDomain.id;
+export async function createDomainFromApplication(data: Omit<ServiceDomain, 'id'>): Promise<string> {
+  try {
+    return await createDomain(data);
+  } catch (error) {
+    throw new Error(`Failed to create domain from application: ${error instanceof Error ? error.message : 'Unknown error'}`);
+  }
 }
 
 // User Services
 export async function createUser(data: Omit<User, 'id'>): Promise<User> {
-  // TODO: Implement Firebase logic
-  const newUser: User = { ...data, id: `user-${Date.now()}` };
-  MOCK_USERS.push(newUser);
-  return newUser;
+  try {
+    const userData: CreateUserData = {
+      username: data.name,
+      email: data.email,
+      role: data.role,
+      is_active: data.status === 'active'
+    };
+    
+    const userId = await userService.createUser(userData);
+    const user = await userService.getUser(parseInt(userId));
+    
+    if (!user) {
+      throw new Error('Failed to retrieve created user');
+    }
+    
+    return user;
+  } catch (error) {
+    throw new Error(`Failed to create user: ${error instanceof Error ? error.message : 'Unknown error'}`);
+  }
 }
 
 export async function getUser(id: string): Promise<User | null> {
-  // TODO: Implement Firebase logic
-  const user = MOCK_USERS.find((u: User) => u.id === id) || null;
-  return user;
+  try {
+    return await userService.getUser(parseInt(id));
+  } catch (error) {
+    throw new Error(`Failed to get user: ${error instanceof Error ? error.message : 'Unknown error'}`);
+  }
 }
 
 export async function updateUser(id: string, data: Partial<User>): Promise<void> {
-  // TODO: Implement Firebase logic
-  const userIndex = MOCK_USERS.findIndex((u: User) => u.id === id);
-  if (userIndex !== -1) {
-    MOCK_USERS[userIndex] = { ...MOCK_USERS[userIndex], ...data };
+  try {
+    const updateData: UpdateUserData = {};
+    
+    if (data.name) updateData.username = data.name;
+    if (data.email) updateData.email = data.email;
+    if (data.role) updateData.role = data.role;
+    if (data.status) updateData.is_active = data.status === 'active';
+    
+    await userService.updateUser(parseInt(id), updateData);
+  } catch (error) {
+    throw new Error(`Failed to update user: ${error instanceof Error ? error.message : 'Unknown error'}`);
   }
 }
 
 export async function deleteUser(id: string): Promise<void> {
-  // TODO: Implement Firebase logic
-  const userIndex = MOCK_USERS.findIndex((u: User) => u.id === id);
-  if (userIndex !== -1) {
-    MOCK_USERS.splice(userIndex, 1);
+  try {
+    await userService.deleteUser(parseInt(id));
+  } catch (error) {
+    throw new Error(`Failed to delete user: ${error instanceof Error ? error.message : 'Unknown error'}`);
   }
 }
 
 export async function getUsers(): Promise<User[]> {
-  // TODO: Implement Firebase logic
-  return MOCK_USERS;
+  try {
+    const result = await userService.getUsers(1, 1000);
+    return result.users;
+  } catch (error) {
+    throw new Error(`Failed to get users: ${error instanceof Error ? error.message : 'Unknown error'}`);
+  }
 }
 
 export async function getUsersByOpd(opd: string): Promise<User[]> {
-  const users = MOCK_USERS.filter((user: User) => user.opd === opd);
-  return users;
+  try {
+    const result = await userService.getUsers(1, 1000, { search: opd });
+    return result.users;
+  } catch (error) {
+    throw new Error(`Failed to get users by OPD: ${error instanceof Error ? error.message : 'Unknown error'}`);
+  }
 }
 
 export async function getUserByEmail(email: string): Promise<User | null> {
-  const user = MOCK_USERS.find((u: User) => u.email === email) || null;
-  return user;
+  try {
+    const result = await userService.getUsers(1, 1000, { search: email });
+    return result.users.find(user => user.email === email) || null;
+  } catch (error) {
+    throw new Error(`Failed to get user by email: ${error instanceof Error ? error.message : 'Unknown error'}`);
+  }
 }
 
 export async function getUserById(id: string): Promise<User | null> {
-  const user = MOCK_USERS.find((u: User) => u.id === id) || null;
-  return user;
+  try {
+    return await getUser(id);
+  } catch (error) {
+    throw new Error(`Failed to get user by ID: ${error instanceof Error ? error.message : 'Unknown error'}`);
+  }
 }
 
 export async function createUserData(data: Omit<User, 'id'>): Promise<string> {
-  const newUser = { ...data, id: `user-${Date.now()}` };
-  MOCK_USERS.push(newUser);
-  return newUser.id;
+  try {
+    const user = await createUser(data);
+    return user.id;
+  } catch (error) {
+    throw new Error(`Failed to create user data: ${error instanceof Error ? error.message : 'Unknown error'}`);
+  }
 }
 
-// Audit Log Services
+// Audit Log Services (Placeholder - implement when audit service is ready)
 export async function createAuditLog(data: AuditLog): Promise<AuditLog> {
-  // TODO: Implement Firebase logic
-  return data;
+  try {
+    // TODO: Implement with database audit service
+    console.log('Audit log created:', data);
+    return data;
+  } catch (error) {
+    throw new Error(`Failed to create audit log: ${error instanceof Error ? error.message : 'Unknown error'}`);
+  }
 }
 
 export async function getAuditLogs(): Promise<AuditLog[]> {
-  // TODO: Implement Firebase logic
-  return MOCK_AUDIT_LOGS;
+  try {
+    // TODO: Implement with database audit service
+    return [];
+  } catch (error) {
+    throw new Error(`Failed to get audit logs: ${error instanceof Error ? error.message : 'Unknown error'}`);
+  }
 }
 
-// Hosting Application Services
+// Hosting Application Services (Placeholder)
 export async function createHostingApplication(data: Omit<HostingApplication, 'id'>): Promise<string> {
-  // TODO: Implement Firebase logic
-  const newApplication = { ...data, id: `hosting-${Date.now()}` };
-  return newApplication.id;
+  try {
+    // TODO: Implement with hosting application service
+    const newApplication = { ...data, id: `hosting-${Date.now()}` };
+    return newApplication.id;
+  } catch (error) {
+    throw new Error(`Failed to create hosting application: ${error instanceof Error ? error.message : 'Unknown error'}`);
+  }
 }
 
 export async function getHostingApplication(id: string): Promise<HostingApplication | null> {
-  // TODO: Implement Firebase logic
-  const application = MOCK_HOSTING_APPLICATIONS.find((app: HostingApplication) => app.id === id) || null;
-  return application;
+  try {
+    // TODO: Implement with hosting application service
+    return null;
+  } catch (error) {
+    throw new Error(`Failed to get hosting application: ${error instanceof Error ? error.message : 'Unknown error'}`);
+  }
 }
 
 export async function updateHostingApplication(id: string, data: Partial<HostingApplication>): Promise<void> {
-  // TODO: Implement Firebase logic
-  const appIndex = MOCK_HOSTING_APPLICATIONS.findIndex((app: HostingApplication) => app.id === id);
-  if (appIndex !== -1) {
-    MOCK_HOSTING_APPLICATIONS[appIndex] = { ...MOCK_HOSTING_APPLICATIONS[appIndex], ...data };
+  try {
+    // TODO: Implement with hosting application service
+    console.log('Hosting application updated:', id, data);
+  } catch (error) {
+    throw new Error(`Failed to update hosting application: ${error instanceof Error ? error.message : 'Unknown error'}`);
   }
 }
 
 export async function deleteHostingApplication(id: string): Promise<void> {
-  // TODO: Implement Firebase logic
+  try {
+    // TODO: Implement with hosting application service
+    console.log('Hosting application deleted:', id);
+  } catch (error) {
+    throw new Error(`Failed to delete hosting application: ${error instanceof Error ? error.message : 'Unknown error'}`);
+  }
 }
 
 export async function getHostingApplications(): Promise<HostingApplication[]> {
-  // TODO: Implement Firebase logic
-  return MOCK_HOSTING_APPLICATIONS;
+  try {
+    // TODO: Implement with hosting application service
+    return [];
+  } catch (error) {
+    throw new Error(`Failed to get hosting applications: ${error instanceof Error ? error.message : 'Unknown error'}`);
+  }
 }
 
 export async function createHostingApplicationData(application: Omit<HostingApplication, 'id'>): Promise<string> {
-  return 'new-id';
+  try {
+    return await createHostingApplication(application);
+  } catch (error) {
+    throw new Error(`Failed to create hosting application data: ${error instanceof Error ? error.message : 'Unknown error'}`);
+  }
 }
 
 // Application approval/rejection
 export async function approveApplication(id: string): Promise<void> {
-  const application = MOCK_APPLICATIONS.find((app: SubdomainApplication) => app.id === id);
-  if (application) {
-    application.status = 'approved';
-    const existingDomain = MOCK_DOMAINS.find((d: Domain) => d.hostname === application.domainName);
-    if (!existingDomain) {
-      MOCK_DOMAINS.push({
-        id: `domain-${Date.now()}`,
+  try {
+    await applicationService.updateApplication(parseInt(id), { status: 'approved' }, 1); // TODO: Get actual user ID
+    
+    // Create domain from approved application
+    const application = await getApplication(id);
+    if (application && application.domainName) {
+      await createDomainFromApplication({
         hostname: application.domainName,
         status: 'active',
         expiryDate: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
         opd: application.opd
       });
     }
+  } catch (error) {
+    throw new Error(`Failed to approve application: ${error instanceof Error ? error.message : 'Unknown error'}`);
   }
 }
 
 export async function rejectApplication(id: string): Promise<void> {
-  const application = MOCK_APPLICATIONS.find((app: SubdomainApplication) => app.id === id);
-  if (application) {
-    application.status = 'rejected';
+  try {
+    await applicationService.updateApplication(parseInt(id), { status: 'rejected' }, 1); // TODO: Get actual user ID
+  } catch (error) {
+    throw new Error(`Failed to reject application: ${error instanceof Error ? error.message : 'Unknown error'}`);
   }
 }

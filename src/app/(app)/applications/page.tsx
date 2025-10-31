@@ -125,7 +125,7 @@ function ApplicationsPageContent() {
               Lihat dan kelola semua permohonan subdomain yang masuk.
             </CardDescription>
           </div>
-           {role === 'Operator' && (
+           {(role === 'Operator' || role === 'Admin Daerah') && (
               <Link href={`/applications/new?role=${role}`}>
                   <Button size="sm" className="gap-1 w-full sm:w-auto">
                       <PlusCircle className="size-3.5" />

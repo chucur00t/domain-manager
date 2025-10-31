@@ -1,4 +1,3 @@
-
 'use client';
 
 import Link from 'next/link';
@@ -15,7 +14,7 @@ import {
   UserCog,
   FolderKanban,
 } from 'lucide-react';
-import { cn } from '@/utils/utils';
+import { cn } from '@/frontend/utils/utils';
 import React from 'react';
 import type { User } from '@/backend/models/types';
 import {
@@ -71,8 +70,6 @@ export const navItems: NavItem[] = [
         { href: (role) => `/super-admin/hosting-registration?role=${encodeURIComponent(role)}`, label: 'Pendaftaran Hosting', icon: Server, roles: ['Super Admin'], exact: true },
     ]
   },
-  { href: (role) => `/applications?role=${encodeURIComponent(role)}`, label: 'Permohonan Domain', icon: FileText, roles: ['Admin Daerah'] },
-  { href: (role) => `/hosting?role=${encodeURIComponent(role)}`, label: 'Permohonan Hosting', icon: Server, roles: ['Admin Daerah'] },
   { href: (role) => `/domains?role=${encodeURIComponent(role)}`, label: 'Manajemen Domain', icon: Globe, roles: ['Admin Daerah', 'Super Admin'] },
   { href: (role) => `/users?role=${encodeURIComponent(role)}`, label: 'Manajemen Pengguna', icon: Users, roles: ['Admin Daerah'] },
   { href: (role) => `/audit-trail?role=${encodeURIComponent(role)}`, label: 'Audit Trail', icon: ShieldAlert, roles: ['Super Admin'] },
@@ -177,4 +174,3 @@ export function MainNav() {
         </React.Suspense>
     )
 }
-

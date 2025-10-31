@@ -52,7 +52,7 @@ import { Separator } from '@/components/ui/separator';
 const formSchema = z.object({
   name: z.string().min(3, { message: 'Nama minimal 3 karakter.' }),
   email: z.string().email({ message: 'Format email tidak valid.' }),
-  role: z.enum(['Super Admin', 'Admin Daerah'], {
+  role: z.enum(['Super Admin', 'Admin Daerah', 'Administrator', 'Operator', 'Auditor', 'Kepala Bidang', 'Pengelola Sistem'], {
     required_error: 'Peran harus dipilih.',
   }),
   opd: z.string().optional(),
@@ -273,6 +273,11 @@ function EditUserFormContent({ user, currentUser, onFormAction, allOpds, isOpen,
                                 <>
                                 <SelectItem value="Super Admin">Super Admin</SelectItem>
                                 <SelectItem value="Admin Daerah">Admin Daerah</SelectItem>
+                                <SelectItem value="Administrator">Administrator</SelectItem>
+                                <SelectItem value="Operator">Operator</SelectItem>
+                                <SelectItem value="Auditor">Auditor</SelectItem>
+                                <SelectItem value="Kepala Bidang">Kepala Bidang</SelectItem>
+                                <SelectItem value="Pengelola Sistem">Pengelola Sistem</SelectItem>
                                 </>
                             )}
                             </SelectContent>
@@ -346,4 +351,3 @@ export function EditUserForm(props: EditUserFormProps) {
         </Suspense>
     )
 }
-

@@ -1,4 +1,4 @@
-﻿export type UserRole = 'Super Admin' | 'Admin Daerah';
+﻿export type UserRole = 'Super Admin' | 'Admin Daerah' | 'Administrator' | 'Operator' | 'Auditor' | 'Kepala Bidang' | 'Pengelola Sistem';
 export type UserStatus = 'active' | 'inactive' | 'blocked';
 
 export interface User {
@@ -36,7 +36,26 @@ export interface ChangeUserStatusRequest {
 
 export type DomainStatus = 'active' | 'inactive' | 'expired' | 'pending';
 
-export interface Domain {
+import { RowDataPacket } from 'mysql2';
+
+export interface DatabaseRow extends RowDataPacket {}
+
+export interface Domain extends DatabaseRow {
+  id: string;
+  hostname: string;
+  status: DomainStatus;
+  expiryDate: string;
+  opd: string;
+  parentDomain?: string;
+  activationDate?: string;
+  ttl?: string;
+  recordType?: string;
+  priority?: string;
+  destination?: string;
+}
+
+// Service-friendly Domain interface for mock data and services
+export interface ServiceDomain {
   id: string;
   hostname: string;
   status: DomainStatus;

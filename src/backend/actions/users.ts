@@ -1,5 +1,5 @@
 ﻿import { ChangeUserStatusRequest, User, UserRole } from '@/backend/models/types';
-import { createAuditLog } from '@/backend/services/audit.service';
+import { auditService } from '@/backend/services/audit.service';
 import * as FirebaseService from '@/backend/services/firebase/services';
 
 export async function getAllUsers() {
@@ -52,7 +52,7 @@ export async function createUser(data: {
       email: data.email,
       role: data.role,
       status: 'active',
-      opd: data.role === 'Admin Perangkat Daerah' ? data.opd || undefined : undefined,
+      opd: data.role === 'Admin Daerah' ? data.opd || undefined : undefined,
       nip: `NIP${Math.floor(Math.random() * 1000000)}`,
       whatsapp: '081234567890'
     };
@@ -61,7 +61,7 @@ export async function createUser(data: {
 
     // Log the audit
     // For creating a new user, we'll use a system userId since the user doesn't exist yet
-    await createAuditLog({
+    await auditService.createAuditLog({
       action: 'create',
       resourceType: 'user',
       resourceId: data.email,
@@ -109,13 +109,13 @@ export async function updateUser(
       name: data.name,
       email: data.email,
       role: data.role,
-      opd: data.role === 'Admin Perangkat Daerah' ? data.opd || undefined : undefined,
+      opd: data.role === 'Admin Daerah' ? data.opd || undefined : undefined,
     };
 
     await FirebaseService.updateUser(id, updatedData);
 
     // Log the audit
-    await createAuditLog({
+    await auditService.createAuditLog({
       action: 'update',
       resourceType: 'user',
       resourceId: id,
@@ -144,7 +144,7 @@ export async function changeUserStatus(id: string, request: ChangeUserStatusRequ
     await FirebaseService.updateUser(id, { status: request.status });
 
     // Log the audit
-    await createAuditLog({
+    await auditService.createAuditLog({
       action: 'update',
       resourceType: 'user',
       resourceId: id,
@@ -175,7 +175,7 @@ export async function deleteUser(id: string) {
     await FirebaseService.deleteUser(id);
 
     // Log the audit
-    await createAuditLog({
+    await auditService.createAuditLog({
       action: 'delete',
       resourceType: 'user',
       resourceId: id,
@@ -212,7 +212,7 @@ export async function userLogin(email: string, password: string) {
     const user = await FirebaseService.getUserByEmail(email);
     if (user && user.status === 'active') {
       // Log the audit
-      await createAuditLog({
+      await auditService.createAuditLog({
         action: 'login',
         resourceType: 'user',
         resourceId: user.id,
@@ -233,7 +233,7 @@ export async function userLogout(userId: string) {
     const user = await FirebaseService.getUserById(userId);
     if (user) {
       // Log the audit
-      await createAuditLog({
+      await auditService.createAuditLog({
         action: 'logout',
         resourceType: 'user',
         resourceId: userId,

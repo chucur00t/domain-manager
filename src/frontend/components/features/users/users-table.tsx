@@ -36,6 +36,11 @@ const ITEMS_PER_PAGE = 10;
 const roleConfig = {
     'Super Admin': { className: 'bg-sky-500 hover:bg-sky-600', level: 2 },
     'Admin Daerah': { className: 'bg-rose-500 hover:bg-rose-600', level: 1 },
+    'Administrator': { className: 'bg-blue-500 hover:bg-blue-600', level: 3 },
+    'Operator': { className: 'bg-green-500 hover:bg-green-600', level: 4 },
+    'Auditor': { className: 'bg-purple-500 hover:bg-purple-600', level: 3 },
+    'Kepala Bidang': { className: 'bg-orange-500 hover:bg-orange-600', level: 2 },
+    'Pengelola Sistem': { className: 'bg-teal-500 hover:bg-teal-600', level: 2 },
 };
 
 
@@ -230,4 +235,3 @@ export function UsersTable(props: UsersTableProps) {
     </Suspense>
   )
 }
-

@@ -8,8 +8,8 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card';
-import { StatCard } from '@/components/shared/stat-card';
+} from '@/frontend/components/ui/card';
+import { StatCard } from '@/frontend/components/shared/stat-card';
 import { Globe, FileText, Users, Building } from 'lucide-react';
 import { MOCK_DOMAINS, MOCK_APPLICATIONS, MOCK_USERS } from '@/backend/utils/mock-data';
 import {
@@ -17,10 +17,11 @@ import {
   ChartContainer,
   ChartTooltip,
   ChartTooltipContent,
-} from '@/components/ui/chart';
+} from '@/frontend/components/ui/chart';
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from 'recharts';
-import { SuperAdminApplicationsTable } from '@/components/features/dashboard/super-admin-applications-table';
-import type { User } from '@/backend/models/types';
+import { SuperAdminApplicationsTable } from '@/frontend/components/dashboard/super-admin-applications-table';
+import { DomainExpiryAlert } from '@/frontend/components/features/domains/domain-expiry-alert';
+import type { User, Domain } from '@/backend/models/types';
 
 const chartConfig = {
   applications: {
@@ -45,6 +46,14 @@ export function SuperAdminDashboard({ role }: Props) {
     opd,
     applications: MOCK_APPLICATIONS.filter(app => app.opd === opd).length,
   })).sort((a,b) => b.applications - a.applications).slice(0, 5); // Show top 5
+
+  // Get domains that are near expiry (30 days or less)
+  const nearExpiryDomains = MOCK_DOMAINS.filter(domain => {
+    const daysUntilExpiry = Math.ceil(
+      (new Date(domain.expiryDate).getTime() - new Date().getTime()) / (1000 * 3600 * 24)
+    );
+    return daysUntilExpiry <= 30;
+  });
 
   const recentApplications = MOCK_APPLICATIONS
     .filter(a => a.status === 'pending_review')
