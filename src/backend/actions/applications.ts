@@ -16,6 +16,18 @@ type ActionResponse = {
   message: string;
 }
 
+// Helper function for logging activity
+const logActivity = async (action: string, description: string, userRole: string) => {
+  await auditService.logAction({
+    action,
+    resourceType: 'application',
+    resourceId: 'system',
+    description,
+    userId: 'system',
+    userRole
+  });
+};
+
 export async function submitApplication(applicationData: Omit<SubdomainApplication, 'id' | 'status' | 'submittedDate' | 'documents'>, currentUserRole: User['role']): Promise<ActionResponse> {
   const { domainName, applicantName, opd, description } = applicationData;
 
@@ -100,9 +112,13 @@ export async function approveApplication(applicationId: string, currentUserRole:
     }
     
     await updateApplicationStatus(applicationId, 'approved');
-    await createDomainFromApplication(application);
     
-    logActivity('APPROVE_APPLICATION', `Menyetujui permohonan ${applicationId} untuk ${application.domainName}`, currentUserRole);
+    // Only create domain if it's a subdomain application
+    if ('domainName' in application) {
+      await createDomainFromApplication(application as SubdomainApplication);
+    }
+    
+    await logActivity('APPROVE_APPLICATION', `Menyetujui permohonan ${applicationId}`, currentUserRole);
     
     revalidatePath('/applications');
     revalidatePath(`/applications/${applicationId}`);

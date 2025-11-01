@@ -1,11 +1,14 @@
 ﻿import { ChangeUserStatusRequest, User, UserRole } from '@/backend/models/types';
 import { auditService } from '@/backend/services/audit.service';
-import * as FirebaseService from '@/backend/services/firebase/services';
+import { UserService } from '@/backend/database/services/user.service';
+
+// Initialize MySQL User Service
+const userService = new UserService();
 
 export async function getAllUsers() {
   try {
-    const users = await FirebaseService.getUsers();
-    return users;
+    const result = await userService.getUsers(1, 100); // Get first 100 users
+    return result.users;
   } catch (error) {
     console.error('Error getting all users:', error);
     throw error;
@@ -14,8 +17,13 @@ export async function getAllUsers() {
 
 export async function getUsersByOpd(opd: string) {
   try {
-    const users = await FirebaseService.getUsersByOpd(opd);
-    return users;
+    // Parse OPD ID from OPD name or use directly if it's an ID
+    const opdId = parseInt(opd);
+    const result = await userService.getUsers(1, 100, { 
+      opd_id: isNaN(opdId) ? undefined : opdId,
+      search: isNaN(opdId) ? opd : undefined
+    });
+    return result.users;
   } catch (error) {
     console.error('Error getting users by OPD:', error);
     throw error;
@@ -24,7 +32,7 @@ export async function getUsersByOpd(opd: string) {
 
 export async function getUserById(id: string) {
   try {
-    const user = await FirebaseService.getUserById(id);
+    const user = await userService.getUser(parseInt(id));
     return user;
   } catch (error) {
     console.error('Error getting user by ID:', error);
@@ -39,7 +47,10 @@ export async function createUser(data: {
   opd?: string;
 }) {
   try {
-    const existingUser = await FirebaseService.getUserByEmail(data.email);
+    // Check if email already exists (TODO: add getUserByEmail to service)
+    const allUsers = await userService.getUsers(1, 1000, { search: data.email });
+    const existingUser = allUsers.users.find(u => u.email === data.email);
+    
     if (existingUser) {
       return {
         success: false,
@@ -47,24 +58,20 @@ export async function createUser(data: {
       };
     }
 
-    const newUser: Omit<User, 'id'> = {
-      name: data.name,
+    // Create user
+    const userId = await userService.createUser({
+      username: data.name,
       email: data.email,
       role: data.role,
-      status: 'active',
-      opd: data.role === 'Admin Daerah' ? data.opd || undefined : undefined,
-      nip: `NIP${Math.floor(Math.random() * 1000000)}`,
-      whatsapp: '081234567890'
-    };
-
-    await FirebaseService.createUser(newUser);
+      opd_id: data.opd ? parseInt(data.opd) : undefined,
+      is_active: true
+    });
 
     // Log the audit
-    // For creating a new user, we'll use a system userId since the user doesn't exist yet
     await auditService.createAuditLog({
       action: 'create',
       resourceType: 'user',
-      resourceId: data.email,
+      resourceId: userId,
       description: `User ${data.name} (${data.email}) created with role ${data.role}`,
       userId: 'system'
     });
@@ -89,14 +96,16 @@ export async function updateUser(
   }
 ) {
   try {
-    const existingUser = await FirebaseService.getUserById(id);
+    const existingUser = await userService.getUser(parseInt(id));
     if (!existingUser) {
       return { success: false, message: 'Pengguna tidak ditemukan.' };
     }
 
     // Check if email is being changed and if new email is already in use
     if (data.email !== existingUser.email) {
-      const emailInUse = await FirebaseService.getUserByEmail(data.email);
+      const allUsers = await userService.getUsers(1, 1000, { search: data.email });
+      const emailInUse = allUsers.users.find(u => u.email === data.email);
+      
       if (emailInUse) {
         return {
           success: false,
@@ -105,14 +114,12 @@ export async function updateUser(
       }
     }
 
-    const updatedData: Partial<User> = {
-      name: data.name,
+    await userService.updateUser(parseInt(id), {
+      username: data.name,
       email: data.email,
       role: data.role,
-      opd: data.role === 'Admin Daerah' ? data.opd || undefined : undefined,
-    };
-
-    await FirebaseService.updateUser(id, updatedData);
+      opd_id: data.opd ? parseInt(data.opd) : undefined
+    });
 
     // Log the audit
     await auditService.createAuditLog({
@@ -135,13 +142,15 @@ export async function updateUser(
 
 export async function changeUserStatus(id: string, request: ChangeUserStatusRequest) {
   try {
-    const user = await FirebaseService.getUserById(id);
+    const user = await userService.getUser(parseInt(id));
     if (!user) {
       return { success: false, message: 'Pengguna tidak ditemukan.' };
     }
 
-    // Update user status
-    await FirebaseService.updateUser(id, { status: request.status });
+    // Update user status - map 'active' to is_active: true
+    await userService.updateUser(parseInt(id), { 
+      is_active: request.status === 'active' 
+    });
 
     // Log the audit
     await auditService.createAuditLog({
@@ -167,12 +176,12 @@ export async function changeUserStatus(id: string, request: ChangeUserStatusRequ
 
 export async function deleteUser(id: string) {
   try {
-    const user = await FirebaseService.getUserById(id);
+    const user = await userService.getUser(parseInt(id));
     if (!user) {
       return { success: false, message: 'Pengguna tidak ditemukan.' };
     }
 
-    await FirebaseService.deleteUser(id);
+    await userService.deleteUser(parseInt(id));
 
     // Log the audit
     await auditService.createAuditLog({
@@ -198,8 +207,9 @@ export async function deleteUser(id: string) {
 
 export async function getUserByEmail(email: string) {
   try {
-    const user = await FirebaseService.getUserByEmail(email);
-    return user;
+    const result = await userService.getUsers(1, 1000, { search: email });
+    const user = result.users.find(u => u.email === email);
+    return user || null;
   } catch (error) {
     console.error('Error getting user by email:', error);
     throw error;
@@ -208,8 +218,9 @@ export async function getUserByEmail(email: string) {
 
 export async function userLogin(email: string, password: string) {
   try {
-    // Mock login - in a real app this would authenticate with Firebase Auth
-    const user = await FirebaseService.getUserByEmail(email);
+    // Get user by email
+    const user = await getUserByEmail(email);
+    
     if (user && user.status === 'active') {
       // Log the audit
       await auditService.createAuditLog({
@@ -230,7 +241,7 @@ export async function userLogin(email: string, password: string) {
 
 export async function userLogout(userId: string) {
   try {
-    const user = await FirebaseService.getUserById(userId);
+    const user = await userService.getUser(parseInt(userId));
     if (user) {
       // Log the audit
       await auditService.createAuditLog({
