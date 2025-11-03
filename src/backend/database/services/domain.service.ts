@@ -285,7 +285,7 @@ export class DomainService {
       let sql = `
         SELECT COUNT(*) as count FROM domains WHERE domain_name = ?
       `;
-      const params = [domainName];
+      const params: (string | number)[] = [domainName];
 
       if (excludeId) {
         sql += ' AND id != ?';

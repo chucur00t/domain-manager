@@ -37,6 +37,7 @@ const statusVariantMap = {
   pending: 'default',
   active: 'secondary',
   inactive: 'outline',
+  expired: 'destructive',
   error: 'destructive',
 } as const;
 

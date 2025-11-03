@@ -8,8 +8,8 @@ export interface User {
   role: UserRole;
   status: UserStatus;
   opd?: string;
-  nip: string;
-  whatsapp: string;
+  nip?: string;
+  whatsapp?: string;
 }
 
 export interface AuditLogInput {

@@ -245,8 +245,8 @@ function DomainDetailContent({ domain }: { domain: Domain }) {
           </CardContent>
         </Card>
         
-        {/* Domain Health Card */}
-        <DomainHealthCard domainId={domain.id} />
+        {/* Domain Health Card - TODO: Implement component */}
+        {/* <DomainHealthCard domainId={domain.id} /> */}
 
         <div className="flex items-center gap-2 md:hidden mt-4">
             <ActionButton />

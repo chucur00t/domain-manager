@@ -1,5 +1,5 @@
 import { type NextRequest } from 'next/server';
-import { domainActivationService } from '@/backend/services/domain-activation.service';
+// import { domainActivationService } from '@/backend/services/domain-activation.service'; // File deleted - legacy PostgreSQL code
 
 export async function POST(request: NextRequest) {
   try {
@@ -19,6 +19,12 @@ export async function POST(request: NextRequest) {
       }, { status: 403 });
     }
 
+    // TODO: Implement domain activation/deactivation using MySQL service
+    return Response.json({ 
+      error: 'Feature not yet implemented - needs migration to MySQL service' 
+    }, { status: 501 });
+
+    /* Legacy code - needs reimplementation:
     let result;
     switch (action) {
       case 'activate':
@@ -35,6 +41,7 @@ export async function POST(request: NextRequest) {
     }
 
     return Response.json(result);
+    */
   } catch (error) {
     console.error('Error processing domain activation/deactivation:', error);
     return Response.json({ error: (error as Error).message }, { status: 500 });

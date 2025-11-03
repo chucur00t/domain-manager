@@ -1,4 +1,4 @@
-import { Pool, PoolConnection, ResultSetHeader, RowDataPacket } from 'mysql2/promise';
+import { Pool, PoolConnection, ResultSetHeader, RowDataPacket, FieldPacket } from 'mysql2/promise';
 
 export interface DatabaseRow extends RowDataPacket {}
 
@@ -6,11 +6,6 @@ export interface QueryResult<T> extends Array<T & DatabaseRow> {
   meta: ResultSetHeader;
 }
 
-export interface DatabaseConnection extends PoolConnection {
-  query<T>(text: string, params?: any[]): Promise<QueryResult<T>>;
-}
-
-export interface DatabasePool extends Pool {
-  query<T>(text: string, params?: any[]): Promise<[QueryResult<T>, any]>;
-  getConnection(): Promise<DatabaseConnection>;
-}
+// Use the actual mysql2 types directly
+export type DatabaseConnection = PoolConnection;
+export type DatabasePool = Pool;

@@ -76,7 +76,11 @@ export function SuperAdminDashboard({ role }: Props) {
 
                 const sortedRecent = [...applications]
                     .filter(a => a.status === 'pending_review')
-                    .sort((a, b) => new Date(b.submittedDate).getTime() - new Date(a.submittedDate).getTime())
+                    .sort((a, b) => {
+                        const dateA = a.submittedDate || a.submissionDate || '';
+                        const dateB = b.submittedDate || b.submissionDate || '';
+                        return new Date(dateB).getTime() - new Date(dateA).getTime();
+                    })
                     .slice(0, 5);
                 setRecentApplications(sortedRecent);
 

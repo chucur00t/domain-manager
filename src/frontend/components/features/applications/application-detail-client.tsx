@@ -36,6 +36,7 @@ import { BackButton } from '@/components/shared/back-button';
 
 
 const statusConfig = {
+  pending: { text: 'Menunggu', variant: 'default' as const, step: 0 },
   pending_review: { text: 'Menunggu Review Admin', variant: 'default' as const, step: 1 },
   pending_approval: { text: 'Menunggu Persetujuan', variant: 'default' as const, step: 2 },
   approved: { text: 'Disetujui', variant: 'secondary' as const, step: 3 },
@@ -230,13 +231,17 @@ function ApplicationDetailContent({ application }: { application: SubdomainAppli
               <div>
               <h3 className="font-semibold text-lg mb-2">Dokumen Pendukung</h3>
               <div className="flex flex-col gap-2">
-                  {application.documents.map((doc, index) => (
+                  {application.documents && application.documents.length > 0 ? (
+                    application.documents.map((doc, index) => (
                       <Button key={index} variant="outline" className="justify-start max-w-xs gap-2">
                           <FileText className="h-4 w-4" />
                           <span>{doc}</span>
                           <Download className="h-4 w-4 ml-auto" />
                       </Button>
-                  ))}
+                    ))
+                  ) : (
+                    <p className="text-sm text-muted-foreground">Tidak ada dokumen</p>
+                  )}
               </div>
               </div>
           </div>

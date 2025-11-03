@@ -30,10 +30,11 @@ type ApplicationsTableProps = {
 };
 
 const statusConfig = {
+  pending: { text: 'Menunggu', variant: 'default' as const, className: "bg-gray-500 hover:bg-gray-600" },
   pending_review: { text: 'Review Admin', variant: 'default' as const, className: "bg-amber-500 hover:bg-amber-600" },
   pending_approval: { text: 'Persetujuan', variant: 'default' as const, className: "bg-blue-500 hover:bg-blue-600" },
   approved: { text: 'Disetujui', variant: 'secondary' as const, className: "bg-green-500 hover:bg-green-600 text-secondary-foreground" },
-  rejected: { text: 'Ditolak', variant: 'destructive' as const },
+  rejected: { text: 'Ditolak', variant: 'destructive' as const, className: "bg-red-500 hover:bg-red-600" },
 };
 
 const ITEMS_PER_PAGE = 10;

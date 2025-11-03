@@ -1,17 +1,40 @@
-﻿import { MOCK_AUDIT_LOGS } from '@/backend/utils/mock-data';
+﻿import { AuditLogRepository, type CreateAuditLogInput } from '@/backend/database/repositories/audit-log.repository';
 import type { AuditLog, AuditLogInput } from '@/backend/models/types';
 
 class AuditService {
   async createAuditLog(data: AuditLogInput): Promise<AuditLog> {
-    // TODO: Implement Firebase logic
-    const newAuditLog: AuditLog = {
-      ...data,
-      id: `audit-${Date.now()}`,
-      timestamp: new Date().toISOString()
-    };
-    
-    MOCK_AUDIT_LOGS.push(newAuditLog);
-    return newAuditLog;
+    try {
+      // Map AuditLogInput to CreateAuditLogInput for repository
+      const auditLogData: CreateAuditLogInput = {
+        user_id: data.userId ? parseInt(data.userId) : undefined,
+        application_id: data.resourceType === 'application' && data.resourceId ? parseInt(data.resourceId) : undefined,
+        action: data.action,
+        details: data.description || undefined
+      };
+      
+      const auditLogId = await AuditLogRepository.create(auditLogData);
+      
+      // Fetch the created audit log to return
+      const createdLog = await AuditLogRepository.findById(auditLogId);
+      
+      if (!createdLog) {
+        throw new Error('Failed to retrieve created audit log');
+      }
+      
+      // Map database record to AuditLog type
+      return {
+        id: createdLog.id.toString(),
+        userId: createdLog.user_id?.toString() || 'system',
+        action: createdLog.action,
+        resourceType: data.resourceType,
+        resourceId: data.resourceId,
+        description: createdLog.details || '',
+        timestamp: createdLog.timestamp.toISOString()
+      };
+    } catch (error) {
+      console.error('Error creating audit log:', error);
+      throw error;
+    }
   }
 
   async logAction(params: {
@@ -38,18 +61,68 @@ class AuditService {
   }
 
   async getAuditLogs(): Promise<AuditLog[]> {
-    return MOCK_AUDIT_LOGS;
+    try {
+      const logs = await AuditLogRepository.findAll(1000);
+      
+      return logs.map(log => ({
+        id: log.id.toString(),
+        userId: log.user_id?.toString() || 'system',
+        action: log.action,
+        resourceType: log.application_id ? 'application' : 'system',
+        resourceId: log.application_id?.toString() || 'system',
+        description: log.details || '',
+        timestamp: log.timestamp.toISOString()
+      }));
+    } catch (error) {
+      console.error('Error getting audit logs:', error);
+      return [];
+    }
   }
 
   async getAuditLogsByUser(userId: string): Promise<AuditLog[]> {
-    return MOCK_AUDIT_LOGS.filter(log => log.userId === userId);
+    try {
+      const logs = await AuditLogRepository.findByUser(parseInt(userId), 1000);
+      
+      return logs.map(log => ({
+        id: log.id.toString(),
+        userId: log.user_id?.toString() || 'system',
+        action: log.action,
+        resourceType: log.application_id ? 'application' : 'system',
+        resourceId: log.application_id?.toString() || 'system',
+        description: log.details || '',
+        timestamp: log.timestamp.toISOString()
+      }));
+    } catch (error) {
+      console.error('Error getting audit logs by user:', error);
+      return [];
+    }
   }
 
   async getAuditLogsByResource(resourceType: string, resourceId: string): Promise<AuditLog[]> {
-    return MOCK_AUDIT_LOGS.filter(log => 
-      log.resourceType === resourceType && log.resourceId === resourceId
-    );
+    try {
+      if (resourceType !== 'application') {
+        return [];
+      }
+      
+      const logs = await AuditLogRepository.findByApplication(parseInt(resourceId));
+      
+      return logs.map(log => ({
+        id: log.id.toString(),
+        userId: log.user_id?.toString() || 'system',
+        action: log.action,
+        resourceType: 'application',
+        resourceId: log.application_id?.toString() || 'system',
+        description: log.details || '',
+        timestamp: log.timestamp.toISOString()
+      }));
+    } catch (error) {
+      console.error('Error getting audit logs by resource:', error);
+      return [];
+    }
   }
 }
 
 export const auditService = new AuditService();
+
+// Export helper function for backward compatibility
+export const logActivity = auditService.logAction.bind(auditService);

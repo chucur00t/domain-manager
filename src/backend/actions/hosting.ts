@@ -41,11 +41,12 @@ export async function submitHostingApplication(formData: FormData): Promise<Acti
     
     const newApp = await createHostingApplication(newApplication);
     
+    // newApp returns a string ID, create log with it
     await auditService.logAction({
       action: 'SUBMIT_HOSTING_APP',
       resourceType: 'hosting',
-      resourceId: newApp.id,
-      description: `Mengajukan permohonan hosting untuk ${applicationName} (ID: ${newApp.id})`,
+      resourceId: typeof newApp === 'string' ? newApp : newId,
+      description: `Mengajukan permohonan hosting untuk ${applicationName} (ID: ${typeof newApp === 'string' ? newApp : newId})`,
       userId: 'system' // Since user is not yet in the system
     });
 

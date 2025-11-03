@@ -36,6 +36,7 @@ import { BackButton } from '@/components/shared/back-button';
 
 
 const statusConfig = {
+  pending: { text: 'Menunggu', variant: 'default' as const, step: 0 },
   pending_review: { text: 'Menunggu Review Admin', variant: 'default' as const, step: 1 },
   pending_approval: { text: 'Menunggu Persetujuan', variant: 'default' as const, step: 2 },
   approved: { text: 'Disetujui', variant: 'secondary' as const, step: 3 },

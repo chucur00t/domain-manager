@@ -29,11 +29,9 @@ import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { Loader2 } from 'lucide-react';
 
-const roleConfig = {
+const roleConfig: Partial<Record<UserRole, { className: string; description: string; }>> = {
     'Super Admin': { className: 'bg-sky-500 hover:bg-sky-600', description: 'Memiliki akses penuh ke seluruh sistem tanpa batasan.' },
-    'Administrator': { className: 'bg-rose-500 hover:bg-rose-600', description: 'Mengelola pengguna dan konten dalam lingkup yang ditentukan.' },
-    'Operator': { className: 'bg-secondary text-secondary-foreground', description: 'Menggunakan fitur inti aplikasi untuk tugas operasional harian.' },
-    'Auditor': { className: 'bg-amber-500 hover:bg-amber-600', description: 'Memiliki akses hanya-baca untuk tujuan pengawasan dan audit.' },
+    'Admin Daerah': { className: 'bg-rose-500 hover:bg-rose-600', description: 'Mengelola domain dan hosting untuk daerah.' },
 };
 
 const PERMISSION_MODULES = [
@@ -75,10 +73,11 @@ export default function RoleDetailPage({ params }: { params: { roleName: string 
   // In a real app, permissions would be fetched from a database.
   // We use a deep copy of mock data to simulate state changes.
   const [initialPermissions] = useState(() => {
-    if (!MOCK_ROLES[roleName]) {
+    const mockRolesObj = MOCK_ROLES as any;
+    if (!mockRolesObj[roleName]) {
       return null;
     }
-    return JSON.parse(JSON.stringify(MOCK_ROLES[roleName]));
+    return JSON.parse(JSON.stringify(mockRolesObj[roleName]));
   });
 
   const [permissions, setPermissions] = useState<RolePermissions | null>(initialPermissions);
@@ -87,7 +86,7 @@ export default function RoleDetailPage({ params }: { params: { roleName: string 
     notFound();
   }
 
-  const roleStyle = roleConfig[roleName];
+  const roleStyle = roleConfig[roleName] || { className: 'bg-gray-500', description: 'Role description' };
 
   const handlePermissionChange = (module: string, permission: 'c' | 'r' | 'u' | 'd', value: boolean) => {
     setPermissions(prev => {
@@ -107,7 +106,8 @@ export default function RoleDetailPage({ params }: { params: { roleName: string 
     setTimeout(() => {
         // Here you would update your central permission store (e.g., Firestore)
         console.log("Saving new permissions for", roleName, permissions);
-        MOCK_ROLES[roleName] = permissions;
+        const mockRolesObj = MOCK_ROLES as any;
+        mockRolesObj[roleName] = permissions;
         toast({
             title: "Izin Diperbarui",
             description: `Izin akses untuk peran ${roleName} telah berhasil disimpan.`,

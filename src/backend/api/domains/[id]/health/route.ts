@@ -1,5 +1,5 @@
 import { NextRequest } from 'next/server';
-import { domainHealthManager } from '@/backend/services/domain-health-manager';
+// import { domainHealthManager } from '@/backend/services/domain-health-manager'; // File deleted - advanced monitoring feature not implemented
 import { notFound, serverError } from '@/backend/config/errors';
 
 export async function GET(
@@ -7,8 +7,12 @@ export async function GET(
   { params }: { params: { id: string } }
 ) {
   try {
-    const health = await domainHealthManager.getLatestHealthCheck(params.id);
-    return Response.json(health);
+    // TODO: Implement basic domain health check
+    // const health = await domainHealthManager.getLatestHealthCheck(params.id);
+    return Response.json({ 
+      message: 'Health check feature not yet implemented',
+      domainId: params.id 
+    });
   } catch (error) {
     console.error('Error checking domain health:', error);
     

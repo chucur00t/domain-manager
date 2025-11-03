@@ -57,15 +57,17 @@ export function ApplicationForm() {
 
   function onSubmit(values: z.infer<typeof formSchema>) {
     startTransition(async () => {
-      const formData = new FormData();
-      formData.append('domainName', `${values.domainName}.${values.parentDomain}`);
-      formData.append('applicantName', values.applicantName);
-      formData.append('opd', values.opd);
-      formData.append('applicationDescription', values.applicationDescription);
-      // Note: In a real app, handle file uploads properly.
-      // formData.append('supportingDocuments', values.supportingDocuments[0]);
+      const applicationData = {
+        userId: 'current-user', // TODO: Get from auth
+        domainName: `${values.domainName}.${values.parentDomain}`,
+        applicantName: values.applicantName,
+        opd: values.opd,
+        purpose: values.applicationDescription,
+        submissionDate: new Date().toISOString().split('T')[0],
+        description: values.applicationDescription,
+      };
 
-      const result = await submitApplication(formData);
+      const result = await submitApplication(applicationData, 'Admin Daerah');
 
       if (result.success) {
         toast({

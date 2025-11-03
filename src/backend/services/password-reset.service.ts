@@ -26,10 +26,13 @@ export class PasswordResetService {
   async createResetToken(email: string): Promise<string | null> {
     try {
       // Find user
-      const [[user]] = await db.query<any[]>(
+      const [rows] = await db.query(
         'SELECT id, name, email FROM users WHERE email = ? AND status != "blocked"',
         [email]
       );
+      
+      const users = rows as any[];
+      const user = users[0];
 
       if (!user) {
         return null;
@@ -84,11 +87,14 @@ export class PasswordResetService {
   async validateToken(token: string): Promise<string | null> {
     try {
       const hashedToken = this.hashToken(token);
-      const [[resetToken]] = await db.query<any[]>(
+      const [rows] = await db.query(
         `SELECT user_id, expiry_date FROM password_reset_tokens 
          WHERE token = ? AND used = 0 AND expiry_date > NOW()`,
         [hashedToken]
       );
+      
+      const tokens = rows as any[];
+      const resetToken = tokens[0];
 
       if (!resetToken) {
         return null;

@@ -4,6 +4,7 @@ import { DomainMonitorClient } from '@/components/features/domains/domain-monito
 import { Loader2 } from 'lucide-react';
 import React from 'react';
 import { getDomain } from '@/lib/firebase/services';
+import type { Domain } from '@/backend/models/types';
 
 // This is now a Server Component
 export default async function DomainMonitorPage({ params }: { params: Promise<{ id: string }> }) {
@@ -15,7 +16,7 @@ export default async function DomainMonitorPage({ params }: { params: Promise<{ 
   }
 
   // We pass the fetched domain data to the Client Component
-  return <DomainMonitorClient domain={domain} />;
+  return <DomainMonitorClient domain={domain as unknown as Domain} />;
 }
 
 // Add a suspense boundary for the page

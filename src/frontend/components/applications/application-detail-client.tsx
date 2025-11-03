@@ -33,16 +33,31 @@ import { cn } from '@/utils/utils';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import type { SubdomainApplication, User } from '@/backend/models/types';
-import { checkDomainApplication, type CheckDomainApplicationOutput } from '@/ai/flows/trademark-and-duplication-sentinel';
+// import { checkDomainApplication, type CheckDomainApplicationOutput } from '@/ai/flows/trademark-and-duplication-sentinel'; // TODO: AI feature not yet implemented
 import { WorkflowStepper } from '@/components/shared/workflow-stepper';
 import { BackButton } from '../shared/back-button';
 
+// TODO: Implement AI check
+type CheckDomainApplicationOutput = {
+  hasTrademark: boolean;
+  isDuplicate: boolean;
+  reasons: string[];
+  sensitiveDataRisk?: boolean;
+  trademarkInfringementRisk?: boolean;
+  trademarkInfringementDetails?: string;
+  domainDuplicationRisk?: boolean;
+  domainDuplicationDetails?: string;
+  securityAnalysis?: string;
+  namingConventionAnalysis?: string;
+  resourceRecommendation?: string;
+};
 
 const statusConfig = {
-  pending_review: { text: 'Menunggu Review Admin', variant: 'default' as const, step: 1 },
-  pending_approval: { text: 'Menunggu Persetujuan Kabid', variant: 'default' as const, step: 2 },
-  approved: { text: 'Disetujui', variant: 'secondary' as const, step: 3 },
-  rejected: { text: 'Ditolak', variant: 'destructive' as const, step: 0 },
+  pending: { text: 'Menunggu', variant: 'default' as const, step: 0, className: 'bg-gray-500' },
+  pending_review: { text: 'Menunggu Review Admin', variant: 'default' as const, step: 1, className: 'bg-yellow-500' },
+  pending_approval: { text: 'Menunggu Persetujuan Kabid', variant: 'default' as const, step: 2, className: 'bg-blue-500' },
+  approved: { text: 'Disetujui', variant: 'secondary' as const, step: 3, className: 'bg-green-500' },
+  rejected: { text: 'Ditolak', variant: 'destructive' as const, step: 0, className: 'bg-red-500' },
 };
 
 
@@ -110,12 +125,16 @@ function ApplicationDetailContent({ application }: { application: SubdomainAppli
     setAnalysisError(null);
     setAnalysisResult(null);
     try {
+        // TODO: Implement AI check
+        /* 
         const result = await checkDomainApplication({
             domainName: application.domainName,
             applicantName: application.applicantName,
             applicationDescription: application.description,
         });
         setAnalysisResult(result);
+        */
+        setAnalysisError("Fitur analisis AI belum diimplementasikan");
     } catch (error) {
         console.error("AI analysis failed:", error);
         setAnalysisError("Gagal menjalankan analisis AI. Silakan coba lagi.");
@@ -259,13 +278,13 @@ function ApplicationDetailContent({ application }: { application: SubdomainAppli
                     <div>
                     <h3 className="font-semibold text-lg mb-2">Dokumen Pendukung</h3>
                     <div className="flex flex-col gap-2">
-                        {application.documents.map((doc, index) => (
+                        {application.documents?.map((doc, index) => (
                             <Button key={index} variant="outline" className="justify-start max-w-xs gap-2">
                                 <FileText className="h-4 w-4" />
                                 <span>{doc}</span>
                                 <Download className="h-4 w-4 ml-auto" />
                             </Button>
-                        ))}
+                        )) || <p className="text-sm text-muted-foreground">Tidak ada dokumen</p>}
                     </div>
                     </div>
                 </div>

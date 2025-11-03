@@ -16,6 +16,7 @@ import { useSearchParams } from 'next/navigation';
 import React from 'react';
 
 const statusConfig = {
+  pending: { text: 'Menunggu', variant: 'default' as const },
   pending_review: { text: 'Review Admin', variant: 'default' as const },
   pending_approval: { text: 'Persetujuan Kabid', variant: 'default' as const },
   approved: { text: 'Disetujui', variant: 'secondary' as const },

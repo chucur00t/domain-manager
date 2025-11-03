@@ -3,6 +3,7 @@
 
 import { revalidatePath } from 'next/cache';
 import { auditService } from '@/backend/services/audit.service';
+import { getCurrentUserId } from '@/backend/utils/auth';
 import type { SubdomainApplication, User } from '@/backend/models/types';
 import { 
   createApplication, 
@@ -46,12 +47,14 @@ export async function submitApplication(applicationData: Omit<SubdomainApplicati
     
     const newAppId = await createApplication(newApplication);
     
+    const currentUserId = await getCurrentUserId();
+    
     await auditService.logAction({
       action: 'SUBMIT_APPLICATION',
       resourceType: 'application',
       resourceId: newAppId,
       description: `Mengajukan permohonan untuk ${domainName}`,
-      userId: 'current-user', // TODO: Get from session
+      userId: currentUserId?.toString() || 'unknown',
       user: applicantName,
       userRole: currentUserRole
     });

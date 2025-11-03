@@ -4,11 +4,18 @@ import {
   domainService, 
   applicationService 
 } from '@/backend/database/services';
+import { HostingService } from '@/backend/database/services/hosting.service';
+
+import { getCurrentUserId } from '@/backend/utils/auth';
+import { auditService } from '@/backend/services/audit.service';
 
 import type { SubdomainApplication, ServiceDomain, User, AuditLog, HostingApplication } from '@/backend/models/types';
 import type { CreateUserData, UpdateUserData, UserFilter } from '@/backend/database/services/user.service';
 import type { CreateDomainData, UpdateDomainData, DomainFilter } from '@/backend/database/services/domain.service';
 import type { CreateSubdomainApplicationData, UpdateApplicationData, ApplicationFilter } from '@/backend/database/services/application.service';
+
+// Initialize hosting service
+const hostingService = new HostingService();
 
 // Application Services
 export async function createApplication(data: SubdomainApplication): Promise<SubdomainApplication> {
@@ -43,7 +50,12 @@ export async function updateApplication(id: string, data: Partial<SubdomainAppli
     if (data.status) updateData.status = data.status;
     if (data.rejectionReason) updateData.reason = data.rejectionReason;
     
-    await applicationService.updateApplication(parseInt(id), updateData, 1); // TODO: Get actual user ID
+    const userId = await getCurrentUserId();
+    if (!userId) {
+      throw new Error('User not authenticated');
+    }
+    
+    await applicationService.updateApplication(parseInt(id), updateData, userId);
   } catch (error) {
     throw new Error(`Failed to update application: ${error instanceof Error ? error.message : 'Unknown error'}`);
   }
@@ -104,7 +116,12 @@ export async function updateSubdomainApplication(id: string, data: Partial<Subdo
     if (data.status) updateData.status = data.status;
     if (data.rejectionReason) updateData.reason = data.rejectionReason;
     
-    await applicationService.updateApplication(parseInt(id), updateData, 1); // TODO: Get actual user ID
+    const userId = await getCurrentUserId();
+    if (!userId) {
+      throw new Error('User not authenticated');
+    }
+    
+    await applicationService.updateApplication(parseInt(id), updateData, userId);
   } catch (error) {
     throw new Error(`Failed to update subdomain application: ${error instanceof Error ? error.message : 'Unknown error'}`);
   }
@@ -286,12 +303,16 @@ export async function createUserData(data: Omit<User, 'id'>): Promise<string> {
   }
 }
 
-// Audit Log Services (Placeholder - implement when audit service is ready)
+// Audit Log Services
 export async function createAuditLog(data: AuditLog): Promise<AuditLog> {
   try {
-    // TODO: Implement with database audit service
-    console.log('Audit log created:', data);
-    return data;
+    return await auditService.createAuditLog({
+      userId: data.userId,
+      action: data.action,
+      resourceType: data.resourceType,
+      resourceId: data.resourceId,
+      description: data.description
+    });
   } catch (error) {
     throw new Error(`Failed to create audit log: ${error instanceof Error ? error.message : 'Unknown error'}`);
   }
@@ -299,19 +320,21 @@ export async function createAuditLog(data: AuditLog): Promise<AuditLog> {
 
 export async function getAuditLogs(): Promise<AuditLog[]> {
   try {
-    // TODO: Implement with database audit service
-    return [];
+    return await auditService.getAuditLogs();
   } catch (error) {
     throw new Error(`Failed to get audit logs: ${error instanceof Error ? error.message : 'Unknown error'}`);
   }
 }
 
-// Hosting Application Services (Placeholder)
+// Hosting Application Services
 export async function createHostingApplication(data: Omit<HostingApplication, 'id'>): Promise<string> {
   try {
-    // TODO: Implement with hosting application service
-    const newApplication = { ...data, id: `hosting-${Date.now()}` };
-    return newApplication.id;
+    // For now, return a generated ID
+    // Full implementation requires mapping HostingApplication type to database schema
+    // which may need type adjustments
+    const hostingId = `hosting-${Date.now()}`;
+    console.log('Hosting application created:', hostingId, data);
+    return hostingId;
   } catch (error) {
     throw new Error(`Failed to create hosting application: ${error instanceof Error ? error.message : 'Unknown error'}`);
   }
@@ -319,7 +342,9 @@ export async function createHostingApplication(data: Omit<HostingApplication, 'i
 
 export async function getHostingApplication(id: string): Promise<HostingApplication | null> {
   try {
-    // TODO: Implement with hosting application service
+    // Implementation pending: Type mismatch between HostingApplication and database schema
+    // Database uses: storage_capacity, bandwidth, server_type
+    // Type uses: applicationName, description, framework, domainName
     return null;
   } catch (error) {
     throw new Error(`Failed to get hosting application: ${error instanceof Error ? error.message : 'Unknown error'}`);
@@ -328,7 +353,7 @@ export async function getHostingApplication(id: string): Promise<HostingApplicat
 
 export async function updateHostingApplication(id: string, data: Partial<HostingApplication>): Promise<void> {
   try {
-    // TODO: Implement with hosting application service
+    // Implementation pending: Type alignment needed
     console.log('Hosting application updated:', id, data);
   } catch (error) {
     throw new Error(`Failed to update hosting application: ${error instanceof Error ? error.message : 'Unknown error'}`);
@@ -337,7 +362,7 @@ export async function updateHostingApplication(id: string, data: Partial<Hosting
 
 export async function deleteHostingApplication(id: string): Promise<void> {
   try {
-    // TODO: Implement with hosting application service
+    // Implementation pending: Type alignment needed
     console.log('Hosting application deleted:', id);
   } catch (error) {
     throw new Error(`Failed to delete hosting application: ${error instanceof Error ? error.message : 'Unknown error'}`);
@@ -346,7 +371,7 @@ export async function deleteHostingApplication(id: string): Promise<void> {
 
 export async function getHostingApplications(): Promise<HostingApplication[]> {
   try {
-    // TODO: Implement with hosting application service
+    // Implementation pending: Type alignment needed
     return [];
   } catch (error) {
     throw new Error(`Failed to get hosting applications: ${error instanceof Error ? error.message : 'Unknown error'}`);
@@ -364,7 +389,12 @@ export async function createHostingApplicationData(application: Omit<HostingAppl
 // Application approval/rejection
 export async function approveApplication(id: string): Promise<void> {
   try {
-    await applicationService.updateApplication(parseInt(id), { status: 'approved' }, 1); // TODO: Get actual user ID
+    const userId = await getCurrentUserId();
+    if (!userId) {
+      throw new Error('User not authenticated');
+    }
+    
+    await applicationService.updateApplication(parseInt(id), { status: 'approved' }, userId);
     
     // Create domain from approved application
     const application = await getApplication(id);
@@ -383,7 +413,12 @@ export async function approveApplication(id: string): Promise<void> {
 
 export async function rejectApplication(id: string): Promise<void> {
   try {
-    await applicationService.updateApplication(parseInt(id), { status: 'rejected' }, 1); // TODO: Get actual user ID
+    const userId = await getCurrentUserId();
+    if (!userId) {
+      throw new Error('User not authenticated');
+    }
+    
+    await applicationService.updateApplication(parseInt(id), { status: 'rejected' }, userId);
   } catch (error) {
     throw new Error(`Failed to reject application: ${error instanceof Error ? error.message : 'Unknown error'}`);
   }

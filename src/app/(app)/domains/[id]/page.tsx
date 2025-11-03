@@ -4,6 +4,7 @@ import { DomainDetailClient } from '@/components/features/domains/domain-detail-
 import { Loader2 } from 'lucide-react';
 import React from 'react';
 import { getDomain } from '@/lib/firebase/services';
+import type { Domain } from '@/backend/models/types';
 
 
 // This is now a Server Component
@@ -16,7 +17,7 @@ export default async function DomainDetailPage({ params }: { params: Promise<{ i
   }
 
   // We pass the fetched domain data to the Client Component
-  return <DomainDetailClient domain={domain} />;
+  return <DomainDetailClient domain={domain as unknown as Domain} />;
 }
 
 // Add a suspense boundary for the page

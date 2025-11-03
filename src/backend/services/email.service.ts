@@ -1,3 +1,5 @@
+import nodemailer from 'nodemailer';
+
 interface EmailPayload {
   to: string;
   subject: string;
@@ -5,23 +7,43 @@ interface EmailPayload {
   html?: string;
 }
 
-// TODO: Implement actual email sending using a provider like SendGrid or AWS SES
-export async function sendEmail(payload: EmailPayload) {
-  if (process.env.NODE_ENV === 'development') {
-    console.log('Email would be sent in production:');
-    console.log(payload);
+/**
+ * Send email using Nodemailer
+ * Supports both development (console log) and production (SMTP)
+ */
+export async function sendEmail(payload: EmailPayload): Promise<void> {
+  // Development mode - just log
+  if (process.env.NODE_ENV === 'development' || !process.env.SMTP_HOST) {
+    console.log('📧 Email (Development Mode):');
+    console.log('To:', payload.to);
+    console.log('Subject:', payload.subject);
+    console.log('Body:', payload.text);
     return;
   }
 
-  // Implement actual email sending here
-  // Example with SendGrid:
-  // const sgMail = require('@sendgrid/mail');
-  // sgMail.setApiKey(process.env.SENDGRID_API_KEY);
-  // await sgMail.send({
-  //   to: payload.to,
-  //   from: process.env.MAIL_FROM,
-  //   subject: payload.subject,
-  //   text: payload.text,
-  //   html: payload.html
-  // });
+  try {
+    // Production mode - send actual email
+    const transporter = nodemailer.createTransport({
+      host: process.env.SMTP_HOST,
+      port: parseInt(process.env.SMTP_PORT || '587'),
+      secure: process.env.SMTP_SECURE === 'true', // true for 465, false for other ports
+      auth: {
+        user: process.env.SMTP_USER,
+        pass: process.env.SMTP_PASS,
+      },
+    });
+
+    await transporter.sendMail({
+      from: process.env.MAIL_FROM || 'noreply@domain-manager.com',
+      to: payload.to,
+      subject: payload.subject,
+      text: payload.text,
+      html: payload.html || payload.text,
+    });
+
+    console.log('✅ Email sent successfully to:', payload.to);
+  } catch (error) {
+    console.error('❌ Email sending failed:', error);
+    throw new Error(`Failed to send email: ${error instanceof Error ? error.message : 'Unknown error'}`);
+  }
 }

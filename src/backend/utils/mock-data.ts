@@ -1,4 +1,6 @@
 ﻿// Safe mock data types to avoid mysql2 conflicts
+import type { SubdomainApplication, User, AuditLog, HostingApplication, UserRole, UserStatus } from '@/backend/models/types';
+
 interface MockDomain {
   id: string;
   hostname: string;
@@ -11,14 +13,12 @@ interface MockUser {
   id: string;
   name: string;
   email: string;
-  role: string;
-  status: string;
+  role: UserRole;
+  status: UserStatus;
   nip?: string;
   whatsapp?: string;
   opd?: string;
 }
-
-import type { SubdomainApplication, User, AuditLog, HostingApplication } from '@/backend/models/types';
 
 export const MOCK_ROLES = [
   'Super Admin',

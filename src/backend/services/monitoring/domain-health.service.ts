@@ -89,7 +89,7 @@ export class DomainHealthService {
 
   private async checkSSL(hostname: string): Promise<DomainHealth['ssl']> {
     try {
-      const response = await new Promise<https.IncomingMessage>((resolve, reject) => {
+      const response = await new Promise<any>((resolve, reject) => {
         const req = https.get(`https://${hostname}`, resolve);
         req.on('error', reject);
         req.end();

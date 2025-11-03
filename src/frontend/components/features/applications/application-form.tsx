@@ -99,9 +99,12 @@ function ApplicationFormContent() {
   function onSubmit(values: z.infer<typeof formSchema>) {
     startTransition(async () => {
       const applicationData = {
+          userId: 'current-user', // TODO: Get from auth
           domainName: `${values.domainName}.${values.parentDomain}`,
           applicantName: values.applicantName,
           opd: values.opd,
+          purpose: values.description, // Using description as purpose
+          submissionDate: new Date().toISOString().split('T')[0],
           description: values.description,
       }
 

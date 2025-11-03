@@ -16,7 +16,9 @@ export function LoginLogger() {
         const isDashboard = pathname.includes('dashboard');
         
         if (role && isDashboard && !loggedInRef.current) {
-            userLogin(role as User['role']);
+            // Note: This is a simplified login - in production use proper email/password
+            const mockEmail = role === 'Super Admin' ? 'admin@example.com' : 'user@example.com';
+            userLogin(mockEmail, 'password123'); // Placeholder password
             loggedInRef.current = true; // Mark as logged to prevent re-triggering
         }
     }, [pathname, searchParams]);
