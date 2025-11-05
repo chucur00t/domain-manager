@@ -83,7 +83,6 @@ export const navItems: NavItem[] = [
     roles: ['Super Admin'],
     subItems: [
         { href: (role) => `/super-admin/users?role=${encodeURIComponent(role)}`, label: 'Manajemen Pengguna', icon: Users, roles: ['Super Admin'], exact: true },
-        { href: (role) => `/super-admin/roles?role=${encodeURIComponent(role)}`, label: 'Manajemen Role', icon: ShieldAlert, roles: ['Super Admin'], exact: true },
         { href: (role) => `/super-admin/opds?role=${encodeURIComponent(role)}`, label: 'Manajemen OPD', icon: Building, roles: ['Super Admin'], exact: true },
     ]
   },

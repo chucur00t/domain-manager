@@ -1,6 +1,8 @@
 
 'use client';
 
+import { useEffect } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import {
   Card,
   CardContent,
@@ -8,85 +10,90 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { MOCK_ROLES } from '@/backend/utils/mock-data';
-import type { UserRole } from '@/backend/models/types';
-import { ArrowRight, UserCog, Shield, Eye, Users } from 'lucide-react';
-import Link from 'next/link';
-import { Button } from '@/components/ui/button';
-import React, { Suspense } from 'react';
-import { useSearchParams } from 'next/navigation';
-import { cn } from '@/utils/utils';
-
-const roleConfig: Record<string, { 
-    icon: typeof UserCog; 
-    description: string; 
-    className: string 
-}> = {
-    'Super Admin': { icon: UserCog, description: 'Akses penuh ke seluruh fitur dan konfigurasi sistem.', className: 'text-sky-500' },
-    'Admin Daerah': { icon: Shield, description: 'Mengelola domain dan permohonan untuk OPD.', className: 'text-rose-500' },
-    'Administrator': { icon: Users, description: 'Mengelola sistem dengan akses administrasi penuh.', className: 'text-blue-500' },
-    'Operator': { icon: Shield, description: 'Mengelola operasi sehari-hari sistem.', className: 'text-green-500' },
-    'Auditor': { icon: Eye, description: 'Melakukan audit dan monitoring sistem.', className: 'text-purple-500' },
-    'Kepala Bidang': { icon: UserCog, description: 'Memimpin bidang dan memberikan persetujuan.', className: 'text-orange-500' },
-    'Pengelola Sistem': { icon: Shield, description: 'Mengelola dan memelihara infrastruktur sistem.', className: 'text-teal-500' },
-};
-
-// Helper function to get role config safely
-const getRoleConfig = (roleName: string) => {
-    return roleConfig[roleName] || {
-        icon: Users,
-        description: `Role: ${roleName}`,
-        className: 'text-gray-500'
-    };
-};
+import { AlertCircle, UserCog } from 'lucide-react';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 function RoleManagementContent() {
+    const router = useRouter();
     const searchParams = useSearchParams();
     const role = searchParams.get('role');
-    const roleQuery = role ? `?role=${role}` : '';
-    
+
+    useEffect(() => {
+        // Redirect to users page after 5 seconds
+        const timer = setTimeout(() => {
+            router.replace(`/super-admin/users?role=${encodeURIComponent(role || 'Super Admin')}`);
+        }, 5000);
+
+        return () => clearTimeout(timer);
+    }, [router, role]);
+
     return (
         <div className="space-y-6">
             <div>
-            <h1 className="text-2xl font-bold tracking-tight">Manajemen Role & Permission</h1>
-            <p className="text-muted-foreground">
-                Tinjau dan kelola hak akses untuk setiap peran dalam sistem.
-            </p>
+                <h1 className="text-3xl font-bold tracking-tight">Manajemen Role</h1>
+                <p className="text-muted-foreground">
+                    Fitur ini telah dihapus
+                </p>
             </div>
-            <div className="grid gap-6 md:grid-cols-2">
-                {MOCK_ROLES.map((roleName) => {
-                    const config = getRoleConfig(roleName);
-                    const Icon = config.icon;
-                    return (
-                        <Card key={roleName}>
-                            <CardHeader>
-                            <CardTitle className={cn("flex items-center gap-3", config.className)}>
-                                <Icon className="h-6 w-6" />
-                                <span>{roleName}</span>
-                            </CardTitle>
-                            <CardDescription>{config.description}</CardDescription>
-                            </CardHeader>
-                            <CardContent>
-                            <Link href={`/super-admin/roles/${encodeURIComponent(roleName)}${roleQuery}`}>
-                                <Button variant="outline" size="sm" className="w-full">
-                                    Lihat Detail Izin
-                                    <ArrowRight className="ml-2 h-4 w-4" />
-                                </Button>
-                            </Link>
-                            </CardContent>
-                        </Card>
-                    )
-                })}
-            </div>
-        </div>
-    )
-}
 
+            <Alert variant="destructive">
+                <AlertCircle className="h-4 w-4" />
+                <AlertTitle>Fitur Tidak Tersedia</AlertTitle>
+                <AlertDescription className="mt-2 space-y-2">
+                    <p>
+                        <strong>Fitur "Manajemen Role" telah dihapus dari sistem.</strong>
+                    </p>
+                    <p className="text-sm">
+                        Role pengguna dikelola secara langsung melalui halaman <strong>Manajemen Pengguna</strong>.
+                    </p>
+                    <p className="text-sm text-muted-foreground">
+                        Anda akan dialihkan ke halaman Manajemen Pengguna dalam 5 detik...
+                    </p>
+                </AlertDescription>
+            </Alert>
+
+            <Card>
+                <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                        <UserCog className="h-5 w-5" />
+                        Informasi
+                    </CardTitle>
+                    <CardDescription>
+                        Mengapa fitur ini dihapus?
+                    </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                    <div>
+                        <h3 className="font-semibold mb-2">Alasan Penghapusan:</h3>
+                        <ul className="list-disc list-inside space-y-1 text-sm text-muted-foreground">
+                            <li>Role sudah didefinisikan secara fixed di sistem</li>
+                            <li>Tidak ada kebutuhan untuk CRUD role dinamis</li>
+                            <li>Assignment role dilakukan saat membuat/edit user</li>
+                            <li>Simplifikasi navigasi dan mengurangi kompleksitas</li>
+                        </ul>
+                    </div>
+                    
+                    <div>
+                        <h3 className="font-semibold mb-2">Role yang Tersedia:</h3>
+                        <div className="grid gap-2 text-sm">
+                            <div className="flex items-center gap-2">
+                                <span className="font-medium">1. Super Admin</span>
+                                <span className="text-muted-foreground">- Akses penuh sistem</span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                                <span className="font-medium">2. Admin Daerah</span>
+                                <span className="text-muted-foreground">- Mengelola domain & hosting OPD</span>
+                            </div>
+                        </div>
+                    </div>
+                </CardContent>
+            </Card>
+        </div>
+    );
+}
 
 export default function RoleManagementPage() {
     return (
-        <Suspense fallback={<div>Loading...</div>}>
-            <RoleManagementContent />
-        </Suspense>
-    )
+        <RoleManagementContent />
+    );
 }
