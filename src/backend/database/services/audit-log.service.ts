@@ -84,7 +84,7 @@ export class AuditLogService {
       const logsSql = `
         SELECT al.id, al.user_id, al.action, al.application_id,
                al.details, al.timestamp,
-               u.username, u.email
+               u.username, u.email, u.role
         FROM audit_logs al
         LEFT JOIN users u ON al.user_id = u.id
         ${whereClause}
@@ -103,7 +103,8 @@ export class AuditLogService {
         resourceId: log.application_id?.toString() || '',
         description: log.details || log.action,
         timestamp: log.timestamp.toISOString(),
-        user: log.username,
+        user: log.username || log.email,
+        userRole: (log as any).role,
         details: log.details
       }));
 
@@ -125,7 +126,7 @@ export class AuditLogService {
       const sql = `
         SELECT al.id, al.user_id, al.action, al.application_id,
                al.details, al.timestamp,
-               u.username, u.email
+               u.username, u.email, u.role
         FROM audit_logs al
         LEFT JOIN users u ON al.user_id = u.id
         WHERE al.id = ?
@@ -147,7 +148,8 @@ export class AuditLogService {
         resourceId: log.application_id?.toString() || '',
         description: log.details || log.action,
         timestamp: log.timestamp.toISOString(),
-        user: log.username,
+        user: log.username || log.email,
+        userRole: (log as any).role,
         details: log.details
       };
     } catch (error) {

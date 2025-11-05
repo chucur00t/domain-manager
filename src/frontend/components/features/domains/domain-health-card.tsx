@@ -17,7 +17,7 @@ import {
   RefreshCcw
 } from 'lucide-react';
 import { Button } from '@/frontend/components/ui/button';
-import { DomainHealth } from '@/backend/services/monitoring/domain-health.service';
+import { DomainHealth } from '@/backend/models/types';
 
 interface DomainHealthCardProps {
   domainId: string;

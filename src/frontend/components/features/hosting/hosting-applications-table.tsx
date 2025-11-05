@@ -51,6 +51,19 @@ const statusConfig = {
   pending_approval: { text: 'Persetujuan', variant: 'default' as const, className: "bg-blue-500 hover:bg-blue-600" },
   approved: { text: 'Disetujui', variant: 'secondary' as const, className: "bg-green-500 hover:bg-green-600 text-secondary-foreground" },
   rejected: { text: 'Ditolak', variant: 'destructive' as const, className: "bg-red-500 hover:bg-red-600" },
+  // Database might use different case
+  Pending: { text: 'Menunggu', variant: 'default' as const, className: "bg-gray-500 hover:bg-gray-600" },
+  Approved: { text: 'Disetujui', variant: 'secondary' as const, className: "bg-green-500 hover:bg-green-600 text-secondary-foreground" },
+  Rejected: { text: 'Ditolak', variant: 'destructive' as const, className: "bg-red-500 hover:bg-red-600" },
+};
+
+// Helper function to get status config safely
+const getStatusConfig = (status: string) => {
+  return statusConfig[status as keyof typeof statusConfig] || {
+    text: status || 'Unknown',
+    variant: 'default' as const,
+    className: "bg-gray-500 hover:bg-gray-600"
+  };
 };
 
 
@@ -179,10 +192,10 @@ function HostingApplicationsTableContent({ applications }: HostingApplicationsTa
                     <TableCell>{app.opd}</TableCell>
                     <TableCell>
                       <Badge 
-                        variant={statusConfig[app.status].variant}
-                        className={cn(statusConfig[app.status].className)}
+                        variant={getStatusConfig(app.status).variant}
+                        className={cn(getStatusConfig(app.status).className)}
                       >
-                        {statusConfig[app.status].text}
+                        {getStatusConfig(app.status).text}
                       </Badge>
                     </TableCell>
                     <TableCell>{app.submittedDate}</TableCell>

@@ -36,7 +36,7 @@ type DomainsTableProps = {
 
 import { DomainStatus } from '@/backend/models/types';
 
-const statusConfig: Record<DomainStatus, {
+const statusConfig: Record<DomainStatus | 'Active' | 'Inactive' | 'Expired', {
   text: string;
   variant: "default" | "secondary" | "destructive" | "outline";
   className: string;
@@ -60,7 +60,32 @@ const statusConfig: Record<DomainStatus, {
     text: 'Kadaluarsa',
     variant: 'destructive',
     className: "bg-red-500 hover:bg-red-600"
+  },
+  // Database might use different case
+  Active: { 
+    text: 'Aktif', 
+    variant: 'secondary', 
+    className: "bg-green-500 hover:bg-green-600 text-secondary-foreground" 
+  },
+  Inactive: { 
+    text: 'Tidak Aktif', 
+    variant: 'outline', 
+    className: "bg-gray-100 hover:bg-gray-200" 
+  },
+  Expired: {
+    text: 'Kadaluarsa',
+    variant: 'destructive',
+    className: "bg-red-500 hover:bg-red-600"
   }
+};
+
+// Helper function to get status config safely
+const getStatusConfig = (status: string) => {
+  return statusConfig[status as keyof typeof statusConfig] || {
+    text: status || 'Unknown',
+    variant: 'default' as const,
+    className: "bg-gray-500 hover:bg-gray-600"
+  };
 };
 
 const ITEMS_PER_PAGE = 10;
@@ -106,10 +131,10 @@ function DomainsTableContent({ domains, currentUser }: DomainsTableProps) {
                   <TableCell>{domain.opd}</TableCell>
                   <TableCell>
                     <Badge 
-                      variant={statusConfig[domain.status].variant}
-                      className={cn(statusConfig[domain.status].className)}
+                      variant={getStatusConfig(domain.status).variant}
+                      className={cn(getStatusConfig(domain.status).className)}
                     >
-                      {statusConfig[domain.status].text}
+                      {getStatusConfig(domain.status).text}
                     </Badge>
                   </TableCell>
                   <TableCell>{domain.activationDate}</TableCell>

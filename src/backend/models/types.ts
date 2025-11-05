@@ -101,6 +101,26 @@ export interface HostingApplication {
   rejectionReason?: string;
 }
 
+// Domain Health Monitoring interface
+export interface DomainHealth {
+  id: string;
+  hostname: string;
+  isUp: boolean;
+  responseTime: number;
+  lastChecked: string;
+  ssl: {
+    isValid: boolean;
+    expiryDate?: string;
+    issuer?: string;
+  };
+  dns: {
+    hasValidRecords: boolean;
+    aRecords?: string[];
+    aaaaRecords?: string[];
+    txtRecords?: string[][];
+  };
+}
+
 // Role Permissions interface (for super admin roles)
 export interface RolePermissions {
   [key: string]: {

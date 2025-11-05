@@ -9,10 +9,14 @@ import {
   Users,
   ShieldAlert,
   Server,
-  PenSquare,
   Settings,
   UserCog,
   FolderKanban,
+  ClipboardCheck,
+  Bell,
+  FileBarChart,
+  Building,
+  ClipboardList,
 } from 'lucide-react';
 import { cn } from '@/frontend/utils/utils';
 import React from 'react';
@@ -48,17 +52,31 @@ export const navItems: NavItem[] = [
     roles: ['Super Admin', 'Admin Daerah'],
     exact: true,
   },
+  // ADMIN DAERAH: Menu Pengajuan (untuk mengajukan permohonan)
   { 
     href: (role) => '#',
-    label: 'Permohonan', 
+    label: 'Pengajuan',  // Untuk Admin Daerah: MENGAJUKAN permohonan
     icon: FolderKanban, 
-    roles: ['Admin Daerah', 'Super Admin'],
+    roles: ['Admin Daerah'],
     subItems: [
-        { href: (role) => `/applications?role=${encodeURIComponent(role)}`, label: 'Permohonan Domain', icon: FileText, roles: ['Admin Daerah', 'Super Admin'] },
-        { href: (role) => `/hosting?role=${encodeURIComponent(role)}`, label: 'Permohonan Hosting', icon: Server, roles: ['Admin Daerah', 'Super Admin'] },
+        { href: (role) => `/applications?role=${encodeURIComponent(role)}`, label: 'Ajukan Domain', icon: FileText, roles: ['Admin Daerah'] },
+        { href: (role) => `/hosting?role=${encodeURIComponent(role)}`, label: 'Ajukan Hosting', icon: Server, roles: ['Admin Daerah'] },
+        { href: (role) => `/applications?role=${encodeURIComponent(role)}`, label: 'Status Pengajuan', icon: ClipboardList, roles: ['Admin Daerah'] },
     ]
   },
-   { 
+  // SUPER ADMIN: Menu Persetujuan (untuk menyetujui permohonan)
+  { 
+    href: (role) => '#',
+    label: 'Persetujuan',  // Untuk Super Admin: MENYETUJUI permohonan
+    icon: ClipboardCheck, 
+    roles: ['Super Admin'],
+    subItems: [
+        { href: (role) => `/super-admin/applications?role=${encodeURIComponent(role)}`, label: 'Permohonan Domain', icon: FileText, roles: ['Super Admin'] },
+        { href: (role) => `/super-admin/hosting-applications?role=${encodeURIComponent(role)}`, label: 'Permohonan Hosting', icon: Server, roles: ['Super Admin'] },
+    ]
+  },
+  // Menu Administrasi untuk Super Admin (TANPA Pendaftaran Subdomain/Hosting)
+  { 
     href: (role) => '#',
     label: 'Administrasi', 
     icon: UserCog, 
@@ -66,13 +84,22 @@ export const navItems: NavItem[] = [
     subItems: [
         { href: (role) => `/super-admin/users?role=${encodeURIComponent(role)}`, label: 'Manajemen Pengguna', icon: Users, roles: ['Super Admin'], exact: true },
         { href: (role) => `/super-admin/roles?role=${encodeURIComponent(role)}`, label: 'Manajemen Role', icon: ShieldAlert, roles: ['Super Admin'], exact: true },
-        { href: (role) => `/super-admin/subdomain-registration?role=${encodeURIComponent(role)}`, label: 'Pendaftaran Subdomain', icon: PenSquare, roles: ['Super Admin'], exact: true },
-        { href: (role) => `/super-admin/hosting-registration?role=${encodeURIComponent(role)}`, label: 'Pendaftaran Hosting', icon: Server, roles: ['Super Admin'], exact: true },
+        { href: (role) => `/super-admin/opds?role=${encodeURIComponent(role)}`, label: 'Manajemen OPD', icon: Building, roles: ['Super Admin'], exact: true },
     ]
   },
-  { href: (role) => `/domains?role=${encodeURIComponent(role)}`, label: 'Manajemen Domain', icon: Globe, roles: ['Admin Daerah', 'Super Admin'] },
-  { href: (role) => `/users?role=${encodeURIComponent(role)}`, label: 'Manajemen Pengguna', icon: Users, roles: ['Admin Daerah'] },
-  { href: (role) => `/audit-trail?role=${encodeURIComponent(role)}`, label: 'Audit Trail', icon: ShieldAlert, roles: ['Super Admin'] },
+  // Admin Daerah: Domain Saya (hanya domain OPD mereka)
+  { href: (role) => `/domains?role=${encodeURIComponent(role)}`, label: 'Domain Saya', icon: Globe, roles: ['Admin Daerah'] },
+  // Super Admin: Manajemen Domain (semua domain)
+  { href: (role) => `/super-admin/domains?role=${encodeURIComponent(role)}`, label: 'Manajemen Domain', icon: Globe, roles: ['Super Admin'] },
+  // Admin Daerah: Hosting Saya
+  { href: (role) => `/hosting?role=${encodeURIComponent(role)}`, label: 'Hosting Saya', icon: Server, roles: ['Admin Daerah'] },
+  // Admin Daerah: Notifikasi
+  { href: (role) => `/notifications?role=${encodeURIComponent(role)}`, label: 'Notifikasi', icon: Bell, roles: ['Admin Daerah'] },
+  // Super Admin: Laporan
+  { href: (role) => `/super-admin/reports?role=${encodeURIComponent(role)}`, label: 'Laporan', icon: FileBarChart, roles: ['Super Admin'] },
+  // Super Admin: Audit Trail
+  { href: (role) => `/super-admin/audit-trail?role=${encodeURIComponent(role)}`, label: 'Audit Trail', icon: ShieldAlert, roles: ['Super Admin'] },
+  // Pengaturan untuk kedua role
   { href: (role) => `/settings?role=${encodeURIComponent(role)}`, label: 'Pengaturan', icon: Settings, roles: ['Super Admin', 'Admin Daerah'] },
 ];
 

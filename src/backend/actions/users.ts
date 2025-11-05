@@ -1,4 +1,6 @@
-﻿import { ChangeUserStatusRequest, User, UserRole } from '@/backend/models/types';
+﻿'use server';
+
+import { ChangeUserStatusRequest, User, UserRole } from '@/backend/models/types';
 import { auditService } from '@/backend/services/audit.service';
 import { UserService } from '@/backend/database/services/user.service';
 

@@ -22,10 +22,14 @@ function UsersPageContent() {
   const router = useRouter();
   const currentUserRole = searchParams.get('role') as User['role'];
   
-  // Redirect to the new Super Admin user management page if the role is Super Admin
+  // Redirect Super Admin to their specific user management page
+  // Redirect Admin Daerah away (they don't have permission - SRS KF-013)
   useEffect(() => {
     if (currentUserRole === 'Super Admin') {
       router.replace(`/super-admin/users?role=Super+Admin`);
+    } else if (currentUserRole === 'Admin Daerah') {
+      // Admin Daerah TIDAK boleh mengelola pengguna (SRS KF-013)
+      router.replace(`/dashboard?role=Admin+Daerah`);
     }
   }, [currentUserRole, router]);
 
@@ -114,10 +118,15 @@ function UsersPageContent() {
   }
   
   // Render a loader while redirecting
-  if (currentUserRole === 'Super Admin') {
+  if (currentUserRole === 'Super Admin' || currentUserRole === 'Admin Daerah') {
       return (
         <div className="flex justify-center items-center h-96">
             <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+            <p className="ml-3 text-muted-foreground">
+              {currentUserRole === 'Admin Daerah' 
+                ? 'Akses ditolak. Mengarahkan ke dashboard...' 
+                : 'Mengarahkan ke halaman manajemen pengguna...'}
+            </p>
         </div>
       )
   }

@@ -40,7 +40,7 @@ SPDPD Web Manager adalah aplikasi web berbasis React.js \+ PHP yang dirancang un
 
 **ID: KF-001 Nama Fitur: Pengajuan & Perpanjangan Domain**
 
-**Deskripsi:** Admin Daerah dapat mengajukan permohonan domain baru atau perpanjangan domain yang sudah ada dengan mengisi formulir dan melampirkan dokumen pendukung. Sistem harus memvalidasi kelengkapan data.
+**Deskripsi:** Admin Daerah dapat mengajukan permohonan domain baru atau perpanjangan domain yang sudah ada saat masa berlaku subdomain sisa satu bulan dengan mengisi formulir dan melampirkan dokumen pendukung. Sistem harus memvalidasi kelengkapan data.
 
 **Prioritas:** Tinggi
 
@@ -100,13 +100,13 @@ SPDPD Web Manager adalah aplikasi web berbasis React.js \+ PHP yang dirancang un
 
 **ID: KF-007 Nama Fitur: Monitoring & Status Domain**
 
-**Deskripsi:** Sistem harus menyediakan dasbor untuk memantau status semua domain (aktif/tidak aktif/disuspensi). Dasbor harus dapat menyortir domain yang disuspensi di bagian teratas.
+**Deskripsi:** Sistem harus menyediakan dasbor untuk memantau status semua domain (aktif/tidak aktif/disuspensi) dan masa aktif domain. Dasbor harus dapat menyortir domain sesuai dengan keinginan (masa aktif domain paling sedikit, domain aktif, domain suspended, domain tidak aktif).
 
 **Prioritas:** Tinggi
 
 **Input:** User *credentials*/data *login*.
 
-**Output:** Dasbor statistik dan status domain.
+**Output:** Dasbor statistik, status domain, masa aktif domain.
 
 **2.2 Modul Pengelolaan Hosting**
 
@@ -176,7 +176,7 @@ SPDPD Web Manager adalah aplikasi web berbasis React.js \+ PHP yang dirancang un
 
 **ID: KF-014 Nama Fitur: Sistem Notifikasi**
 
-**Deskripsi:** Sistem harus mengirimkan notifikasi *in-app* dan email kepada Admin Daerah terkait status permohonan, perpanjangan domain, dan suspensi. **Notifikasi *countdown*** untuk perpanjangan domain harus dikirim beberapa hari sebelum masa berlaku berakhir.
+**Deskripsi:** Sistem harus mengirimkan notifikasi *in-app* dan email kepada Admin Daerah terkait status permohonan, perpanjangan domain, dan suspensi. **Notifikasi *countdown*** untuk perpanjangan domain harus dikirim satu bulan sebelum masa berlaku berakhir.
 
 **Prioritas:** Tinggi
 
@@ -186,7 +186,7 @@ SPDPD Web Manager adalah aplikasi web berbasis React.js \+ PHP yang dirancang un
 
 **ID: KF-015 Nama Fitur: Status Domain**
 
-**Dekripsi:** Fitur ini berfungsi sebagai laman visual yang menampilkan status terkini dari setiap domain (aktif/tidak aktif). Selain itu, fitur ini menunjukkan hitung mundur masa aktif domain sebagai pengingat visual bagi Admin Daerah agar tidak terlambat dalam proses perpanjangan.
+**Dekripsi:** Fitur ini berfungsi sebagai laman visual yang menampilkan status terkini dari setiap domain (aktif/tidak aktif). Selain itu, fitur ini menunjukkan hitung mundur masa aktif domain dengan durasi satu tahun sejak domain di diaktivasi sebagai pengingat visual bagi Admin Daerah agar tidak terlambat dalam proses perpanjangan.
 
 **Prioritas:** Tinggi
 

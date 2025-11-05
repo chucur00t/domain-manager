@@ -9,40 +9,25 @@
  * - CSRF protection
  */
 
-import { cookies } from 'next/headers';
+// DO NOT import 'next/headers' here - it causes issues when imported in client components
+// import { cookies } from 'next/headers';
 import type { User } from '@/backend/models/types';
 
 /**
  * Get current authenticated user from session
  * 
  * TODO: Replace with proper session management
- * Current implementation uses query params which is NOT secure for production
+ * Current implementation returns null - needs implementation
  * 
  * @returns User object or null if not authenticated
  */
 export async function getCurrentUser(): Promise<User | null> {
-  try {
-    // TODO: Implement proper session-based authentication
-    // This is a placeholder that should be replaced with:
-    // 1. Read session from secure cookie
-    // 2. Validate session token
-    // 3. Fetch user from database
-    // 4. Return user object
-    
-    const cookieStore = await cookies();
-    const userCookie = cookieStore.get('user');
-    
-    if (!userCookie) {
-      return null;
-    }
-    
-    // Parse user from cookie (TEMPORARY - not secure)
-    const user = JSON.parse(userCookie.value) as User;
-    return user;
-  } catch (error) {
-    console.error('Error getting current user:', error);
-    return null;
-  }
+  // TODO: Implement proper session-based authentication
+  // This should use NextAuth.js session or similar
+  // For now, return null to avoid server component import issues
+  
+  console.warn('getCurrentUser() is not implemented - returning null');
+  return null;
 }
 
 /**

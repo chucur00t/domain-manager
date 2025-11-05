@@ -18,7 +18,7 @@ import { MainNav } from "@/frontend/components/layout/main-nav";
 import { UserNav } from "@/frontend/components/layout/user-nav";
 import { ColorThemeNav } from "@/frontend/components/layout/color-theme-nav";
 import { NotificationNav } from "@/frontend/components/layout/notification-nav";
-import { LoginLogger } from "@/frontend/components/login-logger";
+// import { LoginLogger } from "@/frontend/components/login-logger"; // DISABLED: Causes backend services to bundle in frontend
 import React from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
@@ -78,7 +78,7 @@ function AppLayoutContent({ children }: { children: ReactNode }) {
                 </div>
             </footer>
         </SidebarInset>
-        <LoginLogger />
+        {/* <LoginLogger /> */}
     </SidebarProvider>
     )
 }

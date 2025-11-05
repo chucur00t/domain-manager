@@ -17,7 +17,11 @@ import React, { Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { cn } from '@/utils/utils';
 
-const roleConfig = {
+const roleConfig: Record<string, { 
+    icon: typeof UserCog; 
+    description: string; 
+    className: string 
+}> = {
     'Super Admin': { icon: UserCog, description: 'Akses penuh ke seluruh fitur dan konfigurasi sistem.', className: 'text-sky-500' },
     'Admin Daerah': { icon: Shield, description: 'Mengelola domain dan permohonan untuk OPD.', className: 'text-rose-500' },
     'Administrator': { icon: Users, description: 'Mengelola sistem dengan akses administrasi penuh.', className: 'text-blue-500' },
@@ -25,6 +29,15 @@ const roleConfig = {
     'Auditor': { icon: Eye, description: 'Melakukan audit dan monitoring sistem.', className: 'text-purple-500' },
     'Kepala Bidang': { icon: UserCog, description: 'Memimpin bidang dan memberikan persetujuan.', className: 'text-orange-500' },
     'Pengelola Sistem': { icon: Shield, description: 'Mengelola dan memelihara infrastruktur sistem.', className: 'text-teal-500' },
+};
+
+// Helper function to get role config safely
+const getRoleConfig = (roleName: string) => {
+    return roleConfig[roleName] || {
+        icon: Users,
+        description: `Role: ${roleName}`,
+        className: 'text-gray-500'
+    };
 };
 
 function RoleManagementContent() {
@@ -41,8 +54,8 @@ function RoleManagementContent() {
             </p>
             </div>
             <div className="grid gap-6 md:grid-cols-2">
-                {(Object.keys(MOCK_ROLES) as UserRole[]).map((roleName) => {
-                    const config = roleConfig[roleName];
+                {MOCK_ROLES.map((roleName) => {
+                    const config = getRoleConfig(roleName);
                     const Icon = config.icon;
                     return (
                         <Card key={roleName}>

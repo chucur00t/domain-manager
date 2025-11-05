@@ -3,7 +3,8 @@
 
 import { useSearchParams, usePathname } from 'next/navigation';
 import { useEffect, useRef } from 'react';
-import { userLogin } from '@/backend/actions/users';
+// DISABLED: This causes backend services to bundle in frontend
+// import { userLogin } from '@/backend/actions/users';
 import type { User } from '@/backend/models/types';
 
 export function LoginLogger() {
@@ -17,9 +18,11 @@ export function LoginLogger() {
         
         if (role && isDashboard && !loggedInRef.current) {
             // Note: This is a simplified login - in production use proper email/password
-            const mockEmail = role === 'Super Admin' ? 'admin@example.com' : 'user@example.com';
-            userLogin(mockEmail, 'password123'); // Placeholder password
+            // const mockEmail = role === 'Super Admin' ? 'admin@example.com' : 'user@example.com';
+            // userLogin(mockEmail, 'password123'); // Placeholder password
             loggedInRef.current = true; // Mark as logged to prevent re-triggering
+            
+            console.log('LoginLogger disabled - would have logged in with role:', role);
         }
     }, [pathname, searchParams]);
 

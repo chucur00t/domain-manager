@@ -18,7 +18,6 @@ import { CardDescription } from '../ui/card';
 import { useSearchParams } from 'next/navigation';
 import React, { useMemo, useEffect, useState } from 'react';
 import type { User, SubdomainApplication, HostingApplication } from '@/backend/models/types';
-import { getUsers, getApplications, getHostingApplications } from '@/backend/services';
 
 type NotificationItem = {
   id: string;
@@ -44,11 +43,20 @@ function NotificationNavContent() {
     const fetchNotifications = async () => {
       setIsLoading(true);
       try {
-        const [users, domainApps, hostingApps] = await Promise.all([
-          getUsers(),
-          getApplications(),
-          getHostingApplications()
+        // Fetch data from API routes instead of direct backend services
+        const [usersRes, domainAppsRes, hostingAppsRes] = await Promise.all([
+          fetch('/api/users'),
+          fetch('/api/applications'),
+          fetch('/api/hosting-applications')
         ]);
+        
+        if (!usersRes.ok || !domainAppsRes.ok || !hostingAppsRes.ok) {
+          throw new Error('Failed to fetch data');
+        }
+        
+        const users: User[] = await usersRes.json();
+        const domainApps: SubdomainApplication[] = await domainAppsRes.json();
+        const hostingApps: HostingApplication[] = await hostingAppsRes.json();
         
         const currentUser = users.find(user => user.role === role);
         let allNotifications: NotificationItem[] = [];

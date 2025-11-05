@@ -1,4 +1,4 @@
-import { Domain, DatabaseRow } from '@/backend/models/types';
+import { Domain, DatabaseRow, DomainHealth } from '@/backend/models/types';
 import { auditService } from '@/backend/services/audit.service';
 import { emailService } from '@/backend/services/notifications/email.service';
 import { RowDataPacket } from 'mysql2';
@@ -9,25 +9,6 @@ import { promisify } from 'util';
 const resolveTxt = promisify(dns.resolveTxt);
 const resolve4 = promisify(dns.resolve4);
 const resolve6 = promisify(dns.resolve6);
-
-export interface DomainHealth {
-  id: string;
-  hostname: string;
-  isUp: boolean;
-  responseTime: number;
-  lastChecked: string;
-  ssl: {
-    isValid: boolean;
-    expiryDate?: string;
-    issuer?: string;
-  };
-  dns: {
-    hasValidRecords: boolean;
-    aRecords?: string[];
-    aaaaRecords?: string[];
-    txtRecords?: string[][];
-  };
-}
 
 export class DomainHealthService {
   private healthCache: Map<string, DomainHealth> = new Map();
