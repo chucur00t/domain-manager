@@ -1,38 +1,38 @@
-'use client';
+"use client";
 
-import { useState, useEffect, useMemo, Suspense } from 'react';
-import { useSearchParams } from 'next/navigation';
+import { useState, useEffect, useMemo, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
-import { 
-  Loader2, 
-  Search, 
-  Globe, 
-  PauseCircle, 
-  PlayCircle, 
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
+import {
+  Loader2,
+  Search,
+  Globe,
+  PauseCircle,
+  PlayCircle,
   XCircle,
   AlertCircle,
   CheckCircle2,
   Activity,
   Shield,
-  Calendar
-} from 'lucide-react';
-import type { Domain, DomainHealth } from '@/backend/models/types';
+  Calendar,
+} from "lucide-react";
+import type { Domain, DomainHealth } from "@/backend/models/types";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
+} from "@/components/ui/select";
 import {
   Dialog,
   DialogContent,
@@ -40,43 +40,47 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog';
-import { Textarea } from '@/components/ui/textarea';
-import { Label } from '@/components/ui/label';
+} from "@/components/ui/dialog";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from '@/components/ui/tooltip';
+} from "@/components/ui/tooltip";
 
-type StatusFilter = 'all' | 'active' | 'inactive' | 'expired' | 'pending';
-type ActionType = 'activate' | 'suspend' | 'deactivate' | 'health-check';
+type StatusFilter = "all" | "active" | "inactive" | "expired";
+type ActionType = "activate" | "suspend" | "deactivate" | "health-check";
 
 function SuperAdminDomainsContent() {
   const searchParams = useSearchParams();
   const [domains, setDomains] = useState<Domain[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
-  const [opdFilter, setOpdFilter] = useState<string>('all');
-  
+  const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
+  const [opdFilter, setOpdFilter] = useState<string>("all");
+
   // Dialog states
   const [selectedDomain, setSelectedDomain] = useState<Domain | null>(null);
   const [actionType, setActionType] = useState<ActionType | null>(null);
-  const [reason, setReason] = useState('');
+  const [reason, setReason] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  
+
   // Health check state
-  const [healthData, setHealthData] = useState<Map<string, DomainHealth>>(new Map());
-  const [isCheckingHealth, setIsCheckingHealth] = useState<Set<string>>(new Set());
+  const [healthData, setHealthData] = useState<Map<string, DomainHealth>>(
+    new Map()
+  );
+  const [isCheckingHealth, setIsCheckingHealth] = useState<Set<string>>(
+    new Set()
+  );
 
   const fetchDomains = async () => {
     setIsLoading(true);
     try {
-      const response = await fetch('/api/domains');
+      const response = await fetch("/api/domains");
       if (!response.ok) {
-        throw new Error('Failed to fetch domains');
+        throw new Error("Failed to fetch domains");
       }
       const data = await response.json();
       setDomains(data);
@@ -94,24 +98,24 @@ function SuperAdminDomainsContent() {
   // Get unique OPDs for filter
   const allOpds = useMemo(() => {
     const opds = domains
-      .map(domain => domain.opd)
+      .map((domain) => domain.opd)
       .filter((opd, index, self) => opd && self.indexOf(opd) === index);
     return opds.sort();
   }, [domains]);
 
   // Filtered domains
   const filteredDomains = useMemo(() => {
-    return domains.filter(domain => {
+    return domains.filter((domain) => {
       // Status filter
-      if (statusFilter !== 'all' && domain.status !== statusFilter) {
+      if (statusFilter !== "all" && domain.status !== statusFilter) {
         return false;
       }
-      
+
       // OPD filter
-      if (opdFilter !== 'all' && domain.opd !== opdFilter) {
+      if (opdFilter !== "all" && domain.opd !== opdFilter) {
         return false;
       }
-      
+
       // Search filter
       if (searchTerm) {
         const search = searchTerm.toLowerCase();
@@ -121,7 +125,7 @@ function SuperAdminDomainsContent() {
           domain.parentDomain?.toLowerCase().includes(search)
         );
       }
-      
+
       return true;
     });
   }, [domains, statusFilter, opdFilter, searchTerm]);
@@ -130,45 +134,43 @@ function SuperAdminDomainsContent() {
   const stats = useMemo(() => {
     return {
       total: domains.length,
-      active: domains.filter(d => d.status === 'active').length,
-      inactive: domains.filter(d => d.status === 'inactive').length,
-      expired: domains.filter(d => d.status === 'expired').length,
-      pending: domains.filter(d => d.status === 'pending').length,
+      active: domains.filter((d) => d.status === "active").length,
+      inactive: domains.filter((d) => d.status === "inactive").length,
+      expired: domains.filter((d) => d.status === "expired").length,
     };
   }, [domains]);
 
   const handleOpenDialog = (domain: Domain, action: ActionType) => {
     setSelectedDomain(domain);
     setActionType(action);
-    setReason('');
+    setReason("");
   };
 
   const handleCloseDialog = () => {
     setSelectedDomain(null);
     setActionType(null);
-    setReason('');
+    setReason("");
   };
 
   const handleCheckHealth = async (domain: Domain) => {
-    setIsCheckingHealth(prev => new Set(prev).add(domain.id));
-    
+    setIsCheckingHealth((prev) => new Set(prev).add(domain.id));
+
     try {
       const response = await fetch(`/api/domains/${domain.id}/health`);
       if (!response.ok) {
-        throw new Error('Failed to check domain health');
+        throw new Error("Failed to check domain health");
       }
       const healthInfo: DomainHealth = await response.json();
-      
-      setHealthData(prev => new Map(prev).set(domain.id, healthInfo));
-      
+
+      setHealthData((prev) => new Map(prev).set(domain.id, healthInfo));
+
       // Show result in dialog
-      handleOpenDialog(domain, 'health-check');
-      
+      handleOpenDialog(domain, "health-check");
     } catch (error) {
       console.error(error);
-      alert('Gagal memeriksa kesehatan domain. Silakan coba lagi.');
+      alert("Gagal memeriksa kesehatan domain. Silakan coba lagi.");
     } finally {
-      setIsCheckingHealth(prev => {
+      setIsCheckingHealth((prev) => {
         const next = new Set(prev);
         next.delete(domain.id);
         return next;
@@ -178,34 +180,41 @@ function SuperAdminDomainsContent() {
 
   const handleSubmitAction = async () => {
     if (!selectedDomain || !actionType) return;
-    
+
     // Skip validation for health-check (view only)
-    if (actionType === 'health-check') {
+    if (actionType === "health-check") {
       handleCloseDialog();
       return;
     }
-    
+
     // Validation for actions that require reason
-    if ((actionType === 'suspend' || actionType === 'deactivate') && !reason.trim()) {
-      alert('Alasan harus diisi!');
+    if (
+      (actionType === "suspend" || actionType === "deactivate") &&
+      !reason.trim()
+    ) {
+      alert("Alasan harus diisi!");
       return;
     }
 
     setIsSubmitting(true);
     try {
       // Map action to new status
-      const statusMap: Record<Exclude<ActionType, 'health-check'>, Domain['status']> = {
-        'activate': 'active',
-        'suspend': 'inactive',
-        'deactivate': 'inactive',
+      const statusMap: Record<
+        Exclude<ActionType, "health-check">,
+        Domain["status"]
+      > = {
+        activate: "active",
+        suspend: "inactive",
+        deactivate: "inactive",
       };
-      
-      const newStatus = statusMap[actionType as Exclude<ActionType, 'health-check'>];
-      
+
+      const newStatus =
+        statusMap[actionType as Exclude<ActionType, "health-check">];
+
       const response = await fetch(`/api/domains/${selectedDomain.id}`, {
-        method: 'PATCH',
+        method: "PATCH",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           status: newStatus,
@@ -215,41 +224,72 @@ function SuperAdminDomainsContent() {
       });
 
       if (!response.ok) {
-        throw new Error('Failed to update domain');
+        throw new Error("Failed to update domain");
       }
 
       // Refresh data
       await fetchDomains();
-      
+
       // Close dialog
       handleCloseDialog();
-      
+
       // Show success message
       const actionLabels = {
-        activate: 'diaktifkan',
-        suspend: 'disuspen',
-        deactivate: 'dinonaktifkan',
+        activate: "diaktifkan",
+        suspend: "disuspen",
+        deactivate: "dinonaktifkan",
       };
-      alert(`Domain berhasil ${actionLabels[actionType as keyof typeof actionLabels]}!`);
-      
+      alert(
+        `Domain berhasil ${
+          actionLabels[actionType as keyof typeof actionLabels]
+        }!`
+      );
     } catch (error) {
       console.error(error);
-      alert('Gagal memproses aksi. Silakan coba lagi.');
+      alert("Gagal memproses aksi. Silakan coba lagi.");
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  const getStatusBadge = (status: Domain['status']) => {
+  const getStatusBadge = (status: Domain["status"]) => {
     switch (status) {
-      case 'active':
-        return <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">Aktif</Badge>;
-      case 'inactive':
-        return <Badge variant="outline" className="bg-gray-50 text-gray-700 border-gray-200">Tidak Aktif</Badge>;
-      case 'expired':
-        return <Badge variant="outline" className="bg-red-50 text-red-700 border-red-200">Kadaluarsa</Badge>;
-      case 'pending':
-        return <Badge variant="outline" className="bg-yellow-50 text-yellow-700 border-yellow-200">Pending</Badge>;
+      case "active":
+        return (
+          <Badge
+            variant="outline"
+            className="bg-green-50 text-green-700 border-green-200"
+          >
+            Aktif
+          </Badge>
+        );
+      case "inactive":
+        return (
+          <Badge
+            variant="outline"
+            className="bg-gray-50 text-gray-700 border-gray-200"
+          >
+            Tidak Aktif
+          </Badge>
+        );
+      case "expired":
+        return (
+          <Badge
+            variant="outline"
+            className="bg-red-50 text-red-700 border-red-200"
+          >
+            Kadaluarsa
+          </Badge>
+        );
+      case "pending":
+        return (
+          <Badge
+            variant="outline"
+            className="bg-yellow-50 text-yellow-700 border-yellow-200"
+          >
+            Pending
+          </Badge>
+        );
       default:
         return <Badge variant="outline">{status}</Badge>;
     }
@@ -257,9 +297,9 @@ function SuperAdminDomainsContent() {
 
   const getActionButtons = (domain: Domain) => {
     const buttons = [];
-    
+
     // Activate button (for inactive/expired/pending domains)
-    if (domain.status !== 'active') {
+    if (domain.status !== "active") {
       buttons.push(
         <TooltipProvider key="activate">
           <Tooltip>
@@ -268,7 +308,7 @@ function SuperAdminDomainsContent() {
                 size="sm"
                 variant="outline"
                 className="text-green-600 border-green-200 hover:bg-green-50"
-                onClick={() => handleOpenDialog(domain, 'activate')}
+                onClick={() => handleOpenDialog(domain, "activate")}
               >
                 <PlayCircle className="h-4 w-4" />
               </Button>
@@ -278,9 +318,9 @@ function SuperAdminDomainsContent() {
         </TooltipProvider>
       );
     }
-    
+
     // Suspend button (for active domains)
-    if (domain.status === 'active') {
+    if (domain.status === "active") {
       buttons.push(
         <TooltipProvider key="suspend">
           <Tooltip>
@@ -289,7 +329,7 @@ function SuperAdminDomainsContent() {
                 size="sm"
                 variant="outline"
                 className="text-orange-600 border-orange-200 hover:bg-orange-50"
-                onClick={() => handleOpenDialog(domain, 'suspend')}
+                onClick={() => handleOpenDialog(domain, "suspend")}
               >
                 <PauseCircle className="h-4 w-4" />
               </Button>
@@ -299,9 +339,9 @@ function SuperAdminDomainsContent() {
         </TooltipProvider>
       );
     }
-    
+
     // Deactivate button (for any active/inactive domain)
-    if (domain.status !== 'expired') {
+    if (domain.status !== "expired") {
       buttons.push(
         <TooltipProvider key="deactivate">
           <Tooltip>
@@ -310,7 +350,7 @@ function SuperAdminDomainsContent() {
                 size="sm"
                 variant="outline"
                 className="text-red-600 border-red-200 hover:bg-red-50"
-                onClick={() => handleOpenDialog(domain, 'deactivate')}
+                onClick={() => handleOpenDialog(domain, "deactivate")}
               >
                 <XCircle className="h-4 w-4" />
               </Button>
@@ -320,9 +360,9 @@ function SuperAdminDomainsContent() {
         </TooltipProvider>
       );
     }
-    
+
     // Health check button (always available for active/inactive domains)
-    if (domain.status === 'active' || domain.status === 'inactive') {
+    if (domain.status === "active" || domain.status === "inactive") {
       const isChecking = isCheckingHealth.has(domain.id);
       buttons.push(
         <TooltipProvider key="health">
@@ -347,7 +387,7 @@ function SuperAdminDomainsContent() {
         </TooltipProvider>
       );
     }
-    
+
     return buttons;
   };
 
@@ -363,10 +403,12 @@ function SuperAdminDomainsContent() {
     <>
       <div className="space-y-6">
         {/* Statistics Cards */}
-        <div className="grid gap-4 md:grid-cols-5">
+        <div className="grid gap-4 md:grid-cols-4">
           <Card>
             <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-medium text-muted-foreground">Total Domain</CardTitle>
+              <CardTitle className="text-sm font-medium text-muted-foreground">
+                Total Domain
+              </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{stats.total}</div>
@@ -380,7 +422,9 @@ function SuperAdminDomainsContent() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-green-600">{stats.active}</div>
+              <div className="text-2xl font-bold text-green-600">
+                {stats.active}
+              </div>
             </CardContent>
           </Card>
           <Card>
@@ -391,7 +435,9 @@ function SuperAdminDomainsContent() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-gray-600">{stats.inactive}</div>
+              <div className="text-2xl font-bold text-gray-600">
+                {stats.inactive}
+              </div>
             </CardContent>
           </Card>
           <Card>
@@ -402,18 +448,9 @@ function SuperAdminDomainsContent() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-red-600">{stats.expired}</div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-                <AlertCircle className="h-4 w-4 text-yellow-600" />
-                Pending
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-yellow-600">{stats.pending}</div>
+              <div className="text-2xl font-bold text-red-600">
+                {stats.expired}
+              </div>
             </CardContent>
           </Card>
         </div>
@@ -426,7 +463,8 @@ function SuperAdminDomainsContent() {
               <div>
                 <CardTitle className="text-2xl">Manajemen Domain</CardTitle>
                 <CardDescription>
-                  Kelola semua domain dari semua OPD - Aktifkan, Suspen, atau Nonaktifkan
+                  Kelola semua domain dari semua OPD - Aktifkan, Suspen, atau
+                  Nonaktifkan
                 </CardDescription>
               </div>
             </div>
@@ -443,7 +481,12 @@ function SuperAdminDomainsContent() {
                   className="pl-10"
                 />
               </div>
-              <Select value={statusFilter} onValueChange={(value) => setStatusFilter(value as StatusFilter)}>
+              <Select
+                value={statusFilter}
+                onValueChange={(value) =>
+                  setStatusFilter(value as StatusFilter)
+                }
+              >
                 <SelectTrigger className="w-full md:w-[180px]">
                   <SelectValue placeholder="Filter Status" />
                 </SelectTrigger>
@@ -452,7 +495,6 @@ function SuperAdminDomainsContent() {
                   <SelectItem value="active">Aktif</SelectItem>
                   <SelectItem value="inactive">Tidak Aktif</SelectItem>
                   <SelectItem value="expired">Kadaluarsa</SelectItem>
-                  <SelectItem value="pending">Pending</SelectItem>
                 </SelectContent>
               </Select>
               <Select value={opdFilter} onValueChange={setOpdFilter}>
@@ -461,8 +503,10 @@ function SuperAdminDomainsContent() {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">Semua OPD</SelectItem>
-                  {allOpds.map(opd => (
-                    <SelectItem key={opd} value={opd}>{opd}</SelectItem>
+                  {allOpds.map((opd) => (
+                    <SelectItem key={opd} value={opd}>
+                      {opd}
+                    </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
@@ -479,52 +523,88 @@ function SuperAdminDomainsContent() {
                 <table className="w-full">
                   <thead className="bg-muted/50">
                     <tr className="border-b">
-                      <th className="px-4 py-3 text-left text-sm font-medium">Hostname</th>
-                      <th className="px-4 py-3 text-left text-sm font-medium">OPD</th>
-                      <th className="px-4 py-3 text-left text-sm font-medium">Parent Domain</th>
-                      <th className="px-4 py-3 text-left text-sm font-medium">Status</th>
-                      <th className="px-4 py-3 text-left text-sm font-medium">Tanggal Aktif</th>
-                      <th className="px-4 py-3 text-left text-sm font-medium">Kadaluarsa</th>
-                      <th className="px-4 py-3 text-right text-sm font-medium">Aksi</th>
+                      <th className="px-4 py-3 text-left text-sm font-medium">
+                        Hostname
+                      </th>
+                      <th className="px-4 py-3 text-left text-sm font-medium">
+                        OPD
+                      </th>
+                      <th className="px-4 py-3 text-left text-sm font-medium">
+                        Parent Domain
+                      </th>
+                      <th className="px-4 py-3 text-left text-sm font-medium">
+                        Status
+                      </th>
+                      <th className="px-4 py-3 text-left text-sm font-medium">
+                        Tanggal Aktif
+                      </th>
+                      <th className="px-4 py-3 text-left text-sm font-medium">
+                        Kadaluarsa
+                      </th>
+                      <th className="px-4 py-3 text-right text-sm font-medium">
+                        Aksi
+                      </th>
                     </tr>
                   </thead>
                   <tbody>
                     {filteredDomains.length === 0 ? (
                       <tr>
-                        <td colSpan={7} className="px-4 py-8 text-center text-muted-foreground">
+                        <td
+                          colSpan={7}
+                          className="px-4 py-8 text-center text-muted-foreground"
+                        >
                           Tidak ada domain yang ditemukan
                         </td>
                       </tr>
                     ) : (
                       filteredDomains.map((domain) => (
-                        <tr key={domain.id} className="border-b hover:bg-muted/30">
+                        <tr
+                          key={domain.id}
+                          className="border-b hover:bg-muted/30"
+                        >
                           <td className="px-4 py-3 text-sm">
                             <code className="bg-muted px-2 py-1 rounded text-xs font-mono">
                               {domain.hostname}
                             </code>
                           </td>
-                          <td className="px-4 py-3 text-sm font-medium">{domain.opd || '-'}</td>
+                          <td className="px-4 py-3 text-sm font-medium">
+                            {domain.opd || "-"}
+                          </td>
                           <td className="px-4 py-3 text-sm">
                             {domain.parentDomain ? (
-                              <code className="text-xs text-muted-foreground">{domain.parentDomain}</code>
-                            ) : '-'}
+                              <code className="text-xs text-muted-foreground">
+                                {domain.parentDomain}
+                              </code>
+                            ) : (
+                              "-"
+                            )}
                           </td>
-                          <td className="px-4 py-3">{getStatusBadge(domain.status)}</td>
+                          <td className="px-4 py-3">
+                            {getStatusBadge(domain.status)}
+                          </td>
                           <td className="px-4 py-3 text-sm">
                             {domain.activationDate ? (
                               <div className="flex items-center gap-1 text-muted-foreground">
                                 <Calendar className="h-3 w-3" />
-                                {new Date(domain.activationDate).toLocaleDateString('id-ID')}
+                                {new Date(
+                                  domain.activationDate
+                                ).toLocaleDateString("id-ID")}
                               </div>
-                            ) : '-'}
+                            ) : (
+                              "-"
+                            )}
                           </td>
                           <td className="px-4 py-3 text-sm">
                             {domain.expiryDate ? (
                               <div className="flex items-center gap-1 text-muted-foreground">
                                 <Calendar className="h-3 w-3" />
-                                {new Date(domain.expiryDate).toLocaleDateString('id-ID')}
+                                {new Date(domain.expiryDate).toLocaleDateString(
+                                  "id-ID"
+                                )}
                               </div>
-                            ) : '-'}
+                            ) : (
+                              "-"
+                            )}
                           </td>
                           <td className="px-4 py-3">
                             <div className="flex justify-end gap-1">
@@ -543,172 +623,224 @@ function SuperAdminDomainsContent() {
       </div>
 
       {/* Action Dialog */}
-      <Dialog open={!!selectedDomain && !!actionType} onOpenChange={(open) => !open && handleCloseDialog()}>
+      <Dialog
+        open={!!selectedDomain && !!actionType}
+        onOpenChange={(open) => !open && handleCloseDialog()}
+      >
         <DialogContent className="max-w-2xl">
           <DialogHeader>
             <DialogTitle>
-              {actionType === 'activate' && 'Aktifkan Domain'}
-              {actionType === 'suspend' && 'Suspen Domain'}
-              {actionType === 'deactivate' && 'Nonaktifkan Domain'}
-              {actionType === 'health-check' && 'Hasil Pemeriksaan Kesehatan Domain'}
+              {actionType === "activate" && "Aktifkan Domain"}
+              {actionType === "suspend" && "Suspen Domain"}
+              {actionType === "deactivate" && "Nonaktifkan Domain"}
+              {actionType === "health-check" &&
+                "Hasil Pemeriksaan Kesehatan Domain"}
             </DialogTitle>
             <DialogDescription>
-              {actionType === 'activate' && 'Domain akan diaktifkan dan dapat diakses kembali'}
-              {actionType === 'suspend' && 'Domain akan disuspen sementara dan tidak dapat diakses'}
-              {actionType === 'deactivate' && 'Domain akan dinonaktifkan secara permanen'}
-              {actionType === 'health-check' && 'Informasi status kesehatan domain'}
+              {actionType === "activate" &&
+                "Domain akan diaktifkan dan dapat diakses kembali"}
+              {actionType === "suspend" &&
+                "Domain akan disuspen sementara dan tidak dapat diakses"}
+              {actionType === "deactivate" &&
+                "Domain akan dinonaktifkan secara permanen"}
+              {actionType === "health-check" &&
+                "Informasi status kesehatan domain"}
             </DialogDescription>
           </DialogHeader>
-          
+
           {selectedDomain && (
             <div className="space-y-4 py-4">
               {/* Domain Details */}
               <div className="grid grid-cols-2 gap-3 text-sm bg-muted/50 p-4 rounded-lg">
                 <div className="text-muted-foreground">Hostname:</div>
-                <div className="font-mono text-xs bg-background px-2 py-1 rounded">{selectedDomain.hostname}</div>
-                
+                <div className="font-mono text-xs bg-background px-2 py-1 rounded">
+                  {selectedDomain.hostname}
+                </div>
+
                 <div className="text-muted-foreground">OPD:</div>
                 <div className="font-medium">{selectedDomain.opd}</div>
-                
+
                 <div className="text-muted-foreground">Status Saat Ini:</div>
                 <div>{getStatusBadge(selectedDomain.status)}</div>
-                
+
                 {selectedDomain.parentDomain && (
                   <>
                     <div className="text-muted-foreground">Parent Domain:</div>
-                    <div className="font-mono text-xs">{selectedDomain.parentDomain}</div>
+                    <div className="font-mono text-xs">
+                      {selectedDomain.parentDomain}
+                    </div>
                   </>
                 )}
               </div>
 
               {/* Health Check Results */}
-              {actionType === 'health-check' && healthData.has(selectedDomain.id) && (
-                <div className="space-y-3 border-t pt-4">
-                  {(() => {
-                    const health = healthData.get(selectedDomain.id)!;
-                    return (
-                      <>
-                        <h4 className="font-semibold text-sm flex items-center gap-2">
-                          <Activity className="h-4 w-4" />
-                          Status Kesehatan
-                        </h4>
-                        
-                        {/* Uptime Status */}
-                        <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
-                          <div className="flex items-center gap-2">
-                            {health.isUp ? (
-                              <CheckCircle2 className="h-5 w-5 text-green-600" />
-                            ) : (
-                              <XCircle className="h-5 w-5 text-red-600" />
-                            )}
-                            <span className="font-medium">
-                              {health.isUp ? 'Domain Online' : 'Domain Offline'}
+              {actionType === "health-check" &&
+                healthData.has(selectedDomain.id) && (
+                  <div className="space-y-3 border-t pt-4">
+                    {(() => {
+                      const health = healthData.get(selectedDomain.id)!;
+                      return (
+                        <>
+                          <h4 className="font-semibold text-sm flex items-center gap-2">
+                            <Activity className="h-4 w-4" />
+                            Status Kesehatan
+                          </h4>
+
+                          {/* Uptime Status */}
+                          <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
+                            <div className="flex items-center gap-2">
+                              {health.isUp ? (
+                                <CheckCircle2 className="h-5 w-5 text-green-600" />
+                              ) : (
+                                <XCircle className="h-5 w-5 text-red-600" />
+                              )}
+                              <span className="font-medium">
+                                {health.isUp
+                                  ? "Domain Online"
+                                  : "Domain Offline"}
+                              </span>
+                            </div>
+                            <Badge
+                              variant={health.isUp ? "default" : "destructive"}
+                            >
+                              {health.isUp ? "UP" : "DOWN"}
+                            </Badge>
+                          </div>
+
+                          {/* Response Time */}
+                          <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
+                            <span className="text-sm text-muted-foreground">
+                              Response Time:
+                            </span>
+                            <span className="font-mono font-medium">
+                              {health.responseTime}ms
                             </span>
                           </div>
-                          <Badge variant={health.isUp ? 'default' : 'destructive'}>
-                            {health.isUp ? 'UP' : 'DOWN'}
-                          </Badge>
-                        </div>
-                        
-                        {/* Response Time */}
-                        <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
-                          <span className="text-sm text-muted-foreground">Response Time:</span>
-                          <span className="font-mono font-medium">{health.responseTime}ms</span>
-                        </div>
-                        
-                        {/* SSL Status */}
-                        {health.ssl && (
-                          <div className="p-3 bg-muted/50 rounded-lg space-y-2">
-                            <div className="flex items-center gap-2">
-                              <Shield className="h-4 w-4" />
-                              <span className="font-medium text-sm">SSL Certificate</span>
-                            </div>
-                            <div className="grid grid-cols-2 gap-2 text-sm">
-                              <div className="text-muted-foreground">Status:</div>
-                              <div className="flex items-center gap-1">
-                                {health.ssl.isValid ? (
+
+                          {/* SSL Status */}
+                          {health.ssl && (
+                            <div className="p-3 bg-muted/50 rounded-lg space-y-2">
+                              <div className="flex items-center gap-2">
+                                <Shield className="h-4 w-4" />
+                                <span className="font-medium text-sm">
+                                  SSL Certificate
+                                </span>
+                              </div>
+                              <div className="grid grid-cols-2 gap-2 text-sm">
+                                <div className="text-muted-foreground">
+                                  Status:
+                                </div>
+                                <div className="flex items-center gap-1">
+                                  {health.ssl.isValid ? (
+                                    <>
+                                      <CheckCircle2 className="h-3 w-3 text-green-600" />
+                                      <span className="text-green-600">
+                                        Valid
+                                      </span>
+                                    </>
+                                  ) : (
+                                    <>
+                                      <XCircle className="h-3 w-3 text-red-600" />
+                                      <span className="text-red-600">
+                                        Invalid
+                                      </span>
+                                    </>
+                                  )}
+                                </div>
+                                {health.ssl.expiryDate && (
                                   <>
-                                    <CheckCircle2 className="h-3 w-3 text-green-600" />
-                                    <span className="text-green-600">Valid</span>
-                                  </>
-                                ) : (
-                                  <>
-                                    <XCircle className="h-3 w-3 text-red-600" />
-                                    <span className="text-red-600">Invalid</span>
+                                    <div className="text-muted-foreground">
+                                      Kadaluarsa:
+                                    </div>
+                                    <div>
+                                      {new Date(
+                                        health.ssl.expiryDate
+                                      ).toLocaleDateString("id-ID")}
+                                    </div>
                                   </>
                                 )}
-                              </div>
-                              {health.ssl.expiryDate && (
-                                <>
-                                  <div className="text-muted-foreground">Kadaluarsa:</div>
-                                  <div>{new Date(health.ssl.expiryDate).toLocaleDateString('id-ID')}</div>
-                                </>
-                              )}
-                              {health.ssl.issuer && (
-                                <>
-                                  <div className="text-muted-foreground">Issuer:</div>
-                                  <div className="text-xs">{health.ssl.issuer}</div>
-                                </>
-                              )}
-                            </div>
-                          </div>
-                        )}
-                        
-                        {/* DNS Status */}
-                        {health.dns && (
-                          <div className="p-3 bg-muted/50 rounded-lg space-y-2">
-                            <div className="flex items-center gap-2">
-                              <Globe className="h-4 w-4" />
-                              <span className="font-medium text-sm">DNS Records</span>
-                            </div>
-                            <div className="grid grid-cols-2 gap-2 text-sm">
-                              <div className="text-muted-foreground">Status:</div>
-                              <div className="flex items-center gap-1">
-                                {health.dns.hasValidRecords ? (
+                                {health.ssl.issuer && (
                                   <>
-                                    <CheckCircle2 className="h-3 w-3 text-green-600" />
-                                    <span className="text-green-600">Valid</span>
-                                  </>
-                                ) : (
-                                  <>
-                                    <AlertCircle className="h-3 w-3 text-yellow-600" />
-                                    <span className="text-yellow-600">Issues Found</span>
+                                    <div className="text-muted-foreground">
+                                      Issuer:
+                                    </div>
+                                    <div className="text-xs">
+                                      {health.ssl.issuer}
+                                    </div>
                                   </>
                                 )}
                               </div>
                             </div>
+                          )}
+
+                          {/* DNS Status */}
+                          {health.dns && (
+                            <div className="p-3 bg-muted/50 rounded-lg space-y-2">
+                              <div className="flex items-center gap-2">
+                                <Globe className="h-4 w-4" />
+                                <span className="font-medium text-sm">
+                                  DNS Records
+                                </span>
+                              </div>
+                              <div className="grid grid-cols-2 gap-2 text-sm">
+                                <div className="text-muted-foreground">
+                                  Status:
+                                </div>
+                                <div className="flex items-center gap-1">
+                                  {health.dns.hasValidRecords ? (
+                                    <>
+                                      <CheckCircle2 className="h-3 w-3 text-green-600" />
+                                      <span className="text-green-600">
+                                        Valid
+                                      </span>
+                                    </>
+                                  ) : (
+                                    <>
+                                      <AlertCircle className="h-3 w-3 text-yellow-600" />
+                                      <span className="text-yellow-600">
+                                        Issues Found
+                                      </span>
+                                    </>
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+                          )}
+
+                          {/* Last Checked */}
+                          <div className="text-xs text-muted-foreground text-center pt-2">
+                            Terakhir diperiksa:{" "}
+                            {new Date(health.lastChecked).toLocaleString(
+                              "id-ID"
+                            )}
                           </div>
-                        )}
-                        
-                        {/* Last Checked */}
-                        <div className="text-xs text-muted-foreground text-center pt-2">
-                          Terakhir diperiksa: {new Date(health.lastChecked).toLocaleString('id-ID')}
-                        </div>
-                      </>
-                    );
-                  })()}
-                </div>
-              )}
+                        </>
+                      );
+                    })()}
+                  </div>
+                )}
 
               {/* Reason Input (for suspend/deactivate) */}
-              {actionType !== 'health-check' && (
+              {actionType !== "health-check" && (
                 <div className="space-y-2">
                   <Label htmlFor="reason">
-                    {(actionType === 'suspend' || actionType === 'deactivate') 
-                      ? 'Alasan *' 
-                      : 'Catatan (Opsional)'}
+                    {actionType === "suspend" || actionType === "deactivate"
+                      ? "Alasan *"
+                      : "Catatan (Opsional)"}
                   </Label>
                   <Textarea
                     id="reason"
                     placeholder={
-                      actionType === 'activate' 
-                        ? 'Tambahkan catatan aktivasi (opsional)...' 
-                        : 'Jelaskan alasan tindakan ini...'
+                      actionType === "activate"
+                        ? "Tambahkan catatan aktivasi (opsional)..."
+                        : "Jelaskan alasan tindakan ini..."
                     }
                     value={reason}
                     onChange={(e) => setReason(e.target.value)}
                     rows={3}
-                    required={actionType === 'suspend' || actionType === 'deactivate'}
+                    required={
+                      actionType === "suspend" || actionType === "deactivate"
+                    }
                   />
                 </div>
               )}
@@ -716,21 +848,27 @@ function SuperAdminDomainsContent() {
           )}
 
           <DialogFooter>
-            <Button 
-              variant="outline" 
-              onClick={handleCloseDialog} 
-              disabled={isSubmitting && actionType !== 'health-check'}
+            <Button
+              variant="outline"
+              onClick={handleCloseDialog}
+              disabled={isSubmitting && actionType !== "health-check"}
             >
-              {actionType === 'health-check' ? 'Tutup' : 'Batal'}
+              {actionType === "health-check" ? "Tutup" : "Batal"}
             </Button>
-            {actionType !== 'health-check' && (
+            {actionType !== "health-check" && (
               <Button
                 onClick={handleSubmitAction}
-                disabled={isSubmitting || ((actionType === 'suspend' || actionType === 'deactivate') && !reason.trim())}
+                disabled={
+                  isSubmitting ||
+                  ((actionType === "suspend" || actionType === "deactivate") &&
+                    !reason.trim())
+                }
                 variant={
-                  actionType === 'activate' ? 'default' : 
-                  actionType === 'suspend' ? 'secondary' : 
-                  'destructive'
+                  actionType === "activate"
+                    ? "default"
+                    : actionType === "suspend"
+                    ? "secondary"
+                    : "destructive"
                 }
               >
                 {isSubmitting ? (
@@ -740,9 +878,24 @@ function SuperAdminDomainsContent() {
                   </>
                 ) : (
                   <>
-                    {actionType === 'activate' && <><PlayCircle className="h-4 w-4 mr-2" />Aktifkan</>}
-                    {actionType === 'suspend' && <><PauseCircle className="h-4 w-4 mr-2" />Suspen</>}
-                    {actionType === 'deactivate' && <><XCircle className="h-4 w-4 mr-2" />Nonaktifkan</>}
+                    {actionType === "activate" && (
+                      <>
+                        <PlayCircle className="h-4 w-4 mr-2" />
+                        Aktifkan
+                      </>
+                    )}
+                    {actionType === "suspend" && (
+                      <>
+                        <PauseCircle className="h-4 w-4 mr-2" />
+                        Suspen
+                      </>
+                    )}
+                    {actionType === "deactivate" && (
+                      <>
+                        <XCircle className="h-4 w-4 mr-2" />
+                        Nonaktifkan
+                      </>
+                    )}
                   </>
                 )}
               </Button>
@@ -756,11 +909,13 @@ function SuperAdminDomainsContent() {
 
 export default function SuperAdminDomainsPage() {
   return (
-    <Suspense fallback={
-      <div className="flex justify-center items-center h-96">
-        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-      </div>
-    }>
+    <Suspense
+      fallback={
+        <div className="flex justify-center items-center h-96">
+          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+        </div>
+      }
+    >
       <SuperAdminDomainsContent />
     </Suspense>
   );

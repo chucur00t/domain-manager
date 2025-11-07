@@ -1,20 +1,20 @@
-'use client';
+"use client";
 
-import { useState, useEffect, useMemo, Suspense } from 'react';
-import { useSearchParams } from 'next/navigation';
+import { useState, useEffect, useMemo, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
-import { 
-  Loader2, 
-  Search, 
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
+import {
+  Loader2,
+  Search,
   Building2,
   Plus,
   Edit,
@@ -22,9 +22,13 @@ import {
   BarChart3,
   Users,
   Globe,
-  Server
-} from 'lucide-react';
-import type { Domain, SubdomainApplication, HostingApplication } from '@/backend/models/types';
+  Server,
+} from "lucide-react";
+import type {
+  Domain,
+  SubdomainApplication,
+  HostingApplication,
+} from "@/backend/models/types";
 import {
   Dialog,
   DialogContent,
@@ -32,7 +36,7 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog';
+} from "@/components/ui/dialog";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -42,9 +46,9 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
+} from "@/components/ui/alert-dialog";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 
 interface OPD {
   id: string;
@@ -63,29 +67,29 @@ interface OPD {
   };
 }
 
-type ActionType = 'add' | 'edit' | 'delete' | 'view';
+type ActionType = "add" | "edit" | "delete" | "view";
 
 function SuperAdminOPDsContent() {
   const searchParams = useSearchParams();
   const [opds, setOpds] = useState<OPD[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState('');
-  
+  const [searchTerm, setSearchTerm] = useState("");
+
   // Dialog states
   const [selectedOPD, setSelectedOPD] = useState<OPD | null>(null);
   const [actionType, setActionType] = useState<ActionType | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  
+
   // Form states
   const [formData, setFormData] = useState({
-    name: '',
-    code: '',
-    contactPerson: '',
-    email: '',
-    phone: '',
-    address: '',
+    name: "",
+    code: "",
+    contactPerson: "",
+    email: "",
+    phone: "",
+    address: "",
   });
 
   const fetchOPDsData = async () => {
@@ -93,12 +97,16 @@ function SuperAdminOPDsContent() {
     try {
       // Fetch all data
       const [domainsRes, appsRes, hostingRes] = await Promise.all([
-        fetch('/api/domains'),
-        fetch('/api/applications'),
-        fetch('/api/hosting-applications'),
+        fetch("/api/domains"),
+        fetch("/api/applications"),
+        fetch("/api/hosting-applications"),
       ]);
 
-      const [domains, applications, hostingApps]: [Domain[], SubdomainApplication[], HostingApplication[]] = await Promise.all([
+      const [domains, applications, hostingApps]: [
+        Domain[],
+        SubdomainApplication[],
+        HostingApplication[]
+      ] = await Promise.all([
         domainsRes.json(),
         appsRes.json(),
         hostingRes.json(),
@@ -108,16 +116,18 @@ function SuperAdminOPDsContent() {
       const opdMap = new Map<string, OPD>();
 
       // Collect OPDs from domains
-      domains.forEach(domain => {
+      domains.forEach((domain) => {
         if (domain.opd && !opdMap.has(domain.opd)) {
           opdMap.set(domain.opd, {
-            id: `opd-${domain.opd.replace(/\s+/g, '-').toLowerCase()}`,
+            id: `opd-${domain.opd.replace(/\s+/g, "-").toLowerCase()}`,
             name: domain.opd,
             code: domain.opd.substring(0, 3).toUpperCase(),
-            contactPerson: 'Admin OPD',
-            email: `admin@${domain.opd.replace(/\s+/g, '').toLowerCase()}.kalbarprov.go.id`,
-            phone: '0561-XXXXXX',
-            address: 'Pontianak, Kalimantan Barat',
+            contactPerson: "Admin OPD",
+            email: `admin@${domain.opd
+              .replace(/\s+/g, "")
+              .toLowerCase()}.kalbarprov.go.id`,
+            phone: "0561-XXXXXX",
+            address: "Pontianak, Kalimantan Barat",
             isActive: true,
             statistics: {
               totalDomains: 0,
@@ -130,16 +140,18 @@ function SuperAdminOPDsContent() {
       });
 
       // Collect OPDs from applications
-      applications.forEach(app => {
+      applications.forEach((app) => {
         if (app.opd && !opdMap.has(app.opd)) {
           opdMap.set(app.opd, {
-            id: `opd-${app.opd.replace(/\s+/g, '-').toLowerCase()}`,
+            id: `opd-${app.opd.replace(/\s+/g, "-").toLowerCase()}`,
             name: app.opd,
             code: app.opd.substring(0, 3).toUpperCase(),
-            contactPerson: 'Admin OPD',
-            email: `admin@${app.opd.replace(/\s+/g, '').toLowerCase()}.kalbarprov.go.id`,
-            phone: '0561-XXXXXX',
-            address: 'Pontianak, Kalimantan Barat',
+            contactPerson: "Admin OPD",
+            email: `admin@${app.opd
+              .replace(/\s+/g, "")
+              .toLowerCase()}.kalbarprov.go.id`,
+            phone: "0561-XXXXXX",
+            address: "Pontianak, Kalimantan Barat",
             isActive: true,
             statistics: {
               totalDomains: 0,
@@ -153,15 +165,23 @@ function SuperAdminOPDsContent() {
 
       // Calculate statistics for each OPD
       opdMap.forEach((opd, opdName) => {
-        opd.statistics.totalDomains = domains.filter(d => d.opd === opdName).length;
-        opd.statistics.totalApplications = applications.filter(a => a.opd === opdName).length;
-        opd.statistics.totalHosting = hostingApps.filter(h => h.opd === opdName).length;
+        opd.statistics.totalDomains = domains.filter(
+          (d) => d.opd === opdName
+        ).length;
+        opd.statistics.totalApplications = applications.filter(
+          (a) => a.opd === opdName
+        ).length;
+        opd.statistics.totalHosting = hostingApps.filter(
+          (h) => h.opd === opdName
+        ).length;
         opd.statistics.totalUsers = 1; // Placeholder - ideally fetch from users API
       });
 
-      setOpds(Array.from(opdMap.values()).sort((a, b) => a.name.localeCompare(b.name)));
+      setOpds(
+        Array.from(opdMap.values()).sort((a, b) => a.name.localeCompare(b.name))
+      );
     } catch (error) {
-      console.error('Failed to fetch OPD data:', error);
+      console.error("Failed to fetch OPD data:", error);
     } finally {
       setIsLoading(false);
     }
@@ -174,13 +194,14 @@ function SuperAdminOPDsContent() {
   // Filtered OPDs
   const filteredOPDs = useMemo(() => {
     if (!searchTerm) return opds;
-    
+
     const search = searchTerm.toLowerCase();
-    return opds.filter(opd =>
-      opd.name.toLowerCase().includes(search) ||
-      opd.code.toLowerCase().includes(search) ||
-      opd.contactPerson.toLowerCase().includes(search) ||
-      opd.email.toLowerCase().includes(search)
+    return opds.filter(
+      (opd) =>
+        opd.name.toLowerCase().includes(search) ||
+        opd.code.toLowerCase().includes(search) ||
+        opd.contactPerson.toLowerCase().includes(search) ||
+        opd.email.toLowerCase().includes(search)
     );
   }, [opds, searchTerm]);
 
@@ -188,27 +209,30 @@ function SuperAdminOPDsContent() {
   const stats = useMemo(() => {
     return {
       total: opds.length,
-      active: opds.filter(o => o.isActive).length,
-      inactive: opds.filter(o => !o.isActive).length,
+      active: opds.filter((o) => o.isActive).length,
+      inactive: opds.filter((o) => !o.isActive).length,
       totalDomains: opds.reduce((sum, o) => sum + o.statistics.totalDomains, 0),
-      totalApplications: opds.reduce((sum, o) => sum + o.statistics.totalApplications, 0),
+      totalApplications: opds.reduce(
+        (sum, o) => sum + o.statistics.totalApplications,
+        0
+      ),
     };
   }, [opds]);
 
   const handleOpenDialog = (action: ActionType, opd?: OPD) => {
     setActionType(action);
     setSelectedOPD(opd || null);
-    
-    if (action === 'add') {
+
+    if (action === "add") {
       setFormData({
-        name: '',
-        code: '',
-        contactPerson: '',
-        email: '',
-        phone: '',
-        address: '',
+        name: "",
+        code: "",
+        contactPerson: "",
+        email: "",
+        phone: "",
+        address: "",
       });
-    } else if (action === 'edit' && opd) {
+    } else if (action === "edit" && opd) {
       setFormData({
         name: opd.name,
         code: opd.code,
@@ -217,11 +241,11 @@ function SuperAdminOPDsContent() {
         phone: opd.phone,
         address: opd.address,
       });
-    } else if (action === 'view' && opd) {
+    } else if (action === "view" && opd) {
       // View mode - just display data
     }
-    
-    if (action === 'delete') {
+
+    if (action === "delete") {
       setIsDeleteDialogOpen(true);
     } else {
       setIsDialogOpen(true);
@@ -234,28 +258,28 @@ function SuperAdminOPDsContent() {
     setSelectedOPD(null);
     setActionType(null);
     setFormData({
-      name: '',
-      code: '',
-      contactPerson: '',
-      email: '',
-      phone: '',
-      address: '',
+      name: "",
+      code: "",
+      contactPerson: "",
+      email: "",
+      phone: "",
+      address: "",
     });
   };
 
   const handleSubmit = async () => {
     // Validation
     if (!formData.name || !formData.code || !formData.email) {
-      alert('Nama, Kode, dan Email OPD harus diisi!');
+      alert("Nama, Kode, dan Email OPD harus diisi!");
       return;
     }
 
     setIsSubmitting(true);
     try {
       // TODO: Call API to create/update OPD
-      if (actionType === 'add') {
+      if (actionType === "add") {
         const newOPD: OPD = {
-          id: `opd-${formData.name.replace(/\s+/g, '-').toLowerCase()}`,
+          id: `opd-${formData.name.replace(/\s+/g, "-").toLowerCase()}`,
           name: formData.name,
           code: formData.code,
           contactPerson: formData.contactPerson,
@@ -270,21 +294,23 @@ function SuperAdminOPDsContent() {
             totalUsers: 0,
           },
         };
-        setOpds(prev => [...prev, newOPD].sort((a, b) => a.name.localeCompare(b.name)));
-        alert('OPD berhasil ditambahkan!');
-      } else if (actionType === 'edit' && selectedOPD) {
-        setOpds(prev => prev.map(opd => 
-          opd.id === selectedOPD.id 
-            ? { ...opd, ...formData }
-            : opd
-        ));
-        alert('Data OPD berhasil diperbarui!');
+        setOpds((prev) =>
+          [...prev, newOPD].sort((a, b) => a.name.localeCompare(b.name))
+        );
+        alert("OPD berhasil ditambahkan!");
+      } else if (actionType === "edit" && selectedOPD) {
+        setOpds((prev) =>
+          prev.map((opd) =>
+            opd.id === selectedOPD.id ? { ...opd, ...formData } : opd
+          )
+        );
+        alert("Data OPD berhasil diperbarui!");
       }
-      
+
       handleCloseDialog();
     } catch (error) {
       console.error(error);
-      alert('Gagal memproses data. Silakan coba lagi.');
+      alert("Gagal memproses data. Silakan coba lagi.");
     } finally {
       setIsSubmitting(false);
     }
@@ -292,16 +318,16 @@ function SuperAdminOPDsContent() {
 
   const handleDelete = async () => {
     if (!selectedOPD) return;
-    
+
     setIsSubmitting(true);
     try {
       // TODO: Call API to delete OPD
-      setOpds(prev => prev.filter(opd => opd.id !== selectedOPD.id));
-      alert('OPD berhasil dihapus!');
+      setOpds((prev) => prev.filter((opd) => opd.id !== selectedOPD.id));
+      alert("OPD berhasil dihapus!");
       handleCloseDialog();
     } catch (error) {
       console.error(error);
-      alert('Gagal menghapus OPD. Silakan coba lagi.');
+      alert("Gagal menghapus OPD. Silakan coba lagi.");
     } finally {
       setIsSubmitting(false);
     }
@@ -353,7 +379,9 @@ function SuperAdminOPDsContent() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{stats.totalApplications}</div>
+              <div className="text-2xl font-bold">
+                {stats.totalApplications}
+              </div>
             </CardContent>
           </Card>
           <Card>
@@ -382,7 +410,7 @@ function SuperAdminOPDsContent() {
                   </CardDescription>
                 </div>
               </div>
-              <Button onClick={() => handleOpenDialog('add')}>
+              <Button onClick={() => handleOpenDialog("add")}>
                 <Plus className="h-4 w-4 mr-2" />
                 Tambah OPD
               </Button>
@@ -411,19 +439,33 @@ function SuperAdminOPDsContent() {
                 <table className="w-full">
                   <thead className="bg-muted/50">
                     <tr className="border-b">
-                      <th className="px-4 py-3 text-left text-sm font-medium">Kode</th>
-                      <th className="px-4 py-3 text-left text-sm font-medium">Nama OPD</th>
-                      <th className="px-4 py-3 text-left text-sm font-medium">Contact Person</th>
-                      <th className="px-4 py-3 text-left text-sm font-medium">Email</th>
-                      <th className="px-4 py-3 text-left text-sm font-medium">Statistik</th>
-                      <th className="px-4 py-3 text-left text-sm font-medium">Status</th>
-                      <th className="px-4 py-3 text-right text-sm font-medium">Aksi</th>
+                      <th className="px-4 py-3 text-left text-sm font-medium">
+                        Kode
+                      </th>
+                      <th className="px-4 py-3 text-left text-sm font-medium">
+                        Nama OPD
+                      </th>
+                      <th className="px-4 py-3 text-left text-sm font-medium">
+                        Contact Person
+                      </th>
+                      <th className="px-4 py-3 text-left text-sm font-medium">
+                        Email
+                      </th>
+                      <th className="px-4 py-3 text-left text-sm font-medium">
+                        Statistik
+                      </th>
+                      <th className="px-4 py-3 text-right text-sm font-medium">
+                        Aksi
+                      </th>
                     </tr>
                   </thead>
                   <tbody>
                     {filteredOPDs.length === 0 ? (
                       <tr>
-                        <td colSpan={7} className="px-4 py-8 text-center text-muted-foreground">
+                        <td
+                          colSpan={6}
+                          className="px-4 py-8 text-center text-muted-foreground"
+                        >
                           Tidak ada OPD yang ditemukan
                         </td>
                       </tr>
@@ -435,10 +477,17 @@ function SuperAdminOPDsContent() {
                               {opd.code}
                             </Badge>
                           </td>
-                          <td className="px-4 py-3 text-sm font-medium">{opd.name}</td>
-                          <td className="px-4 py-3 text-sm">{opd.contactPerson}</td>
+                          <td className="px-4 py-3 text-sm font-medium">
+                            {opd.name}
+                          </td>
                           <td className="px-4 py-3 text-sm">
-                            <a href={`mailto:${opd.email}`} className="text-blue-600 hover:underline">
+                            {opd.contactPerson}
+                          </td>
+                          <td className="px-4 py-3 text-sm">
+                            <a
+                              href={`mailto:${opd.email}`}
+                              className="text-blue-600 hover:underline"
+                            >
                               {opd.email}
                             </a>
                           </td>
@@ -459,23 +508,18 @@ function SuperAdminOPDsContent() {
                             </div>
                           </td>
                           <td className="px-4 py-3">
-                            <Badge variant={opd.isActive ? 'default' : 'secondary'}>
-                              {opd.isActive ? 'Aktif' : 'Tidak Aktif'}
-                            </Badge>
-                          </td>
-                          <td className="px-4 py-3">
                             <div className="flex justify-end gap-1">
                               <Button
                                 size="sm"
                                 variant="outline"
-                                onClick={() => handleOpenDialog('view', opd)}
+                                onClick={() => handleOpenDialog("view", opd)}
                               >
                                 <BarChart3 className="h-4 w-4" />
                               </Button>
                               <Button
                                 size="sm"
                                 variant="outline"
-                                onClick={() => handleOpenDialog('edit', opd)}
+                                onClick={() => handleOpenDialog("edit", opd)}
                               >
                                 <Edit className="h-4 w-4" />
                               </Button>
@@ -483,7 +527,7 @@ function SuperAdminOPDsContent() {
                                 size="sm"
                                 variant="outline"
                                 className="text-red-600 hover:bg-red-50"
-                                onClick={() => handleOpenDialog('delete', opd)}
+                                onClick={() => handleOpenDialog("delete", opd)}
                               >
                                 <Trash2 className="h-4 w-4" />
                               </Button>
@@ -501,40 +545,47 @@ function SuperAdminOPDsContent() {
       </div>
 
       {/* Add/Edit Dialog */}
-      <Dialog open={isDialogOpen} onOpenChange={(open) => !open && handleCloseDialog()}>
+      <Dialog
+        open={isDialogOpen}
+        onOpenChange={(open) => !open && handleCloseDialog()}
+      >
         <DialogContent className="max-w-2xl">
           <DialogHeader>
             <DialogTitle>
-              {actionType === 'add' ? 'Tambah OPD Baru' : 
-               actionType === 'edit' ? 'Edit Data OPD' : 
-               'Detail OPD'}
+              {actionType === "add"
+                ? "Tambah OPD Baru"
+                : actionType === "edit"
+                ? "Edit Data OPD"
+                : "Detail OPD"}
             </DialogTitle>
             <DialogDescription>
-              {actionType === 'add' ? 'Masukkan informasi OPD baru' : 
-               actionType === 'edit' ? 'Perbarui informasi OPD' : 
-               'Informasi lengkap OPD'}
+              {actionType === "add"
+                ? "Masukkan informasi OPD baru"
+                : actionType === "edit"
+                ? "Perbarui informasi OPD"
+                : "Informasi lengkap OPD"}
             </DialogDescription>
           </DialogHeader>
-          
+
           <div className="space-y-4 py-4">
-            {actionType === 'view' && selectedOPD ? (
+            {actionType === "view" && selectedOPD ? (
               <div className="space-y-4">
                 <div className="grid grid-cols-2 gap-3 text-sm bg-muted/50 p-4 rounded-lg">
                   <div className="text-muted-foreground">Kode OPD:</div>
                   <div className="font-medium">{selectedOPD.code}</div>
-                  
+
                   <div className="text-muted-foreground">Nama OPD:</div>
                   <div className="font-medium">{selectedOPD.name}</div>
-                  
+
                   <div className="text-muted-foreground">Contact Person:</div>
                   <div>{selectedOPD.contactPerson}</div>
-                  
+
                   <div className="text-muted-foreground">Email:</div>
                   <div>{selectedOPD.email}</div>
-                  
+
                   <div className="text-muted-foreground">Telepon:</div>
                   <div>{selectedOPD.phone}</div>
-                  
+
                   <div className="text-muted-foreground">Alamat:</div>
                   <div className="col-span-1">{selectedOPD.address}</div>
                 </div>
@@ -547,8 +598,12 @@ function SuperAdminOPDsContent() {
                         <div className="flex items-center gap-2">
                           <Globe className="h-4 w-4 text-muted-foreground" />
                           <div>
-                            <p className="text-xs text-muted-foreground">Domain</p>
-                            <p className="text-2xl font-bold">{selectedOPD.statistics.totalDomains}</p>
+                            <p className="text-xs text-muted-foreground">
+                              Domain
+                            </p>
+                            <p className="text-2xl font-bold">
+                              {selectedOPD.statistics.totalDomains}
+                            </p>
                           </div>
                         </div>
                       </CardContent>
@@ -558,8 +613,12 @@ function SuperAdminOPDsContent() {
                         <div className="flex items-center gap-2">
                           <BarChart3 className="h-4 w-4 text-muted-foreground" />
                           <div>
-                            <p className="text-xs text-muted-foreground">Permohonan</p>
-                            <p className="text-2xl font-bold">{selectedOPD.statistics.totalApplications}</p>
+                            <p className="text-xs text-muted-foreground">
+                              Permohonan
+                            </p>
+                            <p className="text-2xl font-bold">
+                              {selectedOPD.statistics.totalApplications}
+                            </p>
                           </div>
                         </div>
                       </CardContent>
@@ -569,8 +628,12 @@ function SuperAdminOPDsContent() {
                         <div className="flex items-center gap-2">
                           <Server className="h-4 w-4 text-muted-foreground" />
                           <div>
-                            <p className="text-xs text-muted-foreground">Hosting</p>
-                            <p className="text-2xl font-bold">{selectedOPD.statistics.totalHosting}</p>
+                            <p className="text-xs text-muted-foreground">
+                              Hosting
+                            </p>
+                            <p className="text-2xl font-bold">
+                              {selectedOPD.statistics.totalHosting}
+                            </p>
                           </div>
                         </div>
                       </CardContent>
@@ -580,8 +643,12 @@ function SuperAdminOPDsContent() {
                         <div className="flex items-center gap-2">
                           <Users className="h-4 w-4 text-muted-foreground" />
                           <div>
-                            <p className="text-xs text-muted-foreground">Pengguna</p>
-                            <p className="text-2xl font-bold">{selectedOPD.statistics.totalUsers}</p>
+                            <p className="text-xs text-muted-foreground">
+                              Pengguna
+                            </p>
+                            <p className="text-2xl font-bold">
+                              {selectedOPD.statistics.totalUsers}
+                            </p>
                           </div>
                         </div>
                       </CardContent>
@@ -597,7 +664,9 @@ function SuperAdminOPDsContent() {
                     <Input
                       id="name"
                       value={formData.name}
-                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                      onChange={(e) =>
+                        setFormData({ ...formData, name: e.target.value })
+                      }
                       placeholder="Dinas Komunikasi dan Informatika"
                     />
                   </div>
@@ -606,7 +675,12 @@ function SuperAdminOPDsContent() {
                     <Input
                       id="code"
                       value={formData.code}
-                      onChange={(e) => setFormData({ ...formData, code: e.target.value.toUpperCase() })}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          code: e.target.value.toUpperCase(),
+                        })
+                      }
                       placeholder="DISKOMINFO"
                       maxLength={10}
                     />
@@ -619,7 +693,12 @@ function SuperAdminOPDsContent() {
                     <Input
                       id="contactPerson"
                       value={formData.contactPerson}
-                      onChange={(e) => setFormData({ ...formData, contactPerson: e.target.value })}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          contactPerson: e.target.value,
+                        })
+                      }
                       placeholder="Nama PIC"
                     />
                   </div>
@@ -628,7 +707,9 @@ function SuperAdminOPDsContent() {
                     <Input
                       id="phone"
                       value={formData.phone}
-                      onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                      onChange={(e) =>
+                        setFormData({ ...formData, phone: e.target.value })
+                      }
                       placeholder="0561-XXXXXX"
                     />
                   </div>
@@ -640,7 +721,9 @@ function SuperAdminOPDsContent() {
                     id="email"
                     type="email"
                     value={formData.email}
-                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, email: e.target.value })
+                    }
                     placeholder="admin@opd.kalbarprov.go.id"
                   />
                 </div>
@@ -650,7 +733,9 @@ function SuperAdminOPDsContent() {
                   <Textarea
                     id="address"
                     value={formData.address}
-                    onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, address: e.target.value })
+                    }
                     placeholder="Alamat lengkap OPD"
                     rows={3}
                   />
@@ -660,10 +745,14 @@ function SuperAdminOPDsContent() {
           </div>
 
           <DialogFooter>
-            <Button variant="outline" onClick={handleCloseDialog} disabled={isSubmitting}>
-              {actionType === 'view' ? 'Tutup' : 'Batal'}
+            <Button
+              variant="outline"
+              onClick={handleCloseDialog}
+              disabled={isSubmitting}
+            >
+              {actionType === "view" ? "Tutup" : "Batal"}
             </Button>
-            {actionType !== 'view' && (
+            {actionType !== "view" && (
               <Button onClick={handleSubmit} disabled={isSubmitting}>
                 {isSubmitting ? (
                   <>
@@ -672,7 +761,7 @@ function SuperAdminOPDsContent() {
                   </>
                 ) : (
                   <>
-                    {actionType === 'add' ? 'Tambah OPD' : 'Simpan Perubahan'}
+                    {actionType === "add" ? "Tambah OPD" : "Simpan Perubahan"}
                   </>
                 )}
               </Button>
@@ -682,19 +771,23 @@ function SuperAdminOPDsContent() {
       </Dialog>
 
       {/* Delete Confirmation Dialog */}
-      <AlertDialog open={isDeleteDialogOpen} onOpenChange={(open) => !open && handleCloseDialog()}>
+      <AlertDialog
+        open={isDeleteDialogOpen}
+        onOpenChange={(open) => !open && handleCloseDialog()}
+      >
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Hapus OPD?</AlertDialogTitle>
             <AlertDialogDescription>
-              Apakah Anda yakin ingin menghapus OPD "{selectedOPD?.name}"? 
-              Tindakan ini tidak dapat dibatalkan dan akan menghapus semua data terkait.
+              Apakah Anda yakin ingin menghapus OPD "{selectedOPD?.name}"?
+              Tindakan ini tidak dapat dibatalkan dan akan menghapus semua data
+              terkait.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel disabled={isSubmitting}>Batal</AlertDialogCancel>
-            <AlertDialogAction 
-              onClick={handleDelete} 
+            <AlertDialogAction
+              onClick={handleDelete}
               disabled={isSubmitting}
               className="bg-red-600 hover:bg-red-700"
             >
@@ -704,7 +797,7 @@ function SuperAdminOPDsContent() {
                   Menghapus...
                 </>
               ) : (
-                'Hapus'
+                "Hapus"
               )}
             </AlertDialogAction>
           </AlertDialogFooter>
@@ -716,11 +809,13 @@ function SuperAdminOPDsContent() {
 
 export default function SuperAdminOPDsPage() {
   return (
-    <Suspense fallback={
-      <div className="flex justify-center items-center h-96">
-        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-      </div>
-    }>
+    <Suspense
+      fallback={
+        <div className="flex justify-center items-center h-96">
+          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+        </div>
+      }
+    >
       <SuperAdminOPDsContent />
     </Suspense>
   );
