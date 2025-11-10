@@ -118,7 +118,52 @@ export async function approveApplication(applicationId: string, currentUserRole:
     
     // Only create domain if it's a subdomain application
     if ('domainName' in application) {
-      await createDomainFromApplication(application as SubdomainApplication);
+      const domain = await createDomainFromApplication(application as SubdomainApplication);
+      
+      // Auto-create DNS records if provider is configured
+      if (domain) {
+        try {
+          const { dnsManagerService } = await import('@/backend/services/dns/dns-manager.service');
+          
+          const currentUserId = await getCurrentUserId();
+          const userId = currentUserId?.toString() || 'system';
+          
+          // Get target IP from environment or use default
+          const targetIP = process.env.DEFAULT_SERVER_IP || '103.xxx.xxx.xxx';
+          
+          const dnsResult = await dnsManagerService.createDomainRecords({
+            domain: domain as any, // ServiceDomain to Domain type compatibility
+            targetIP,
+            createWWW: true,
+            proxied: true,
+            userId,
+          });
+          
+          if (!dnsResult.success) {
+            console.warn(`DNS creation warning for ${domain.hostname}:`, dnsResult.error);
+            // Don't fail the approval, just log the warning
+            await auditService.logAction({
+              action: 'DNS_AUTO_CREATE_WARNING',
+              resourceType: 'domain',
+              resourceId: domain.id.toString(),
+              description: `DNS auto-create warning: ${dnsResult.error}. Domain created but DNS may need manual configuration.`,
+              userId,
+              userRole: currentUserRole
+            });
+          }
+        } catch (dnsError) {
+          console.error('Error auto-creating DNS records:', dnsError);
+          // Don't fail the approval, just log the error
+          await auditService.logAction({
+            action: 'DNS_AUTO_CREATE_ERROR',
+            resourceType: 'domain',
+            resourceId: domain.id.toString(),
+            description: `DNS auto-create failed: ${dnsError instanceof Error ? dnsError.message : 'Unknown error'}`,
+            userId: (await getCurrentUserId())?.toString() || 'system',
+            userRole: currentUserRole
+          });
+        }
+      }
     }
     
     await logActivity('APPROVE_APPLICATION', `Menyetujui permohonan ${applicationId}`, currentUserRole);

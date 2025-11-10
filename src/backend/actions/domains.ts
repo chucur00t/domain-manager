@@ -44,6 +44,20 @@ export async function activateDomain(domainId: string, currentUserRole: User['ro
     
     await domainService.updateDomain(parseInt(domainId), { status: 'active' });
     
+    // Update DNS records status if provider is configured
+    try {
+      const { dnsManagerService } = await import('@/backend/services/dns/dns-manager.service');
+      
+      await dnsManagerService.updateDomainRecords({
+        domain: domain as any, // ServiceDomain to Domain type compatibility
+        newStatus: 'active',
+        userId: 'system',
+      });
+    } catch (dnsError) {
+      console.warn('DNS update warning:', dnsError);
+      // Don't fail activation, just log warning
+    }
+    
     logActivity('ACTIVATE_DOMAIN', `Mengaktifkan domain ${domain.hostname} (ID: ${domainId})`, currentUserRole);
     
     revalidatePath('/domains');
@@ -71,6 +85,20 @@ export async function deactivateDomain(domainId: string, currentUserRole: User['
     }
     
     await domainService.updateDomain(parseInt(domainId), { status: 'inactive' });
+
+    // Update DNS records status if provider is configured
+    try {
+      const { dnsManagerService } = await import('@/backend/services/dns/dns-manager.service');
+      
+      await dnsManagerService.updateDomainRecords({
+        domain: domain as any, // ServiceDomain to Domain type compatibility
+        newStatus: 'suspended',
+        userId: 'system',
+      });
+    } catch (dnsError) {
+      console.warn('DNS update warning:', dnsError);
+      // Don't fail deactivation, just log warning
+    }
 
     logActivity('DEACTIVATE_DOMAIN', `Menonaktifkan domain ${domain.hostname} (ID: ${domainId})`, currentUserRole);
     
