@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   Card,
   CardContent,
@@ -18,7 +18,7 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { StatCard } from "@/components/shared/stat-card";
-import { Globe, FileText, CheckCircle, Clock } from "lucide-react";
+import { Globe, FileText, CheckCircle, Clock, Loader2 } from "lucide-react";
 import {
   ChartConfig,
   ChartContainer,
@@ -28,7 +28,7 @@ import {
   ChartLegendContent,
 } from "@/components/ui/chart";
 import { Pie, PieChart, Cell } from "recharts";
-import type { SubdomainApplication, Domain } from "@/backend/models/types";
+import type { SubdomainApplication, Domain, User } from "@/backend/models/types";
 
 const applicationChartConfig = {
   approved: {
@@ -50,19 +50,61 @@ const applicationChartConfig = {
 } satisfies ChartConfig;
 
 type Props = {
-  applications: SubdomainApplication[];
-  domains: Domain[];
-  userOpd: string;
+  role: User["role"];
+  userOpd?: string;
 };
 
-export function AdminDaerahDashboard({
-  applications,
-  domains,
-  userOpd,
-}: Props) {
-  // Filter data by user OPD
-  const opdApplications = applications.filter((app) => app.opd === userOpd);
-  const opdDomains = domains.filter((domain) => domain.opd === userOpd);
+export function AdminDaerahDashboard({ role, userOpd }: Props) {
+  const [isLoading, setIsLoading] = useState(true);
+  const [applications, setApplications] = useState<SubdomainApplication[]>([]);
+  const [domains, setDomains] = useState<Domain[]>([]);
+  const [currentUserOpd, setCurrentUserOpd] = useState<string>(userOpd || "");
+
+  useEffect(() => {
+    const fetchData = async () => {
+      setIsLoading(true);
+      try {
+        const [domainsRes, appsRes, usersRes] = await Promise.all([
+          fetch("/api/domains"),
+          fetch("/api/applications"),
+          fetch("/api/users"),
+        ]);
+
+        const allDomains: Domain[] = await domainsRes.json();
+        const allApplications: SubdomainApplication[] = await appsRes.json();
+        const users: User[] = await usersRes.json();
+
+        // Find current user's OPD if not provided
+        let opdToFilter = userOpd;
+        if (!opdToFilter) {
+          const currentUser = users.find((u) => u.role === role);
+          opdToFilter = currentUser?.opd || "";
+          setCurrentUserOpd(opdToFilter);
+        }
+
+        // Filter data by user OPD
+        const filteredApps = allApplications.filter(
+          (app) => app.opd === opdToFilter
+        );
+        const filteredDomains = allDomains.filter(
+          (domain) => domain.opd === opdToFilter
+        );
+
+        setApplications(filteredApps);
+        setDomains(filteredDomains);
+      } catch (error) {
+        console.error("Failed to fetch dashboard data:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [role, userOpd]);
+
+  // Filter data by user OPD (using state data)
+  const opdApplications = applications;
+  const opdDomains = domains;
 
   // Calculate statistics
   const stats = {
@@ -131,6 +173,14 @@ export function AdminDaerahDashboard({
       countdown: calculateCountdown(domain.activationDate!),
     }))
     .sort((a, b) => a.countdown.days - b.countdown.days);
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-full w-full">
+        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col gap-8">
