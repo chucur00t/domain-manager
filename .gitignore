@@ -46,3 +46,6 @@ next-env.d.ts
 # firebase
 firebase-debug.log
 firestore-debug.log
+# Temporary analysis files
+struktur*.txt
+typecheck-output.txt
