@@ -21,8 +21,15 @@ export * from './firebase/services';
 // ===========================================
 
 export const getApplications = async () => {
-  const result = await applicationService.getApplications(1, 100);
-  return result.applications;
+  try {
+    const result = await applicationService.getApplications(1, 100);
+    return result.applications;
+  } catch (error) {
+    console.error('Error fetching applications from database, using mock data:', error);
+    // Fallback to mock data
+    const { MOCK_APPLICATIONS } = await import('@/backend/utils/mock-data');
+    return MOCK_APPLICATIONS;
+  }
 };
 
 export const getApplicationById = async (id: string) => {
@@ -149,8 +156,15 @@ export const deleteUser = async (id: string) => {
 // ===========================================
 
 export const getAuditLogs = async () => {
-  const result = await auditLogService.getAuditLogs(1, 100);
-  return result.logs;
+  try {
+    const result = await auditLogService.getAuditLogs(1, 100);
+    return result.logs;
+  } catch (error) {
+    console.error('Error fetching audit logs from database, using mock data:', error);
+    // Fallback to mock data
+    const { MOCK_AUDIT_LOGS } = await import('@/backend/utils/mock-data');
+    return MOCK_AUDIT_LOGS;
+  }
 };
 
 export const createAuditLog = async (log: AuditLog) => {
@@ -165,8 +179,15 @@ export const createAuditLog = async (log: AuditLog) => {
 };
 
 export const getHostingApplications = async () => {
-  const result = await hostingService.getHostings(1, 100);
-  return result.hostings;
+  try {
+    const result = await hostingService.getHostings(1, 100);
+    return result.hostings;
+  } catch (error) {
+    console.error('Error fetching hosting applications from database, using mock data:', error);
+    // Fallback to mock data
+    const { MOCK_HOSTING_APPLICATIONS } = await import('@/backend/utils/mock-data');
+    return MOCK_HOSTING_APPLICATIONS;
+  }
 };
 
 export const getHostingApplicationById = async (id: string) => {

@@ -77,45 +77,8 @@ function SuperAdminAuditTrailContent() {
         setLogs(Array.isArray(data) ? data : []);
       } catch (error) {
         console.error("Error fetching audit logs:", error);
-        // Fallback to mock data if API fails
-        setLogs([
-          {
-            id: "1",
-            userId: "admin-1",
-            timestamp: new Date().toISOString(),
-            user: "admin@kalbar.go.id",
-            userRole: "Super Admin",
-            action: "LOGIN",
-            resourceType: "auth",
-            resourceId: "auth-1",
-            description: "Login berhasil",
-            details: "Login berhasil dari IP 192.168.1.1",
-          },
-          {
-            id: "2",
-            userId: "opd-1",
-            timestamp: new Date(Date.now() - 3600000).toISOString(),
-            user: "opd@kalbar.go.id",
-            userRole: "Admin Daerah",
-            action: "CREATE_DOMAIN",
-            resourceType: "domain",
-            resourceId: "domain-1",
-            description: "Mengajukan domain baru",
-            details: "Mengajukan domain: example.kalbarprov.go.id",
-          },
-          {
-            id: "3",
-            userId: "admin-1",
-            timestamp: new Date(Date.now() - 7200000).toISOString(),
-            user: "admin@kalbar.go.id",
-            userRole: "Super Admin",
-            action: "APPROVE_DOMAIN",
-            resourceType: "domain",
-            resourceId: "domain-1",
-            description: "Menyetujui domain",
-            details: "Menyetujui domain: example.kalbarprov.go.id",
-          },
-        ]);
+        // Use empty array when API is not available
+        setLogs([]);
       } finally {
         setIsLoading(false);
       }
