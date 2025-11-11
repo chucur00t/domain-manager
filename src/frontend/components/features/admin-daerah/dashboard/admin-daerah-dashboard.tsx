@@ -55,7 +55,11 @@ type Props = {
   userOpd: string;
 };
 
-export function AdminDaerahDashboard({ applications, domains, userOpd }: Props) {
+export function AdminDaerahDashboard({
+  applications,
+  domains,
+  userOpd,
+}: Props) {
   // Filter data by user OPD
   const opdApplications = applications.filter((app) => app.opd === userOpd);
   const opdDomains = domains.filter((domain) => domain.opd === userOpd);
@@ -80,7 +84,8 @@ export function AdminDaerahDashboard({ applications, domains, userOpd }: Props) 
     },
     {
       name: "pending_review",
-      value: opdApplications.filter((a) => a.status === "pending_review").length,
+      value: opdApplications.filter((a) => a.status === "pending_review")
+        .length,
       fill: "var(--color-pending_review)",
     },
     {

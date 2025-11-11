@@ -17,12 +17,12 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart";
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from "recharts";
-import { SuperAdminApplicationsTable } from "./super-admin-applications-table";
 import type {
   User,
   SubdomainApplication,
   Domain,
 } from "@/backend/models/types";
+import { SuperAdminApplicationsTable } from "@/components/features/super-admin/dashboard/super-admin-applications-table";
 
 const chartConfig = {
   applications: {

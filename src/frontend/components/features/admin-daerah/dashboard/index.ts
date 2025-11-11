@@ -1,1 +1,1 @@
-export { AdminDaerahDashboard } from './admin-daerah-dashboard';
+export { AdminDaerahDashboard } from "./admin-daerah-dashboard";

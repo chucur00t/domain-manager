@@ -29,13 +29,15 @@ src/frontend/components/features/
 ## 🎯 Konvensi Penamaan
 
 ### **Super Admin Components:**
+
 - Prefix: `super-admin-` atau dalam folder `super-admin/`
-- Contoh: 
+- Contoh:
   - `super-admin-dashboard.tsx`
   - `super-admin-applications-table.tsx`
   - `super-admin-users-table.tsx`
 
 ### **Admin Daerah Components:**
+
 - Prefix: `admin-daerah-` atau dalam folder `admin-daerah/`
 - Contoh:
   - `admin-daerah-dashboard.tsx`
@@ -43,6 +45,7 @@ src/frontend/components/features/
   - `admin-daerah-applications-table.tsx`
 
 ### **Shared Components:**
+
 - Lokasi: `src/frontend/components/shared/`
 - Contoh:
   - `stat-card.tsx`
@@ -55,11 +58,11 @@ src/frontend/components/features/
 
 ```typescript
 // ✅ GOOD - Import dari index
-import { SuperAdminDashboard } from '@/components/features/super-admin/dashboard';
-import { AdminDaerahDashboard } from '@/components/features/admin-daerah/dashboard';
+import { SuperAdminDashboard } from "@/components/features/super-admin/dashboard";
+import { AdminDaerahDashboard } from "@/components/features/admin-daerah/dashboard";
 
 // ❌ BAD - Import langsung dari file
-import { SuperAdminDashboard } from '@/components/features/super-admin/dashboard/super-admin-dashboard';
+import { SuperAdminDashboard } from "@/components/features/super-admin/dashboard/super-admin-dashboard";
 ```
 
 ### **Path Aliases yang Tersedia:**
@@ -74,10 +77,10 @@ import { SuperAdminDashboard } from '@/components/features/super-admin/dashboard
 
 ### **File yang Sudah Dipindahkan:**
 
-| File Lama | File Baru |
-|-----------|-----------|
-| `src/frontend/components/dashboard/kabid-dashboard.tsx` | `src/frontend/components/features/super-admin/dashboard/super-admin-dashboard.tsx` |
-| `src/frontend/components/features/dashboard/super-admin-dashboard.tsx` | `src/frontend/components/features/super-admin/dashboard/super-admin-dashboard.tsx` |
+| File Lama                                                                       | File Baru                                                                                   |
+| ------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
+| `src/frontend/components/dashboard/kabid-dashboard.tsx`                         | `src/frontend/components/features/super-admin/dashboard/super-admin-dashboard.tsx`          |
+| `src/frontend/components/features/dashboard/super-admin-dashboard.tsx`          | `src/frontend/components/features/super-admin/dashboard/super-admin-dashboard.tsx`          |
 | `src/frontend/components/features/dashboard/super-admin-applications-table.tsx` | `src/frontend/components/features/super-admin/dashboard/super-admin-applications-table.tsx` |
 
 ### **File yang Perlu Update Import:**
@@ -135,13 +138,15 @@ import { AdminDaerah[ComponentName] } from '@/components/features/admin-daerah/[
 ## 🎨 Component Examples
 
 ### **Super Admin Dashboard:**
+
 ```typescript
 <SuperAdminDashboard role="Super Admin" />
 ```
 
 ### **Admin Daerah Dashboard:**
+
 ```typescript
-<AdminDaerahDashboard 
+<AdminDaerahDashboard
   applications={applications}
   domains={domains}
   userOpd="Dinas Kesehatan"

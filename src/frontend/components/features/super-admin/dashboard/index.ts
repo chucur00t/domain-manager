@@ -1,2 +1,2 @@
-export { SuperAdminDashboard } from './super-admin-dashboard';
-export { SuperAdminApplicationsTable } from './super-admin-applications-table';
+export { SuperAdminDashboard } from "./super-admin-dashboard";
+export { SuperAdminApplicationsTable } from "./super-admin-applications-table";
