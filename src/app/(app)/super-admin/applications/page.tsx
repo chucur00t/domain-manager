@@ -71,7 +71,7 @@ function SuperAdminApplicationsContent() {
   // Get unique OPDs for filter
   const allOpds = useMemo(() => {
     const opds = applications
-      .map(app => app.opd_name)
+      .map(app => app.opd)
       .filter((opd, index, self) => opd && self.indexOf(opd) === index);
     return opds.sort();
   }, [applications]);
@@ -80,12 +80,19 @@ function SuperAdminApplicationsContent() {
   const filteredApplications = useMemo(() => {
     return applications.filter(app => {
       // Status filter
-      if (statusFilter !== 'all' && app.status !== statusFilter) {
+      const statusMap: Record<StatusFilter, SubdomainApplication['status'] | null> = {
+        'all': null,
+        'Pending': 'pending_review',
+        'Approved': 'approved',
+        'Rejected': 'rejected'
+      };
+      const mappedStatus = statusMap[statusFilter];
+      if (mappedStatus && app.status !== mappedStatus) {
         return false;
       }
       
       // OPD filter
-      if (opdFilter !== 'all' && app.opd_name !== opdFilter) {
+      if (opdFilter !== 'all' && app.opd !== opdFilter) {
         return false;
       }
       
@@ -93,9 +100,9 @@ function SuperAdminApplicationsContent() {
       if (searchTerm) {
         const search = searchTerm.toLowerCase();
         return (
-          app.subdomain?.toLowerCase().includes(search) ||
-          app.opd_name?.toLowerCase().includes(search) ||
-          app.purpose?.toLowerCase().includes(search)
+          app.domainName?.toLowerCase().includes(search) ||
+          app.opd?.toLowerCase().includes(search) ||
+          app.description?.toLowerCase().includes(search)
         );
       }
       
@@ -105,7 +112,7 @@ function SuperAdminApplicationsContent() {
 
   // Count pending applications
   const pendingCount = useMemo(() => {
-    return applications.filter(app => app.status === 'Pending').length;
+    return applications.filter(app => app.status === 'pending_review').length;
   }, [applications]);
 
   const handleOpenDialog = (app: SubdomainApplication, action: 'approve' | 'reject') => {
@@ -271,18 +278,18 @@ function SuperAdminApplicationsContent() {
                     filteredApplications.map((app) => (
                       <tr key={app.id} className="border-b hover:bg-muted/30">
                         <td className="px-4 py-3 text-sm">
-                          {app.created_at ? new Date(app.created_at).toLocaleDateString('id-ID') : '-'}
+                          {app.submittedDate ? new Date(app.submittedDate).toLocaleDateString('id-ID') : '-'}
                         </td>
-                        <td className="px-4 py-3 text-sm font-medium">{app.opd_name || '-'}</td>
+                        <td className="px-4 py-3 text-sm font-medium">{app.opd || '-'}</td>
                         <td className="px-4 py-3 text-sm">
                           <code className="bg-muted px-2 py-1 rounded text-xs">
-                            {app.subdomain || '-'}
+                            {app.domainName || '-'}
                           </code>
                         </td>
-                        <td className="px-4 py-3 text-sm max-w-xs truncate">{app.purpose || '-'}</td>
-                        <td className="px-4 py-3">{getStatusBadge(app.status || 'Pending')}</td>
+                        <td className="px-4 py-3 text-sm max-w-xs truncate">{app.description || '-'}</td>
+                        <td className="px-4 py-3">{getStatusBadge(app.status)}</td>
                         <td className="px-4 py-3 text-right">
-                          {app.status === 'Pending' ? (
+                          {app.status === 'pending_review' ? (
                             <div className="flex justify-end gap-2">
                               <Button
                                 size="sm"
@@ -305,7 +312,7 @@ function SuperAdminApplicationsContent() {
                             </div>
                           ) : (
                             <span className="text-sm text-muted-foreground">
-                              {app.status === 'Approved' ? 'Sudah Disetujui' : 'Sudah Ditolak'}
+                              {app.status === 'approved' ? 'Sudah Disetujui' : 'Sudah Ditolak'}
                             </span>
                           )}
                         </td>
@@ -337,11 +344,11 @@ function SuperAdminApplicationsContent() {
             <div className="space-y-4 py-4">
               <div className="grid grid-cols-2 gap-2 text-sm">
                 <div className="text-muted-foreground">OPD:</div>
-                <div className="font-medium">{selectedApp.opd_name}</div>
+                <div className="font-medium">{selectedApp.opd}</div>
                 <div className="text-muted-foreground">Domain:</div>
-                <div className="font-mono text-xs bg-muted px-2 py-1 rounded">{selectedApp.subdomain}</div>
+                <div className="font-mono text-xs bg-muted px-2 py-1 rounded">{selectedApp.domainName}</div>
                 <div className="text-muted-foreground">Tujuan:</div>
-                <div className="col-span-1">{selectedApp.purpose}</div>
+                <div className="col-span-1">{selectedApp.description}</div>
               </div>
 
               <div className="space-y-2">
