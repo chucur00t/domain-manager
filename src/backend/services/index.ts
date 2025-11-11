@@ -135,7 +135,9 @@ export const updateDomainStatus = async (
   await domainService.updateDomain(parseInt(id), { status });
 };
 
-export const createDomainFromApplication = async (application: SubdomainApplication): Promise<ServiceDomain> => {
+export const createDomainFromApplication = async (
+  application: SubdomainApplication
+): Promise<ServiceDomain> => {
   const domainData = {
     domain_name: application.domainName,
     status: "active" as const,
@@ -143,14 +145,16 @@ export const createDomainFromApplication = async (application: SubdomainApplicat
   };
 
   const domainId = await domainService.createDomain(domainData);
-  
+
   // Fetch the created domain to return complete object
-  const createdDomain = await domainService.getDomain(parseInt(domainId.toString()));
-  
+  const createdDomain = await domainService.getDomain(
+    parseInt(domainId.toString())
+  );
+
   if (!createdDomain) {
-    throw new Error('Failed to fetch created domain');
+    throw new Error("Failed to fetch created domain");
   }
-  
+
   return createdDomain;
 };
 

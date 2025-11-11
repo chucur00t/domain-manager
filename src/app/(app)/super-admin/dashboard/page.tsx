@@ -3,29 +3,16 @@
 import React from 'react';
 import { useSearchParams } from 'next/navigation';
 import type { User } from '@/backend/models/types';
-import { SuperAdminDashboard } from '@/components/features/dashboard/super-admin-dashboard';
-import { KabidDashboard } from '@/components/features/dashboard/kabid-dashboard';
+import { SuperAdminDashboard } from '@/components/features/super-admin/dashboard';
 import { Loader2 } from 'lucide-react';
 
 function SuperAdminDashboardContent() {
   const searchParams = useSearchParams();
   const role = searchParams.get('role') as User['role'];
-    
-  const getDashboardForRole = () => {
-    switch (role) {
-      case 'Super Admin':
-        return <SuperAdminDashboard role={role} />;
-      case 'Admin Daerah':
-        return <KabidDashboard />;
-      default:
-        // Fallback or a generic dashboard
-        return <div>Dashboard tidak tersedia untuk peran ini.</div>;
-    }
-  }
   
   return (
     <div>
-        {getDashboardForRole()}
+      <SuperAdminDashboard role={role} />
     </div>
   );
 }
