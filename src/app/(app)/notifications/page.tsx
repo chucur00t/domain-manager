@@ -125,7 +125,11 @@ function NotificationsPageContent() {
             app.status === "approved"
               ? `Permohonan domain "${app.domainName}" telah disetujui dan siap digunakan.`
               : `Permohonan domain "${app.domainName}" ditolak.`,
-          status: app.status as 'approved' | 'rejected' | 'pending_review' | 'pending_approval',
+          status: app.status as
+            | "approved"
+            | "rejected"
+            | "pending_review"
+            | "pending_approval",
           timestamp: app.submittedDate || new Date().toISOString(),
           relatedId: app.id,
           isRead: false,
@@ -153,7 +157,11 @@ function NotificationsPageContent() {
             app.status === "approved"
               ? `Permohonan hosting untuk "${app.applicationName}" telah disetujui dan sumber daya telah dialokasikan.`
               : `Permohonan hosting untuk "${app.applicationName}" ditolak.`,
-          status: app.status as 'approved' | 'rejected' | 'pending_review' | 'pending_approval',
+          status: app.status as
+            | "approved"
+            | "rejected"
+            | "pending_review"
+            | "pending_approval",
           timestamp: app.submittedDate || new Date().toISOString(),
           relatedId: app.id,
           isRead: false,
