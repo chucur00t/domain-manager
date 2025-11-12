@@ -171,14 +171,12 @@ function SuperAdminOPDsContent() {
         opd.statistics.totalApplications = applications.filter(
           (a) => a.opd === opdName
         ).length;
-        
+
         // Filter hosting applications for this OPD
-        const opdHostingApps = hostingApps.filter(
-          (h) => h.opd === opdName
-        );
+        const opdHostingApps = hostingApps.filter((h) => h.opd === opdName);
         opd.statistics.totalHosting = opdHostingApps.length;
         opd.hostedDomains = opdHostingApps;
-        
+
         opd.statistics.totalUsers = 1; // Placeholder - ideally fetch from users API
       });
 
@@ -629,64 +627,70 @@ function SuperAdminOPDsContent() {
                 </div>
 
                 {/* Domain yang Sudah Hosting */}
-                {selectedOPD.hostedDomains && selectedOPD.hostedDomains.length > 0 && (
-                  <div className="border-t pt-4">
-                    <h4 className="font-semibold mb-3 flex items-center gap-2">
-                      <Server className="h-4 w-4" />
-                      Domain yang Sudah Hosting ({selectedOPD.hostedDomains.length})
-                    </h4>
-                    <div className="space-y-2 max-h-64 overflow-y-auto">
-                      {selectedOPD.hostedDomains.map((hosting, index) => (
-                        <div
-                          key={hosting.id || index}
-                          className="flex items-center justify-between p-3 bg-muted/30 rounded-lg hover:bg-muted/50 transition-colors"
-                        >
-                          <div className="flex-1">
-                            <div className="flex items-center gap-2">
-                              <Globe className="h-3 w-3 text-muted-foreground" />
-                              <p className="font-medium text-sm">
-                                {hosting.domainName}
+                {selectedOPD.hostedDomains &&
+                  selectedOPD.hostedDomains.length > 0 && (
+                    <div className="border-t pt-4">
+                      <h4 className="font-semibold mb-3 flex items-center gap-2">
+                        <Server className="h-4 w-4" />
+                        Domain yang Sudah Hosting (
+                        {selectedOPD.hostedDomains.length})
+                      </h4>
+                      <div className="space-y-2 max-h-64 overflow-y-auto">
+                        {selectedOPD.hostedDomains.map((hosting, index) => (
+                          <div
+                            key={hosting.id || index}
+                            className="flex items-center justify-between p-3 bg-muted/30 rounded-lg hover:bg-muted/50 transition-colors"
+                          >
+                            <div className="flex-1">
+                              <div className="flex items-center gap-2">
+                                <Globe className="h-3 w-3 text-muted-foreground" />
+                                <p className="font-medium text-sm">
+                                  {hosting.domainName}
+                                </p>
+                              </div>
+                              <p className="text-xs text-muted-foreground mt-1 ml-5">
+                                {hosting.applicationName}
                               </p>
+                              {hosting.framework && (
+                                <p className="text-xs text-muted-foreground ml-5">
+                                  Framework: {hosting.framework}
+                                </p>
+                              )}
                             </div>
-                            <p className="text-xs text-muted-foreground mt-1 ml-5">
-                              {hosting.applicationName}
-                            </p>
-                            {hosting.framework && (
-                              <p className="text-xs text-muted-foreground ml-5">
-                                Framework: {hosting.framework}
-                              </p>
-                            )}
+                            <div className="flex items-center gap-2">
+                              {hosting.status === "approved" && (
+                                <Badge
+                                  variant="default"
+                                  className="text-xs bg-green-600"
+                                >
+                                  Aktif
+                                </Badge>
+                              )}
+                              {hosting.status === "pending" && (
+                                <Badge variant="secondary" className="text-xs">
+                                  Pending
+                                </Badge>
+                              )}
+                            </div>
                           </div>
-                          <div className="flex items-center gap-2">
-                            {hosting.status === 'approved' && (
-                              <Badge variant="default" className="text-xs bg-green-600">
-                                Aktif
-                              </Badge>
-                            )}
-                            {hosting.status === 'pending' && (
-                              <Badge variant="secondary" className="text-xs">
-                                Pending
-                              </Badge>
-                            )}
-                          </div>
-                        </div>
-                      ))}
+                        ))}
+                      </div>
                     </div>
-                  </div>
-                )}
+                  )}
 
-                {selectedOPD.hostedDomains && selectedOPD.hostedDomains.length === 0 && (
-                  <div className="border-t pt-4">
-                    <h4 className="font-semibold mb-3 flex items-center gap-2">
-                      <Server className="h-4 w-4" />
-                      Domain yang Sudah Hosting
-                    </h4>
-                    <div className="text-center py-8 text-muted-foreground text-sm">
-                      <Server className="h-8 w-8 mx-auto mb-2 opacity-30" />
-                      <p>Belum ada domain yang di-hosting</p>
+                {selectedOPD.hostedDomains &&
+                  selectedOPD.hostedDomains.length === 0 && (
+                    <div className="border-t pt-4">
+                      <h4 className="font-semibold mb-3 flex items-center gap-2">
+                        <Server className="h-4 w-4" />
+                        Domain yang Sudah Hosting
+                      </h4>
+                      <div className="text-center py-8 text-muted-foreground text-sm">
+                        <Server className="h-8 w-8 mx-auto mb-2 opacity-30" />
+                        <p>Belum ada domain yang di-hosting</p>
+                      </div>
                     </div>
-                  </div>
-                )}
+                  )}
               </div>
             ) : (
               <div className="grid gap-4">
