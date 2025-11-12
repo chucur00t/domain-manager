@@ -140,7 +140,7 @@ export const createDomainFromApplication = async (
 ): Promise<ServiceDomain> => {
   const domainData = {
     domain_name: application.domainName,
-    status: "active" as const,
+    status: "pending" as const, // Domain disetujui tapi belum di-hosting
     expires_at: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000), // 1 year from now
   };
 

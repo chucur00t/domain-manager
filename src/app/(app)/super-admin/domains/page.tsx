@@ -24,6 +24,7 @@ import {
   Activity,
   Shield,
   Calendar,
+  Clock,
 } from "lucide-react";
 import type { Domain, DomainHealth } from "@/backend/models/types";
 import {
@@ -128,6 +129,7 @@ function SuperAdminDomainsContent() {
     return {
       total: domains.length,
       active: domains.filter((d) => d.status === "active").length,
+      pending: domains.filter((d) => d.status === "pending").length,
       inactive: domains.filter((d) => d.status === "inactive").length,
       expired: domains.filter((d) => d.status === "expired").length,
     };
@@ -256,6 +258,15 @@ function SuperAdminDomainsContent() {
             Aktif
           </Badge>
         );
+      case "pending":
+        return (
+          <Badge
+            variant="outline"
+            className="bg-blue-50 text-blue-700 border-blue-200"
+          >
+            Menunggu Hosting
+          </Badge>
+        );
       case "inactive":
         return (
           <Badge
@@ -315,12 +326,25 @@ function SuperAdminDomainsContent() {
             <CardHeader className="pb-3">
               <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
                 <CheckCircle2 className="h-4 w-4 text-green-600" />
-                Aktif
+                Aktif (Di-hosting)
               </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-green-600">
                 {stats.active}
+              </div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+                <Clock className="h-4 w-4 text-blue-600" />
+                Menunggu Hosting
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-blue-600">
+                {stats.pending}
               </div>
             </CardContent>
           </Card>

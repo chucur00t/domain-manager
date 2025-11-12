@@ -106,6 +106,33 @@ export async function approveHostingApplication(applicationId: string, currentUs
   
   await updateHostingApplication(applicationId, { status: 'approved' });
   
+  // Update domain status to 'active' when hosting is approved
+  if (application.domainName) {
+    try {
+      const { DomainService } = await import('@/backend/database/services/domain.service');
+      const domainService = new DomainService();
+      
+      // Find domain by hostname
+      const domainsResult = await domainService.getDomains(1, 100);
+      const domain = domainsResult.domains.find(d => d.hostname === application.domainName);
+      
+      if (domain) {
+        await domainService.updateDomain(parseInt(domain.id), { status: 'active' });
+        
+        await auditService.logAction({
+          action: 'ACTIVATE_DOMAIN',
+          resourceType: 'domain',
+          resourceId: domain.id,
+          description: `Mengaktifkan domain ${application.domainName} karena hosting disetujui`,
+          userId: 'system'
+        });
+      }
+    } catch (error) {
+      console.error('Error updating domain status:', error);
+      // Don't fail hosting approval if domain update fails
+    }
+  }
+  
   await auditService.logAction({
     action: 'APPROVE_HOSTING_APP',
     resourceType: 'hosting',
@@ -116,6 +143,8 @@ export async function approveHostingApplication(applicationId: string, currentUs
   
   revalidatePath('/hosting');
   revalidatePath(`/hosting/${applicationId}`);
+  revalidatePath('/domains');
+  revalidatePath('/super-admin/domains');
   revalidatePath('/super-admin/dashboard');
   revalidatePath('/audit-trail');
 
