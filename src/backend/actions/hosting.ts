@@ -143,7 +143,7 @@ export async function approveHostingApplication(
 
   await updateHostingApplication(applicationId, { status: "approved" });
 
-  // Update domain status to 'active' when hosting is approved
+  // CREATE domain when hosting is approved (domain langsung active karena hosting disetujui)
   if (application.domainName) {
     try {
       const { DomainService } = await import(
@@ -151,28 +151,80 @@ export async function approveHostingApplication(
       );
       const domainService = new DomainService();
 
-      // Find domain by hostname
+      // Check if domain already exists
       const domainsResult = await domainService.getDomains(1, 100);
-      const domain = domainsResult.domains.find(
+      const existingDomain = domainsResult.domains.find(
         (d) => d.hostname === application.domainName
       );
 
-      if (domain) {
-        await domainService.updateDomain(parseInt(domain.id), {
+      if (existingDomain) {
+        // Domain sudah ada, update ke active
+        await domainService.updateDomain(parseInt(existingDomain.id), {
           status: "active",
         });
 
         await auditService.logAction({
           action: "ACTIVATE_DOMAIN",
           resourceType: "domain",
-          resourceId: domain.id,
+          resourceId: existingDomain.id,
           description: `Mengaktifkan domain ${application.domainName} karena hosting disetujui`,
           userId: "system",
         });
+      } else {
+        // Domain belum ada, buat baru dengan status active
+        const domainData = {
+          domain_name: application.domainName,
+          opd_id: 1, // TODO: Get actual OPD ID from OPD name
+          status: "active" as const,
+          expires_at: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000), // 1 year
+        };
+
+        const newDomainId = await domainService.createDomain(domainData);
+
+        await auditService.logAction({
+          action: "CREATE_DOMAIN",
+          resourceType: "domain",
+          resourceId: newDomainId.toString(),
+          description: `Membuat domain ${application.domainName} karena hosting disetujui`,
+          userId: "system",
+        });
+
+        // Auto-create DNS records if provider is configured
+        try {
+          const { dnsManagerService } = await import(
+            "@/backend/services/dns/dns-manager.service"
+          );
+
+          const targetIP = process.env.DEFAULT_SERVER_IP || "103.xxx.xxx.xxx";
+
+          const createdDomain = await domainService.getDomain(
+            parseInt(newDomainId.toString())
+          );
+
+          if (createdDomain) {
+            const dnsResult = await dnsManagerService.createDomainRecords({
+              domain: createdDomain as any,
+              targetIP,
+              createWWW: true,
+              proxied: true,
+              userId: "system",
+            });
+
+            if (!dnsResult.success) {
+              console.warn(
+                `DNS creation warning for ${application.domainName}:`,
+                dnsResult.error
+              );
+            }
+          }
+        } catch (dnsError) {
+          console.error("Error auto-creating DNS records:", dnsError);
+          // Don't fail hosting approval if DNS creation fails
+        }
       }
     } catch (error) {
-      console.error("Error updating domain status:", error);
-      // Don't fail hosting approval if domain update fails
+      console.error("Error creating/updating domain:", error);
+      // Don't fail hosting approval if domain creation fails
     }
   }
 

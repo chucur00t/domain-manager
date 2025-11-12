@@ -54,23 +54,27 @@ function HostingApplicationFormContent() {
   const currentUserRole = searchParams.get("role") as User["role"];
 
   const [allUsers, setAllUsers] = useState<User[]>([]);
-  const [allDomains, setAllDomains] = useState<Domain[]>([]);
+  const [approvedApplications, setApprovedApplications] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const fetchData = async () => {
       setIsLoading(true);
       try {
-        const [usersRes, domainsRes] = await Promise.all([
+        const [usersRes, applicationsRes] = await Promise.all([
           fetch("/api/users"),
-          fetch("/api/domains"),
+          fetch("/api/applications"),
         ]);
-        if (!usersRes.ok || !domainsRes.ok)
+        if (!usersRes.ok || !applicationsRes.ok)
           throw new Error("Gagal mengambil data");
         const usersData: User[] = await usersRes.json();
-        const domainsData: Domain[] = await domainsRes.json();
+        const applicationsData: any[] = await applicationsRes.json();
+
         setAllUsers(usersData);
-        setAllDomains(domainsData);
+        // Filter hanya aplikasi yang sudah disetujui
+        setApprovedApplications(
+          applicationsData.filter((app) => app.status === "approved")
+        );
       } catch (error) {
         console.error(error);
         toast({
@@ -98,11 +102,10 @@ function HostingApplicationFormContent() {
 
   const availableDomains = useMemo(() => {
     if (!operatorOpd) return [];
-    // Domain yang sudah disetujui (pending) dan menunggu hosting
-    return allDomains.filter(
-      (d) => d.opd === operatorOpd && d.status === "pending"
-    );
-  }, [operatorOpd, allDomains]);
+    // Domain dari aplikasi yang sudah disetujui (approved) milik OPD ini
+    // Belum masuk ke manajemen domain, menunggu keputusan hosting
+    return approvedApplications.filter((app) => app.opd === operatorOpd);
+  }, [operatorOpd, approvedApplications]);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -195,21 +198,22 @@ function HostingApplicationFormContent() {
                     </FormControl>
                     <SelectContent>
                       {availableDomains.length > 0 ? (
-                        availableDomains.map((domain: Domain) => (
-                          <SelectItem key={domain.id} value={domain.hostname}>
-                            {domain.hostname}
+                        availableDomains.map((app: any) => (
+                          <SelectItem key={app.id} value={app.domainName}>
+                            {app.domainName}
                           </SelectItem>
                         ))
                       ) : (
                         <div className="px-2 py-1.5 text-sm text-muted-foreground">
-                          Tidak ada domain yang tersedia. Ajukan domain terlebih
-                          dahulu.
+                          Tidak ada domain yang disetujui. Ajukan dan tunggu
+                          persetujuan domain terlebih dahulu.
                         </div>
                       )}
                     </SelectContent>
                   </Select>
                   <FormDescription>
-                    Pilih dari domain yang sudah disetujui dan menunggu hosting.
+                    Pilih dari domain yang sudah disetujui. Domain akan aktif
+                    setelah hosting disetujui.
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
