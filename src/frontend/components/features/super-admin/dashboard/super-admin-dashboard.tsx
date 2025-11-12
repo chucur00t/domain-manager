@@ -43,6 +43,8 @@ export function SuperAdminDashboard({ role }: Props) {
     totalUsersCount: 0,
     totalOpdCount: 0,
   });
+
+  console.log("SuperAdminDashboard rendered with stats:", stats);
   const [applicationsByOpd, setApplicationsByOpd] = useState<
     { opd: string; applications: number }[]
   >([]);
@@ -64,6 +66,12 @@ export function SuperAdminDashboard({ role }: Props) {
         const applications: SubdomainApplication[] = await appsRes.json();
         const users: User[] = await usersRes.json();
 
+        console.log("Dashboard data fetched:", {
+          domainsCount: domains.length,
+          applicationsCount: applications.length,
+          usersCount: users.length,
+        });
+
         const opdList = [...new Set(applications.map((app) => app.opd))];
         const appCounts = opdList
           .map((opd) => ({
@@ -73,7 +81,7 @@ export function SuperAdminDashboard({ role }: Props) {
           .sort((a, b) => b.applications - a.applications)
           .slice(0, 5);
 
-        setStats({
+        const calculatedStats = {
           activeDomainsCount: domains.filter((d) => d.status === "active")
             .length,
           pendingApplicationsCount: applications.filter(
@@ -81,7 +89,11 @@ export function SuperAdminDashboard({ role }: Props) {
           ).length,
           totalUsersCount: users.length,
           totalOpdCount: opdList.length,
-        });
+        };
+
+        console.log("Calculated stats:", calculatedStats);
+
+        setStats(calculatedStats);
 
         setApplicationsByOpd(appCounts);
 
@@ -154,7 +166,7 @@ export function SuperAdminDashboard({ role }: Props) {
           description="Jumlah pengguna terdaftar di sistem."
         />
         <StatCard
-          title="Total OPD"
+          title="Total OPD Terdaftar"
           value={stats.totalOpdCount}
           icon={<Building className="h-4 w-4 text-muted-foreground" />}
           description="Jumlah OPD yang telah mengajukan."
