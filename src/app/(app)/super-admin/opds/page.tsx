@@ -566,36 +566,6 @@ function SuperAdminOPDsContent() {
                     <Card>
                       <CardContent className="pt-4">
                         <div className="flex items-center gap-2">
-                          <Globe className="h-4 w-4 text-muted-foreground" />
-                          <div>
-                            <p className="text-xs text-muted-foreground">
-                              Domain
-                            </p>
-                            <p className="text-2xl font-bold">
-                              {selectedOPD.statistics.totalDomains}
-                            </p>
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                    <Card>
-                      <CardContent className="pt-4">
-                        <div className="flex items-center gap-2">
-                          <BarChart3 className="h-4 w-4 text-muted-foreground" />
-                          <div>
-                            <p className="text-xs text-muted-foreground">
-                              Permohonan
-                            </p>
-                            <p className="text-2xl font-bold">
-                              {selectedOPD.statistics.totalApplications}
-                            </p>
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                    <Card>
-                      <CardContent className="pt-4">
-                        <div className="flex items-center gap-2">
                           <Server className="h-4 w-4 text-muted-foreground" />
                           <div>
                             <p className="text-xs text-muted-foreground">
