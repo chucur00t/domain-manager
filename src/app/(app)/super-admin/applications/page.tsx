@@ -99,9 +99,14 @@ function SuperAdminApplicationsContent() {
     });
   }, [applications, statusFilter, opdFilter, searchTerm]);
 
-  // Count pending applications
+  // Count pending applications (all pending statuses)
   const pendingCount = useMemo(() => {
-    return applications.filter((app) => app.status === "pending_review").length;
+    return applications.filter(
+      (app) =>
+        app.status === "pending" ||
+        app.status === "pending_review" ||
+        app.status === "pending_approval"
+    ).length;
   }, [applications]);
 
   const getStatusBadge = (status: SubdomainApplication["status"]) => {

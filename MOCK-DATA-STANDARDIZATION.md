@@ -6,6 +6,7 @@
 ## Summary Data Mock
 
 ### Total Data
+
 - **OPDs**: 10
 - **Users**: 10 (1 Super Admin + 9 Admin Daerah)
 - **Domains**: 10
@@ -15,6 +16,7 @@
 ### Breakdown Detail
 
 #### 1. OPDs (10)
+
 1. Dinas Kesehatan
 2. Dinas Pendidikan
 3. Dinas Komunikasi dan Informatika
@@ -27,6 +29,7 @@
 10. Dinas Perlindungan Anak dan Keluarga Berencana
 
 #### 2. Users (10)
+
 - **1 Super Admin**: Ahmad Supardi (admin@bandung.go.id)
 - **9 Admin Daerah** (1 per OPD):
   - user3: Budi Santoso - Dinas Kesehatan (active)
@@ -40,12 +43,15 @@
   - user10: Rina Andriani - Dispora (active)
 
 #### 3. Domains (10)
+
 **Status Breakdown:**
+
 - Active: 8 domains
 - Inactive: 1 domain (disdag.bandung.go.id - dinonaktifkan dengan sengaja)
 - Expired: 1 domain (ppkb.bandung.go.id - kadaluarsa)
 
 **Daftar Domains:**
+
 1. dinkes.bandung.go.id (active)
 2. disdik.bandung.go.id (active)
 3. diskominfo.bandung.go.id (active)
@@ -58,13 +64,16 @@
 10. ppkb.bandung.go.id (expired)
 
 #### 4. Applications (14)
+
 **Status Breakdown:**
+
 - Approved: 10 (semua sudah disetujui dan memiliki hosting)
 - Pending Approval: 2 (menunggu persetujuan Super Admin)
 - Pending Review: 1 (review awal)
 - Rejected: 1 (ditolak dengan alasan)
 
 **Approved (10)** - Sudah ada hosting & domain:
+
 1. app1: dinkes.bandung.go.id
 2. app2: disdik.bandung.go.id
 3. app3: diskominfo.bandung.go.id
@@ -77,23 +86,29 @@
 10. app10: ppkb.bandung.go.id
 
 **Pending Approval (2)**:
+
 - app11: vaksinasi.dinkes.bandung.go.id (Dinas Kesehatan)
 - app12: ppdb.disdik.bandung.go.id (Dinas Pendidikan)
 
 **Pending Review (1)**:
+
 - app13: smartcity.diskominfo.bandung.go.id (Diskominfo)
 
 **Rejected (1)**:
+
 - app14: bansos.dinsos.bandung.go.id (Dinas Sosial)
 
 #### 5. Hosting Applications (14)
+
 **Status Breakdown:**
+
 - Approved: 10 (semua sudah membuat domain aktif)
 - Pending Approval: 2 (menunggu persetujuan Super Admin)
 - Pending Review: 1 (review awal)
 - Rejected: 1 (ditolak dengan alasan)
 
 **Approved (10)** - Domain sudah dibuat:
+
 1. host1: dinkes.bandung.go.id
 2. host2: disdik.bandung.go.id
 3. host3: diskominfo.bandung.go.id
@@ -106,23 +121,28 @@
 10. host10: ppkb.bandung.go.id
 
 **Pending Approval (2)**:
+
 - host11: vaksinasi.dinkes.bandung.go.id (Dinas Kesehatan)
 - host12: ppdb.disdik.bandung.go.id (Dinas Pendidikan)
 
 **Pending Review (1)**:
+
 - host13: smartcity.diskominfo.bandung.go.id (Diskominfo)
 
 **Rejected (1)**:
+
 - host14: bansos.dinsos.bandung.go.id (Dinas Sosial)
 
 ## Konsistensi Data
 
 ### Workflow Logic
+
 ```
 Application Submitted → Approved → Hosting Submitted → Hosting Approved → Domain Created (Active)
 ```
 
 ### Korelasi Data
+
 1. **10 Approved Applications** = **10 Approved Hosting** = **10 Domains**
 2. Setiap domain memiliki application dan hosting yang sesuai
 3. Nama domain sama persis di application, hosting, dan domain
@@ -135,23 +155,27 @@ Application Submitted → Approved → Hosting Submitted → Hosting Approved �
 ## Statistik Yang Ditampilkan UI
 
 ### Dashboard Super Admin
+
 - Total Domain Aktif: 8
 - Total Permohonan Pending: 2 (pending_approval) + 1 (pending_review) = 3
 - Total Users: 10
 - Total OPDs: 10
 
 ### Dashboard Admin Daerah
+
 - Total Domain per OPD: 1 (kecuali PPKB yang expired)
 - Total Applications per OPD: 1-2
 - Total Hosting per OPD: 1-2
 
 ### Halaman Manajemen Domain
+
 - Total: 10
 - Aktif: 8
 - Tidak Aktif: 1
 - Kadaluarsa: 1
 
 ### Halaman Manajemen Permohonan
+
 - Total: 14
 - Approved: 10
 - Pending Approval: 2
@@ -159,6 +183,7 @@ Application Submitted → Approved → Hosting Submitted → Hosting Approved �
 - Rejected: 1
 
 ### Halaman Manajemen Hosting
+
 - Total: 14
 - Approved: 10
 - Pending Approval: 2
@@ -166,18 +191,22 @@ Application Submitted → Approved → Hosting Submitted → Hosting Approved �
 - Rejected: 1
 
 ### Halaman Manajemen OPD
+
 Per OPD statistics:
+
 - Total Hosting: 1-2
 - Total Users: 1
 - (Total Domain dan Total Permohonan telah dihapus)
 
 ### Halaman Manajemen Users
+
 - Total Users: 10
 - Total OPDs: 10
 
 ## Perubahan dari Data Sebelumnya
 
 ### Before Standardization
+
 - Domains: 15 (tidak konsisten)
 - Applications: 10 (tidak match dengan domain)
 - Hosting: 8 (tidak match dengan application)
@@ -185,6 +214,7 @@ Per OPD statistics:
 - Subdomain bercampur dengan domain utama
 
 ### After Standardization
+
 - Domains: 10 (1 per OPD)
 - Applications: 14 (10 approved + 4 pending/rejected)
 - Hosting: 14 (match dengan applications)
@@ -194,11 +224,13 @@ Per OPD statistics:
 ## Catatan Penting
 
 1. **Status Domain**:
+
    - `active`: Domain sedang di-hosting dan berfungsi normal
    - `inactive`: Domain sengaja dinonaktifkan (bukan karena kadaluarsa)
    - `expired`: Domain sudah lewat tanggal kadaluarsa
 
 2. **Workflow**:
+
    - Domain TIDAK dibuat saat application disetujui
    - Domain baru dibuat saat hosting disetujui
    - Satu application bisa memiliki satu hosting application
