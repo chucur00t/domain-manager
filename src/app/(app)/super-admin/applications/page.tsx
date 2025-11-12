@@ -13,12 +13,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import {
-  Loader2,
-  Search,
-  FileText,
-  ExternalLink,
-} from "lucide-react";
+import { Loader2, Search, FileText, ExternalLink } from "lucide-react";
 import type { SubdomainApplication } from "@/backend/models/types";
 import {
   Select,
@@ -111,7 +106,11 @@ function SuperAdminApplicationsContent() {
 
   const getStatusBadge = (status: SubdomainApplication["status"]) => {
     // Simplify to 3 main statuses
-    if (status === "pending" || status === "pending_review" || status === "pending_approval") {
+    if (
+      status === "pending" ||
+      status === "pending_review" ||
+      status === "pending_approval"
+    ) {
       return (
         <Badge
           variant="outline"
@@ -121,7 +120,7 @@ function SuperAdminApplicationsContent() {
         </Badge>
       );
     }
-    
+
     if (status === "approved") {
       return (
         <Badge
@@ -132,7 +131,7 @@ function SuperAdminApplicationsContent() {
         </Badge>
       );
     }
-    
+
     if (status === "rejected") {
       return (
         <Badge
@@ -143,7 +142,7 @@ function SuperAdminApplicationsContent() {
         </Badge>
       );
     }
-    
+
     return <Badge variant="outline">{status}</Badge>;
   };
 
@@ -283,13 +282,11 @@ function SuperAdminApplicationsContent() {
                           {getStatusBadge(app.status)}
                         </td>
                         <td className="px-4 py-3 text-right">
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            asChild
-                          >
+                          <Button size="sm" variant="outline" asChild>
                             <Link
-                              href={`/applications/${app.id}?role=${role || "Super Admin"}`}
+                              href={`/applications/${app.id}?role=${
+                                role || "Super Admin"
+                              }`}
                               target="_blank"
                               rel="noopener noreferrer"
                               className="inline-flex items-center gap-1"
