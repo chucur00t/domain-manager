@@ -260,7 +260,7 @@ function SuperAdminDomainsContent() {
         return (
           <Badge
             variant="outline"
-            className="bg-gray-50 text-gray-700 border-gray-200"
+            className="bg-orange-50 text-orange-700 border-orange-200"
           >
             Tidak Aktif
           </Badge>
@@ -287,8 +287,6 @@ function SuperAdminDomainsContent() {
         return <Badge variant="outline">{status}</Badge>;
     }
   };
-
-
 
   if (isLoading) {
     return (
@@ -329,12 +327,12 @@ function SuperAdminDomainsContent() {
           <Card>
             <CardHeader className="pb-3">
               <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-                <PauseCircle className="h-4 w-4 text-gray-600" />
+                <PauseCircle className="h-4 w-4 text-orange-600" />
                 Tidak Aktif
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-gray-600">
+              <div className="text-2xl font-bold text-orange-600">
                 {stats.inactive}
               </div>
             </CardContent>
@@ -498,7 +496,9 @@ function SuperAdminDomainsContent() {
                               <Button
                                 size="sm"
                                 variant="outline"
-                                onClick={() => handleOpenDialog(domain, "health-check")}
+                                onClick={() =>
+                                  handleOpenDialog(domain, "health-check")
+                                }
                               >
                                 Lihat Detail
                               </Button>
@@ -797,7 +797,8 @@ function SuperAdminDomainsContent() {
                   onClick={handleSubmitAction}
                   disabled={
                     isSubmitting ||
-                    ((actionType === "suspend" || actionType === "deactivate") &&
+                    ((actionType === "suspend" ||
+                      actionType === "deactivate") &&
                       !reason.trim())
                   }
                   variant={
