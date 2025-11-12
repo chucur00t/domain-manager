@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useMemo, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
+import Link from "next/link";
 import {
   Card,
   CardContent,
@@ -15,10 +16,8 @@ import { Badge } from "@/components/ui/badge";
 import {
   Loader2,
   Search,
-  CheckCircle,
-  XCircle,
-  AlertCircle,
-  Filter,
+  FileText,
+  ExternalLink,
 } from "lucide-react";
 import type { SubdomainApplication } from "@/backend/models/types";
 import {
@@ -28,36 +27,17 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
 
 type StatusFilter = "all" | "Pending" | "Approved" | "Rejected";
 
 function SuperAdminApplicationsContent() {
   const searchParams = useSearchParams();
+  const role = searchParams.get("role");
   const [applications, setApplications] = useState<SubdomainApplication[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
   const [opdFilter, setOpdFilter] = useState<string>("all");
-
-  // Dialog states
-  const [selectedApp, setSelectedApp] = useState<SubdomainApplication | null>(
-    null
-  );
-  const [actionType, setActionType] = useState<"approve" | "reject" | null>(
-    null
-  );
-  const [comment, setComment] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const fetchApplications = async () => {
     setIsLoading(true);
@@ -129,102 +109,42 @@ function SuperAdminApplicationsContent() {
     return applications.filter((app) => app.status === "pending_review").length;
   }, [applications]);
 
-  const handleOpenDialog = (
-    app: SubdomainApplication,
-    action: "approve" | "reject"
-  ) => {
-    setSelectedApp(app);
-    setActionType(action);
-    setComment("");
-  };
-
-  const handleCloseDialog = () => {
-    setSelectedApp(null);
-    setActionType(null);
-    setComment("");
-  };
-
-  const handleSubmitAction = async () => {
-    if (!selectedApp || !actionType) return;
-
-    // Validation: Reject requires comment
-    if (actionType === "reject" && !comment.trim()) {
-      alert("Alasan penolakan harus diisi!");
-      return;
-    }
-
-    setIsSubmitting(true);
-    try {
-      // TODO: Call API to update application status
-      const newStatus = actionType === "approve" ? "Approved" : "Rejected";
-
-      const response = await fetch(`/api/applications/${selectedApp.id}`, {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          status: newStatus,
-          comment: comment || undefined,
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to update application");
-      }
-
-      // Refresh data
-      await fetchApplications();
-
-      // Close dialog
-      handleCloseDialog();
-
-      // Show success message
-      alert(
-        `Permohonan berhasil ${
-          actionType === "approve" ? "disetujui" : "ditolak"
-        }!`
+  const getStatusBadge = (status: SubdomainApplication["status"]) => {
+    // Simplify to 3 main statuses
+    if (status === "pending" || status === "pending_review" || status === "pending_approval") {
+      return (
+        <Badge
+          variant="outline"
+          className="bg-yellow-50 text-yellow-700 border-yellow-200"
+        >
+          Pending
+        </Badge>
       );
-    } catch (error) {
-      console.error(error);
-      alert("Gagal memproses permohonan. Silakan coba lagi.");
-    } finally {
-      setIsSubmitting(false);
     }
-  };
-
-  const getStatusBadge = (status: string) => {
-    switch (status) {
-      case "Pending":
-        return (
-          <Badge
-            variant="outline"
-            className="bg-yellow-50 text-yellow-700 border-yellow-200"
-          >
-            Pending
-          </Badge>
-        );
-      case "Approved":
-        return (
-          <Badge
-            variant="outline"
-            className="bg-green-50 text-green-700 border-green-200"
-          >
-            Disetujui
-          </Badge>
-        );
-      case "Rejected":
-        return (
-          <Badge
-            variant="outline"
-            className="bg-red-50 text-red-700 border-red-200"
-          >
-            Ditolak
-          </Badge>
-        );
-      default:
-        return <Badge variant="outline">{status}</Badge>;
+    
+    if (status === "approved") {
+      return (
+        <Badge
+          variant="outline"
+          className="bg-green-50 text-green-700 border-green-200"
+        >
+          Disetujui
+        </Badge>
+      );
     }
+    
+    if (status === "rejected") {
+      return (
+        <Badge
+          variant="outline"
+          className="bg-red-50 text-red-700 border-red-200"
+        >
+          Ditolak
+        </Badge>
+      );
+    }
+    
+    return <Badge variant="outline">{status}</Badge>;
   };
 
   if (isLoading) {
@@ -363,34 +283,22 @@ function SuperAdminApplicationsContent() {
                           {getStatusBadge(app.status)}
                         </td>
                         <td className="px-4 py-3 text-right">
-                          {app.status === "pending_review" ? (
-                            <div className="flex justify-end gap-2">
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                className="text-green-600 border-green-200 hover:bg-green-50"
-                                onClick={() => handleOpenDialog(app, "approve")}
-                              >
-                                <CheckCircle className="h-4 w-4 mr-1" />
-                                Setujui
-                              </Button>
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                className="text-red-600 border-red-200 hover:bg-red-50"
-                                onClick={() => handleOpenDialog(app, "reject")}
-                              >
-                                <XCircle className="h-4 w-4 mr-1" />
-                                Tolak
-                              </Button>
-                            </div>
-                          ) : (
-                            <span className="text-sm text-muted-foreground">
-                              {app.status === "approved"
-                                ? "Sudah Disetujui"
-                                : "Sudah Ditolak"}
-                            </span>
-                          )}
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            asChild
+                          >
+                            <Link
+                              href={`/applications/${app.id}?role=${role || "Super Admin"}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="inline-flex items-center gap-1"
+                            >
+                              <FileText className="h-4 w-4" />
+                              Lihat Detail
+                              <ExternalLink className="h-3 w-3" />
+                            </Link>
+                          </Button>
                         </td>
                       </tr>
                     ))
@@ -401,100 +309,6 @@ function SuperAdminApplicationsContent() {
           </div>
         </CardContent>
       </Card>
-
-      {/* Confirmation Dialog */}
-      <Dialog
-        open={!!selectedApp && !!actionType}
-        onOpenChange={(open) => !open && handleCloseDialog()}
-      >
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>
-              {actionType === "approve"
-                ? "Setujui Permohonan"
-                : "Tolak Permohonan"}
-            </DialogTitle>
-            <DialogDescription>
-              {actionType === "approve"
-                ? "Domain akan diaktifkan dan notifikasi akan dikirim ke OPD."
-                : "Mohon berikan alasan penolakan yang jelas."}
-            </DialogDescription>
-          </DialogHeader>
-
-          {selectedApp && (
-            <div className="space-y-4 py-4">
-              <div className="grid grid-cols-2 gap-2 text-sm">
-                <div className="text-muted-foreground">OPD:</div>
-                <div className="font-medium">{selectedApp.opd}</div>
-                <div className="text-muted-foreground">Domain:</div>
-                <div className="font-mono text-xs bg-muted px-2 py-1 rounded">
-                  {selectedApp.domainName}
-                </div>
-                <div className="text-muted-foreground">Tujuan:</div>
-                <div className="col-span-1">{selectedApp.description}</div>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="comment">
-                  {actionType === "reject"
-                    ? "Alasan Penolakan *"
-                    : "Komentar (Opsional)"}
-                </Label>
-                <Textarea
-                  id="comment"
-                  placeholder={
-                    actionType === "reject"
-                      ? "Jelaskan alasan penolakan..."
-                      : "Tambahkan catatan jika diperlukan..."
-                  }
-                  value={comment}
-                  onChange={(e) => setComment(e.target.value)}
-                  rows={4}
-                  required={actionType === "reject"}
-                />
-              </div>
-            </div>
-          )}
-
-          <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={handleCloseDialog}
-              disabled={isSubmitting}
-            >
-              Batal
-            </Button>
-            <Button
-              onClick={handleSubmitAction}
-              disabled={
-                isSubmitting || (actionType === "reject" && !comment.trim())
-              }
-              variant={actionType === "approve" ? "default" : "destructive"}
-            >
-              {isSubmitting ? (
-                <>
-                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                  Memproses...
-                </>
-              ) : (
-                <>
-                  {actionType === "approve" ? (
-                    <>
-                      <CheckCircle className="h-4 w-4 mr-2" />
-                      Setujui & Aktifkan
-                    </>
-                  ) : (
-                    <>
-                      <XCircle className="h-4 w-4 mr-2" />
-                      Tolak Permohonan
-                    </>
-                  )}
-                </>
-              )}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
     </>
   );
 }

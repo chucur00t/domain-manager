@@ -35,10 +35,11 @@ import { WorkflowStepper } from '@/components/shared/workflow-stepper';
 import { BackButton } from '@/components/shared/back-button';
 
 
+// Simplified status config - only 3 main statuses
 const statusConfig = {
-  pending: { text: 'Menunggu', variant: 'default' as const, step: 0 },
-  pending_review: { text: 'Menunggu Review Admin', variant: 'default' as const, step: 1 },
-  pending_approval: { text: 'Menunggu Persetujuan', variant: 'default' as const, step: 2 },
+  pending: { text: 'Pending', variant: 'default' as const, step: 0 },
+  pending_review: { text: 'Pending', variant: 'default' as const, step: 1 },
+  pending_approval: { text: 'Pending', variant: 'default' as const, step: 2 },
   approved: { text: 'Disetujui', variant: 'secondary' as const, step: 3 },
   rejected: { text: 'Ditolak', variant: 'destructive' as const, step: 0 },
 };
