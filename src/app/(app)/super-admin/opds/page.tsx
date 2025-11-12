@@ -18,7 +18,6 @@ import {
   Building2,
   Plus,
   Trash2,
-  BarChart3,
   Users,
   Globe,
   Server,
@@ -214,11 +213,6 @@ function SuperAdminOPDsContent() {
       total: opds.length,
       active: opds.filter((o) => o.isActive).length,
       inactive: opds.filter((o) => !o.isActive).length,
-      totalDomains: opds.reduce((sum, o) => sum + o.statistics.totalDomains, 0),
-      totalApplications: opds.reduce(
-        (sum, o) => sum + o.statistics.totalApplications,
-        0
-      ),
     };
   }, [opds]);
 
@@ -348,7 +342,7 @@ function SuperAdminOPDsContent() {
     <>
       <div className="space-y-6">
         {/* Statistics Cards */}
-        <div className="grid gap-4 md:grid-cols-4">
+        <div className="grid gap-4 md:grid-cols-3">
           <Card>
             <CardHeader className="pb-3">
               <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
@@ -359,43 +353,36 @@ function SuperAdminOPDsContent() {
             <CardContent>
               <div className="text-2xl font-bold">{stats.total}</div>
               <p className="text-xs text-muted-foreground mt-1">
-                {stats.active} aktif, {stats.inactive} tidak aktif
+                Organisasi Perangkat Daerah terdaftar
               </p>
             </CardContent>
           </Card>
           <Card>
             <CardHeader className="pb-3">
               <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-                <Globe className="h-4 w-4" />
-                Total Domain
+                <Building2 className="h-4 w-4" />
+                OPD Aktif
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{stats.totalDomains}</div>
+              <div className="text-2xl font-bold">{stats.active}</div>
+              <p className="text-xs text-muted-foreground mt-1">
+                OPD yang sedang aktif
+              </p>
             </CardContent>
           </Card>
           <Card>
             <CardHeader className="pb-3">
               <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-                <BarChart3 className="h-4 w-4" />
-                Total Permohonan
+                <Building2 className="h-4 w-4" />
+                OPD Tidak Aktif
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">
-                {stats.totalApplications}
-              </div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-                <Users className="h-4 w-4" />
-                Total Pengguna
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{stats.total}</div>
+              <div className="text-2xl font-bold">{stats.inactive}</div>
+              <p className="text-xs text-muted-foreground mt-1">
+                OPD yang tidak aktif
+              </p>
             </CardContent>
           </Card>
         </div>
