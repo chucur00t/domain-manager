@@ -13,12 +13,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import {
-  Loader2,
-  Search,
-  FileText,
-  ExternalLink,
-} from "lucide-react";
+import { Loader2, Search, FileText, ExternalLink } from "lucide-react";
 import type { HostingApplication } from "@/backend/models/types";
 import {
   Select,
@@ -283,13 +278,11 @@ function SuperAdminHostingApplicationsContent() {
                           {getStatusBadge(app.status || "pending_review")}
                         </td>
                         <td className="px-4 py-3 text-right">
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            asChild
-                          >
+                          <Button size="sm" variant="outline" asChild>
                             <Link
-                              href={`/hosting/${app.id}?role=${role || "Super Admin"}`}
+                              href={`/hosting/${app.id}?role=${
+                                role || "Super Admin"
+                              }`}
                               target="_blank"
                               rel="noopener noreferrer"
                               className="inline-flex items-center gap-1"
