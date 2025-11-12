@@ -87,27 +87,26 @@ function SuperAdminAuditTrailContent() {
   }, []);
 
   const allActions = useMemo(() => {
-    // Predefined actions yang penting
+    // Predefined actions yang penting dan konsisten (Bahasa Indonesia)
     const predefinedActions = [
-      "REAKTIVASI",
-      "PERMOHONAN HOSTING",
-      "PERMOHONAN DOMAIN",
-      "DEAKTIVASI DOMAIN",
-      "DEAKTIVASI HOSTING",
+      // Autentikasi
       "LOGIN",
       "LOGOUT",
-      "CREATE_DOMAIN",
-      "APPROVE_DOMAIN",
-      "REJECT_DOMAIN",
-      "SUSPEND_DOMAIN",
-      "ACTIVATE_DOMAIN",
-      "DELETE_DOMAIN",
-      "CREATE_HOSTING",
-      "APPROVE_HOSTING",
-      "REJECT_HOSTING",
-      "CREATE_USER",
-      "UPDATE_USER",
-      "DELETE_USER",
+      // Manajemen Domain
+      "PERMOHONAN DOMAIN",
+      "PERSETUJUAN DOMAIN",
+      "PENOLAKAN DOMAIN",
+      "AKTIVASI DOMAIN",
+      "SUSPENSI DOMAIN",
+      "DEAKTIVASI DOMAIN",
+      // Manajemen Hosting
+      "PERMOHONAN HOSTING",
+      "PERSETUJUAN HOSTING",
+      "PENOLAKAN HOSTING",
+      // Manajemen Pengguna
+      "TAMBAH PENGGUNA",
+      "UBAH PENGGUNA",
+      "HAPUS PENGGUNA",
     ];
 
     // Combine dengan actions dari logs
