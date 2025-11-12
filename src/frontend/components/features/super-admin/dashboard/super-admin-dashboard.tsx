@@ -142,7 +142,7 @@ export function SuperAdminDashboard({ role }: Props) {
           description="Jumlah seluruh domain yang aktif."
         />
         <StatCard
-          title="Permohonan Perlu Direview"
+          title="Permohonan Belum Disetujui"
           value={stats.pendingApplicationsCount}
           icon={<FileText className="h-4 w-4 text-amber-500" />}
           description="Permohonan yang menunggu review teknis."
@@ -154,7 +154,7 @@ export function SuperAdminDashboard({ role }: Props) {
           description="Jumlah pengguna terdaftar di sistem."
         />
         <StatCard
-          title="Total OPD Terdaftar"
+          title="Total OPD"
           value={stats.totalOpdCount}
           icon={<Building className="h-4 w-4 text-muted-foreground" />}
           description="Jumlah OPD yang telah mengajukan."
@@ -202,9 +202,9 @@ export function SuperAdminDashboard({ role }: Props) {
         </Card>
         <Card className="animate-fade-in" style={{ animationDelay: "300ms" }}>
           <CardHeader>
-            <CardTitle>Permohonan Terbaru untuk Direview</CardTitle>
+            <CardTitle>Permohonan Belum Disetujui</CardTitle>
             <CardDescription>
-              5 permohonan terakhir yang membutuhkan review.
+              5 permohonan terakhir yang masih dalam status pending.
             </CardDescription>
           </CardHeader>
           <CardContent>

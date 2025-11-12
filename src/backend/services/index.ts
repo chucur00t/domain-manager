@@ -163,8 +163,18 @@ export const createDomainFromApplication = async (
 // ===========================================
 
 export const getUsers = async () => {
-  const result = await userService.getUsers(1, 100);
-  return result.users;
+  try {
+    const result = await userService.getUsers(1, 100);
+    return result.users;
+  } catch (error) {
+    console.error(
+      "Error fetching users from database, using mock data:",
+      error
+    );
+    // Fallback to mock data
+    const { MOCK_USERS } = await import("@/backend/utils/mock-data");
+    return MOCK_USERS;
+  }
 };
 
 export const getUserById = async (id: string) => {

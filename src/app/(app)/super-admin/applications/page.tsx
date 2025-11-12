@@ -1,26 +1,33 @@
-'use client';
+"use client";
 
-import { useState, useEffect, useMemo, Suspense } from 'react';
-import { useSearchParams } from 'next/navigation';
+import { useState, useEffect, useMemo, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
-import { Loader2, Search, CheckCircle, XCircle, AlertCircle, Filter } from 'lucide-react';
-import type { SubdomainApplication } from '@/backend/models/types';
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
+import {
+  Loader2,
+  Search,
+  CheckCircle,
+  XCircle,
+  AlertCircle,
+  Filter,
+} from "lucide-react";
+import type { SubdomainApplication } from "@/backend/models/types";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
+} from "@/components/ui/select";
 import {
   Dialog,
   DialogContent,
@@ -28,32 +35,36 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog';
-import { Textarea } from '@/components/ui/textarea';
-import { Label } from '@/components/ui/label';
+} from "@/components/ui/dialog";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
 
-type StatusFilter = 'all' | 'Pending' | 'Approved' | 'Rejected';
+type StatusFilter = "all" | "Pending" | "Approved" | "Rejected";
 
 function SuperAdminApplicationsContent() {
   const searchParams = useSearchParams();
   const [applications, setApplications] = useState<SubdomainApplication[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
-  const [opdFilter, setOpdFilter] = useState<string>('all');
-  
+  const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
+  const [opdFilter, setOpdFilter] = useState<string>("all");
+
   // Dialog states
-  const [selectedApp, setSelectedApp] = useState<SubdomainApplication | null>(null);
-  const [actionType, setActionType] = useState<'approve' | 'reject' | null>(null);
-  const [comment, setComment] = useState('');
+  const [selectedApp, setSelectedApp] = useState<SubdomainApplication | null>(
+    null
+  );
+  const [actionType, setActionType] = useState<"approve" | "reject" | null>(
+    null
+  );
+  const [comment, setComment] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const fetchApplications = async () => {
     setIsLoading(true);
     try {
-      const response = await fetch('/api/applications');
+      const response = await fetch("/api/applications");
       if (!response.ok) {
-        throw new Error('Failed to fetch applications');
+        throw new Error("Failed to fetch applications");
       }
       const data = await response.json();
       setApplications(data);
@@ -71,31 +82,34 @@ function SuperAdminApplicationsContent() {
   // Get unique OPDs for filter
   const allOpds = useMemo(() => {
     const opds = applications
-      .map(app => app.opd)
+      .map((app) => app.opd)
       .filter((opd, index, self) => opd && self.indexOf(opd) === index);
     return opds.sort();
   }, [applications]);
 
   // Filtered applications
   const filteredApplications = useMemo(() => {
-    return applications.filter(app => {
+    return applications.filter((app) => {
       // Status filter
-      const statusMap: Record<StatusFilter, SubdomainApplication['status'] | null> = {
-        'all': null,
-        'Pending': 'pending_review',
-        'Approved': 'approved',
-        'Rejected': 'rejected'
+      const statusMap: Record<
+        StatusFilter,
+        SubdomainApplication["status"] | null
+      > = {
+        all: null,
+        Pending: "pending_review",
+        Approved: "approved",
+        Rejected: "rejected",
       };
       const mappedStatus = statusMap[statusFilter];
       if (mappedStatus && app.status !== mappedStatus) {
         return false;
       }
-      
+
       // OPD filter
-      if (opdFilter !== 'all' && app.opd !== opdFilter) {
+      if (opdFilter !== "all" && app.opd !== opdFilter) {
         return false;
       }
-      
+
       // Search filter
       if (searchTerm) {
         const search = searchTerm.toLowerCase();
@@ -105,46 +119,49 @@ function SuperAdminApplicationsContent() {
           app.description?.toLowerCase().includes(search)
         );
       }
-      
+
       return true;
     });
   }, [applications, statusFilter, opdFilter, searchTerm]);
 
   // Count pending applications
   const pendingCount = useMemo(() => {
-    return applications.filter(app => app.status === 'pending_review').length;
+    return applications.filter((app) => app.status === "pending_review").length;
   }, [applications]);
 
-  const handleOpenDialog = (app: SubdomainApplication, action: 'approve' | 'reject') => {
+  const handleOpenDialog = (
+    app: SubdomainApplication,
+    action: "approve" | "reject"
+  ) => {
     setSelectedApp(app);
     setActionType(action);
-    setComment('');
+    setComment("");
   };
 
   const handleCloseDialog = () => {
     setSelectedApp(null);
     setActionType(null);
-    setComment('');
+    setComment("");
   };
 
   const handleSubmitAction = async () => {
     if (!selectedApp || !actionType) return;
-    
+
     // Validation: Reject requires comment
-    if (actionType === 'reject' && !comment.trim()) {
-      alert('Alasan penolakan harus diisi!');
+    if (actionType === "reject" && !comment.trim()) {
+      alert("Alasan penolakan harus diisi!");
       return;
     }
 
     setIsSubmitting(true);
     try {
       // TODO: Call API to update application status
-      const newStatus = actionType === 'approve' ? 'Approved' : 'Rejected';
-      
+      const newStatus = actionType === "approve" ? "Approved" : "Rejected";
+
       const response = await fetch(`/api/applications/${selectedApp.id}`, {
-        method: 'PATCH',
+        method: "PATCH",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           status: newStatus,
@@ -153,21 +170,24 @@ function SuperAdminApplicationsContent() {
       });
 
       if (!response.ok) {
-        throw new Error('Failed to update application');
+        throw new Error("Failed to update application");
       }
 
       // Refresh data
       await fetchApplications();
-      
+
       // Close dialog
       handleCloseDialog();
-      
+
       // Show success message
-      alert(`Permohonan berhasil ${actionType === 'approve' ? 'disetujui' : 'ditolak'}!`);
-      
+      alert(
+        `Permohonan berhasil ${
+          actionType === "approve" ? "disetujui" : "ditolak"
+        }!`
+      );
     } catch (error) {
       console.error(error);
-      alert('Gagal memproses permohonan. Silakan coba lagi.');
+      alert("Gagal memproses permohonan. Silakan coba lagi.");
     } finally {
       setIsSubmitting(false);
     }
@@ -175,12 +195,33 @@ function SuperAdminApplicationsContent() {
 
   const getStatusBadge = (status: string) => {
     switch (status) {
-      case 'Pending':
-        return <Badge variant="outline" className="bg-yellow-50 text-yellow-700 border-yellow-200">Pending</Badge>;
-      case 'Approved':
-        return <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">Disetujui</Badge>;
-      case 'Rejected':
-        return <Badge variant="outline" className="bg-red-50 text-red-700 border-red-200">Ditolak</Badge>;
+      case "Pending":
+        return (
+          <Badge
+            variant="outline"
+            className="bg-yellow-50 text-yellow-700 border-yellow-200"
+          >
+            Pending
+          </Badge>
+        );
+      case "Approved":
+        return (
+          <Badge
+            variant="outline"
+            className="bg-green-50 text-green-700 border-green-200"
+          >
+            Disetujui
+          </Badge>
+        );
+      case "Rejected":
+        return (
+          <Badge
+            variant="outline"
+            className="bg-red-50 text-red-700 border-red-200"
+          >
+            Ditolak
+          </Badge>
+        );
       default:
         return <Badge variant="outline">{status}</Badge>;
     }
@@ -200,7 +241,9 @@ function SuperAdminApplicationsContent() {
         <CardHeader>
           <div className="flex items-center justify-between">
             <div>
-              <CardTitle className="text-2xl">Persetujuan Permohonan Domain</CardTitle>
+              <CardTitle className="text-2xl">
+                Persetujuan Permohonan Domain
+              </CardTitle>
               <CardDescription>
                 Tinjau dan proses permohonan domain dari semua OPD
               </CardDescription>
@@ -224,7 +267,10 @@ function SuperAdminApplicationsContent() {
                 className="pl-10"
               />
             </div>
-            <Select value={statusFilter} onValueChange={(value) => setStatusFilter(value as StatusFilter)}>
+            <Select
+              value={statusFilter}
+              onValueChange={(value) => setStatusFilter(value as StatusFilter)}
+            >
               <SelectTrigger className="w-full md:w-[180px]">
                 <SelectValue placeholder="Filter Status" />
               </SelectTrigger>
@@ -241,8 +287,10 @@ function SuperAdminApplicationsContent() {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">Semua OPD</SelectItem>
-                {allOpds.map(opd => (
-                  <SelectItem key={opd} value={opd}>{opd}</SelectItem>
+                {allOpds.map((opd) => (
+                  <SelectItem key={opd} value={opd}>
+                    {opd}
+                  </SelectItem>
                 ))}
               </SelectContent>
             </Select>
@@ -250,7 +298,8 @@ function SuperAdminApplicationsContent() {
 
           {/* Results info */}
           <div className="text-sm text-muted-foreground">
-            Menampilkan {filteredApplications.length} dari {applications.length} permohonan
+            Menampilkan {filteredApplications.length} dari {applications.length}{" "}
+            permohonan
           </div>
 
           {/* Applications Table */}
@@ -259,18 +308,33 @@ function SuperAdminApplicationsContent() {
               <table className="w-full">
                 <thead className="bg-muted/50">
                   <tr className="border-b">
-                    <th className="px-4 py-3 text-left text-sm font-medium">Tanggal</th>
-                    <th className="px-4 py-3 text-left text-sm font-medium">OPD</th>
-                    <th className="px-4 py-3 text-left text-sm font-medium">Domain</th>
-                    <th className="px-4 py-3 text-left text-sm font-medium">Tujuan</th>
-                    <th className="px-4 py-3 text-left text-sm font-medium">Status</th>
-                    <th className="px-4 py-3 text-right text-sm font-medium">Aksi</th>
+                    <th className="px-4 py-3 text-left text-sm font-medium">
+                      Tanggal
+                    </th>
+                    <th className="px-4 py-3 text-left text-sm font-medium">
+                      OPD
+                    </th>
+                    <th className="px-4 py-3 text-left text-sm font-medium">
+                      Domain
+                    </th>
+                    <th className="px-4 py-3 text-left text-sm font-medium">
+                      Tujuan
+                    </th>
+                    <th className="px-4 py-3 text-left text-sm font-medium">
+                      Status
+                    </th>
+                    <th className="px-4 py-3 text-right text-sm font-medium">
+                      Aksi
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
                   {filteredApplications.length === 0 ? (
                     <tr>
-                      <td colSpan={6} className="px-4 py-8 text-center text-muted-foreground">
+                      <td
+                        colSpan={6}
+                        className="px-4 py-8 text-center text-muted-foreground"
+                      >
                         Tidak ada permohonan yang ditemukan
                       </td>
                     </tr>
@@ -278,24 +342,34 @@ function SuperAdminApplicationsContent() {
                     filteredApplications.map((app) => (
                       <tr key={app.id} className="border-b hover:bg-muted/30">
                         <td className="px-4 py-3 text-sm">
-                          {app.submittedDate ? new Date(app.submittedDate).toLocaleDateString('id-ID') : '-'}
+                          {app.submittedDate
+                            ? new Date(app.submittedDate).toLocaleDateString(
+                                "id-ID"
+                              )
+                            : "-"}
                         </td>
-                        <td className="px-4 py-3 text-sm font-medium">{app.opd || '-'}</td>
+                        <td className="px-4 py-3 text-sm font-medium">
+                          {app.opd || "-"}
+                        </td>
                         <td className="px-4 py-3 text-sm">
                           <code className="bg-muted px-2 py-1 rounded text-xs">
-                            {app.domainName || '-'}
+                            {app.domainName || "-"}
                           </code>
                         </td>
-                        <td className="px-4 py-3 text-sm max-w-xs truncate">{app.description || '-'}</td>
-                        <td className="px-4 py-3">{getStatusBadge(app.status)}</td>
+                        <td className="px-4 py-3 text-sm max-w-xs truncate">
+                          {app.description || "-"}
+                        </td>
+                        <td className="px-4 py-3">
+                          {getStatusBadge(app.status)}
+                        </td>
                         <td className="px-4 py-3 text-right">
-                          {app.status === 'pending_review' ? (
+                          {app.status === "pending_review" ? (
                             <div className="flex justify-end gap-2">
                               <Button
                                 size="sm"
                                 variant="outline"
                                 className="text-green-600 border-green-200 hover:bg-green-50"
-                                onClick={() => handleOpenDialog(app, 'approve')}
+                                onClick={() => handleOpenDialog(app, "approve")}
                               >
                                 <CheckCircle className="h-4 w-4 mr-1" />
                                 Setujui
@@ -304,7 +378,7 @@ function SuperAdminApplicationsContent() {
                                 size="sm"
                                 variant="outline"
                                 className="text-red-600 border-red-200 hover:bg-red-50"
-                                onClick={() => handleOpenDialog(app, 'reject')}
+                                onClick={() => handleOpenDialog(app, "reject")}
                               >
                                 <XCircle className="h-4 w-4 mr-1" />
                                 Tolak
@@ -312,7 +386,9 @@ function SuperAdminApplicationsContent() {
                             </div>
                           ) : (
                             <span className="text-sm text-muted-foreground">
-                              {app.status === 'approved' ? 'Sudah Disetujui' : 'Sudah Ditolak'}
+                              {app.status === "approved"
+                                ? "Sudah Disetujui"
+                                : "Sudah Ditolak"}
                             </span>
                           )}
                         </td>
@@ -327,56 +403,73 @@ function SuperAdminApplicationsContent() {
       </Card>
 
       {/* Confirmation Dialog */}
-      <Dialog open={!!selectedApp && !!actionType} onOpenChange={(open) => !open && handleCloseDialog()}>
+      <Dialog
+        open={!!selectedApp && !!actionType}
+        onOpenChange={(open) => !open && handleCloseDialog()}
+      >
         <DialogContent>
           <DialogHeader>
             <DialogTitle>
-              {actionType === 'approve' ? 'Setujui Permohonan' : 'Tolak Permohonan'}
+              {actionType === "approve"
+                ? "Setujui Permohonan"
+                : "Tolak Permohonan"}
             </DialogTitle>
             <DialogDescription>
-              {actionType === 'approve' 
-                ? 'Domain akan diaktifkan dan notifikasi akan dikirim ke OPD.' 
-                : 'Mohon berikan alasan penolakan yang jelas.'}
+              {actionType === "approve"
+                ? "Domain akan diaktifkan dan notifikasi akan dikirim ke OPD."
+                : "Mohon berikan alasan penolakan yang jelas."}
             </DialogDescription>
           </DialogHeader>
-          
+
           {selectedApp && (
             <div className="space-y-4 py-4">
               <div className="grid grid-cols-2 gap-2 text-sm">
                 <div className="text-muted-foreground">OPD:</div>
                 <div className="font-medium">{selectedApp.opd}</div>
                 <div className="text-muted-foreground">Domain:</div>
-                <div className="font-mono text-xs bg-muted px-2 py-1 rounded">{selectedApp.domainName}</div>
+                <div className="font-mono text-xs bg-muted px-2 py-1 rounded">
+                  {selectedApp.domainName}
+                </div>
                 <div className="text-muted-foreground">Tujuan:</div>
                 <div className="col-span-1">{selectedApp.description}</div>
               </div>
 
               <div className="space-y-2">
                 <Label htmlFor="comment">
-                  {actionType === 'reject' ? 'Alasan Penolakan *' : 'Komentar (Opsional)'}
+                  {actionType === "reject"
+                    ? "Alasan Penolakan *"
+                    : "Komentar (Opsional)"}
                 </Label>
                 <Textarea
                   id="comment"
-                  placeholder={actionType === 'reject' 
-                    ? 'Jelaskan alasan penolakan...' 
-                    : 'Tambahkan catatan jika diperlukan...'}
+                  placeholder={
+                    actionType === "reject"
+                      ? "Jelaskan alasan penolakan..."
+                      : "Tambahkan catatan jika diperlukan..."
+                  }
                   value={comment}
                   onChange={(e) => setComment(e.target.value)}
                   rows={4}
-                  required={actionType === 'reject'}
+                  required={actionType === "reject"}
                 />
               </div>
             </div>
           )}
 
           <DialogFooter>
-            <Button variant="outline" onClick={handleCloseDialog} disabled={isSubmitting}>
+            <Button
+              variant="outline"
+              onClick={handleCloseDialog}
+              disabled={isSubmitting}
+            >
               Batal
             </Button>
             <Button
               onClick={handleSubmitAction}
-              disabled={isSubmitting || (actionType === 'reject' && !comment.trim())}
-              variant={actionType === 'approve' ? 'default' : 'destructive'}
+              disabled={
+                isSubmitting || (actionType === "reject" && !comment.trim())
+              }
+              variant={actionType === "approve" ? "default" : "destructive"}
             >
               {isSubmitting ? (
                 <>
@@ -385,7 +478,7 @@ function SuperAdminApplicationsContent() {
                 </>
               ) : (
                 <>
-                  {actionType === 'approve' ? (
+                  {actionType === "approve" ? (
                     <>
                       <CheckCircle className="h-4 w-4 mr-2" />
                       Setujui & Aktifkan
@@ -408,11 +501,13 @@ function SuperAdminApplicationsContent() {
 
 export default function SuperAdminApplicationsPage() {
   return (
-    <Suspense fallback={
-      <div className="flex justify-center items-center h-96">
-        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-      </div>
-    }>
+    <Suspense
+      fallback={
+        <div className="flex justify-center items-center h-96">
+          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+        </div>
+      }
+    >
       <SuperAdminApplicationsContent />
     </Suspense>
   );

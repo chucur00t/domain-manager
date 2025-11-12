@@ -4,10 +4,13 @@
 **Target:** Super Admin Dashboard - Tabel Permohonan Terbaru
 
 ## 🎯 Tujuan
+
 Menyederhanakan tampilan status pada tabel "Permohonan Terbaru untuk Direview" di dashboard Super Admin dari 5 status detail menjadi 3 status utama yang lebih mudah dipahami.
 
 ## 📊 Status Sebelum Perubahan
+
 Tabel menampilkan 5 jenis status berbeda:
+
 1. **Menunggu** (pending)
 2. **Review Admin** (pending_review)
 3. **Persetujuan Kabid** (pending_approval)
@@ -15,12 +18,15 @@ Tabel menampilkan 5 jenis status berbeda:
 5. **Ditolak** (rejected)
 
 ### Permasalahan:
+
 - Terlalu banyak status untuk tampilan dashboard yang seharusnya simple
 - User kebingungan dengan perbedaan antara "Menunggu", "Review Admin", dan "Persetujuan Kabid"
 - Dashboard seharusnya memberikan overview cepat, bukan detail workflow
 
 ## ✅ Status Setelah Perubahan
+
 Tabel sekarang hanya menampilkan 3 status utama:
+
 1. **Pending** (untuk semua status pending: pending, pending_review, pending_approval)
 2. **Disetujui** (approved)
 3. **Ditolak** (rejected)
@@ -28,6 +34,7 @@ Tabel sekarang hanya menampilkan 3 status utama:
 ## 🔧 Implementasi
 
 ### File yang Dimodifikasi:
+
 **`src/frontend/components/features/super-admin/dashboard/super-admin-applications-table.tsx`**
 
 ### Perubahan Kode:
@@ -54,6 +61,7 @@ const statusConfig = {
 ```
 
 ### Logika:
+
 - **Semua status pending** (pending, pending_review, pending_approval) → Ditampilkan sebagai **"Pending"**
 - Backend tetap menyimpan status detail (pending, pending_review, pending_approval)
 - Hanya tampilan di dashboard yang disederhanakan
@@ -62,15 +70,18 @@ const statusConfig = {
 ## 📈 Keuntungan
 
 ### 1. User Experience (UX):
+
 - ✅ Lebih mudah dipahami oleh Super Admin
 - ✅ Mengurangi cognitive load
 - ✅ Dashboard lebih clean dan fokus pada overview
 
 ### 2. Konsistensi:
+
 - ✅ Sesuai dengan prinsip dashboard yang menampilkan ringkasan
 - ✅ Detail workflow tetap tersedia di halaman aplikasi yang spesifik
 
 ### 3. Maintenance:
+
 - ✅ Lebih mudah dimodifikasi jika ada perubahan workflow
 - ✅ Tetap mempertahankan status detail di backend
 
@@ -130,14 +141,17 @@ const statusConfig = {
 ## 📚 Related Files
 
 ### Component yang Dimodifikasi:
+
 - `src/frontend/components/features/super-admin/dashboard/super-admin-applications-table.tsx`
 
 ### Component Terkait (Tidak Berubah):
+
 - `src/frontend/components/features/super-admin/dashboard/super-admin-dashboard.tsx` - Parent component
 - `src/app/(app)/super-admin/applications/page.tsx` - Detail page dengan status lengkap
 - `src/app/api/applications/route.ts` - API endpoint
 
 ### Database Schema:
+
 ```sql
 -- applications.status remains unchanged
 status ENUM('pending', 'pending_review', 'pending_approval', 'approved', 'rejected')
@@ -146,6 +160,7 @@ status ENUM('pending', 'pending_review', 'pending_approval', 'approved', 'reject
 ## 🎨 Visual Comparison
 
 ### Before:
+
 ```
 ┌──────────────────────────────────────────────┐
 │ Permohonan Terbaru untuk Direview           │
@@ -161,6 +176,7 @@ status ENUM('pending', 'pending_review', 'pending_approval', 'approved', 'reject
 ```
 
 ### After:
+
 ```
 ┌──────────────────────────────────────────────┐
 │ Permohonan Terbaru untuk Direview           │
@@ -180,6 +196,7 @@ status ENUM('pending', 'pending_review', 'pending_approval', 'approved', 'reject
 Perubahan ini meningkatkan user experience dengan menyederhanakan tampilan status di dashboard, sambil tetap mempertahankan detail workflow di backend dan halaman detail. Ini adalah implementasi best practice untuk dashboard design: **show summary, hide details**.
 
 ---
+
 **Status:** ✅ Implemented  
 **Impact:** Low risk - UI only change  
 **Next Step:** Commit & push, then verify in browser
