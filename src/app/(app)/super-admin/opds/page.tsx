@@ -17,7 +17,6 @@ import {
   Search,
   Building2,
   Plus,
-  Edit,
   Trash2,
   BarChart3,
   Users,
@@ -440,9 +439,6 @@ function SuperAdminOPDsContent() {
                   <thead className="bg-muted/50">
                     <tr className="border-b">
                       <th className="px-4 py-3 text-left text-sm font-medium">
-                        Kode
-                      </th>
-                      <th className="px-4 py-3 text-left text-sm font-medium">
                         Nama OPD
                       </th>
                       <th className="px-4 py-3 text-left text-sm font-medium">
@@ -450,9 +446,6 @@ function SuperAdminOPDsContent() {
                       </th>
                       <th className="px-4 py-3 text-left text-sm font-medium">
                         Email
-                      </th>
-                      <th className="px-4 py-3 text-left text-sm font-medium">
-                        Statistik
                       </th>
                       <th className="px-4 py-3 text-right text-sm font-medium">
                         Aksi
@@ -463,7 +456,7 @@ function SuperAdminOPDsContent() {
                     {filteredOPDs.length === 0 ? (
                       <tr>
                         <td
-                          colSpan={6}
+                          colSpan={4}
                           className="px-4 py-8 text-center text-muted-foreground"
                         >
                           Tidak ada OPD yang ditemukan
@@ -472,11 +465,6 @@ function SuperAdminOPDsContent() {
                     ) : (
                       filteredOPDs.map((opd) => (
                         <tr key={opd.id} className="border-b hover:bg-muted/30">
-                          <td className="px-4 py-3 text-sm">
-                            <Badge variant="outline" className="font-mono">
-                              {opd.code}
-                            </Badge>
-                          </td>
                           <td className="px-4 py-3 text-sm font-medium">
                             {opd.name}
                           </td>
@@ -491,37 +479,14 @@ function SuperAdminOPDsContent() {
                               {opd.email}
                             </a>
                           </td>
-                          <td className="px-4 py-3 text-sm">
-                            <div className="flex gap-2">
-                              <Badge variant="secondary" className="text-xs">
-                                <Globe className="h-3 w-3 mr-1" />
-                                {opd.statistics.totalDomains}
-                              </Badge>
-                              <Badge variant="secondary" className="text-xs">
-                                <BarChart3 className="h-3 w-3 mr-1" />
-                                {opd.statistics.totalApplications}
-                              </Badge>
-                              <Badge variant="secondary" className="text-xs">
-                                <Server className="h-3 w-3 mr-1" />
-                                {opd.statistics.totalHosting}
-                              </Badge>
-                            </div>
-                          </td>
                           <td className="px-4 py-3">
-                            <div className="flex justify-end gap-1">
+                            <div className="flex justify-end gap-2">
                               <Button
                                 size="sm"
                                 variant="outline"
                                 onClick={() => handleOpenDialog("view", opd)}
                               >
-                                <BarChart3 className="h-4 w-4" />
-                              </Button>
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                onClick={() => handleOpenDialog("edit", opd)}
-                              >
-                                <Edit className="h-4 w-4" />
+                                Lihat Detail
                               </Button>
                               <Button
                                 size="sm"
@@ -529,7 +494,8 @@ function SuperAdminOPDsContent() {
                                 className="text-red-600 hover:bg-red-50"
                                 onClick={() => handleOpenDialog("delete", opd)}
                               >
-                                <Trash2 className="h-4 w-4" />
+                                <Trash2 className="h-4 w-4 mr-2" />
+                                Hapus
                               </Button>
                             </div>
                           </td>

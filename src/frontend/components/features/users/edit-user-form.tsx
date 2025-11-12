@@ -115,9 +115,10 @@ function EditUserFormContent({
     defaultValues: {
       name: user?.name || "",
       email: user?.email || "",
-      role: (user?.role === 'Super Admin' || user?.role === 'Admin Daerah') 
-        ? user.role 
-        : "Admin Daerah",
+      role:
+        user?.role === "Super Admin" || user?.role === "Admin Daerah"
+          ? user.role
+          : "Admin Daerah",
       opd: user?.opd || "",
     },
   });
@@ -133,11 +134,11 @@ function EditUserFormContent({
 
   useEffect(() => {
     if (user) {
-      const validRole: 'Super Admin' | 'Admin Daerah' = 
-        (user.role === 'Super Admin' || user.role === 'Admin Daerah') 
-          ? user.role 
-          : 'Admin Daerah';
-      
+      const validRole: "Super Admin" | "Admin Daerah" =
+        user.role === "Super Admin" || user.role === "Admin Daerah"
+          ? user.role
+          : "Admin Daerah";
+
       form.reset({
         name: user.name,
         email: user.email,
