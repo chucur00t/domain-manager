@@ -260,7 +260,7 @@ function SuperAdminDomainsContent() {
         return (
           <Badge
             variant="outline"
-            className="bg-orange-50 text-orange-700 border-orange-200"
+            className="bg-orange-50 text-orange-500 border-orange-200"
           >
             Tidak Aktif
           </Badge>
@@ -327,12 +327,12 @@ function SuperAdminDomainsContent() {
           <Card>
             <CardHeader className="pb-3">
               <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-                <PauseCircle className="h-4 w-4 text-orange-600" />
+                <PauseCircle className="h-4 w-4 text-orange-500" />
                 Tidak Aktif
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-orange-600">
+              <div className="text-2xl font-bold text-orange-500">
                 {stats.inactive}
               </div>
             </CardContent>
