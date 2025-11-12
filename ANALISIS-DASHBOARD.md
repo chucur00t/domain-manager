@@ -33,10 +33,12 @@ src/
 ## 🎯 1. SUPER ADMIN DASHBOARD
 
 ### 📄 File: `super-admin-dashboard.tsx`
+
 **Lokasi:** `src/frontend/components/features/super-admin/dashboard/`  
 **Baris Code:** 221 lines
 
 ### 🔑 Props Interface
+
 ```typescript
 type Props = {
   role: User["role"];
@@ -44,6 +46,7 @@ type Props = {
 ```
 
 ### 📊 State Management
+
 ```typescript
 const [isLoading, setIsLoading] = useState(true);
 const [stats, setStats] = useState({
@@ -61,6 +64,7 @@ const [recentApplications, setRecentApplications] = useState<
 ```
 
 ### 🔄 Data Fetching (useEffect)
+
 ```typescript
 useEffect(() => {
   const fetchData = async () => {
@@ -70,17 +74,17 @@ useEffect(() => {
       fetch("/api/applications"),
       fetch("/api/users"),
     ]);
-    
+
     // 2. Parse responses
     const domains: Domain[] = await domainsRes.json();
     const applications: SubdomainApplication[] = await appsRes.json();
     const users: User[] = await usersRes.json();
-    
+
     // 3. Process data untuk statistics
     // 4. Process data untuk charts
     // 5. Process data untuk recent applications table
   };
-  
+
   fetchData();
 }, []);
 ```
@@ -88,23 +92,25 @@ useEffect(() => {
 ### 📈 Fungsi-Fungsi Utama
 
 #### 1. **Statistics Calculation**
+
 ```typescript
 // Active Domains Count
-activeDomainsCount: domains.filter((d) => d.status === "active").length
+activeDomainsCount: domains.filter((d) => d.status === "active").length;
 
 // Pending Applications Count
 pendingApplicationsCount: applications.filter(
   (a) => a.status === "pending_review"
-).length
+).length;
 
 // Total Users Count
-totalUsersCount: users.length
+totalUsersCount: users.length;
 
 // Total OPD Count
-totalOpdCount: [...new Set(applications.map((app) => app.opd))].length
+totalOpdCount: [...new Set(applications.map((app) => app.opd))].length;
 ```
 
 #### 2. **Applications by OPD (Top 5)**
+
 ```typescript
 const opdList = [...new Set(applications.map((app) => app.opd))];
 const appCounts = opdList
@@ -115,9 +121,11 @@ const appCounts = opdList
   .sort((a, b) => b.applications - a.applications)
   .slice(0, 5);
 ```
+
 **Output:** Array of top 5 OPDs dengan jumlah aplikasi terbanyak
 
 #### 3. **Recent Applications (Latest 5)**
+
 ```typescript
 const sortedRecent = [...applications]
   .filter((a) => a.status === "pending_review")
@@ -128,9 +136,11 @@ const sortedRecent = [...applications]
   })
   .slice(0, 5);
 ```
+
 **Output:** 5 permohonan terbaru yang pending review, sorted by date descending
 
 #### 4. **Page Title Generator**
+
 ```typescript
 const getPageTitle = () => {
   switch (role) {
@@ -145,17 +155,21 @@ const getPageTitle = () => {
 ### 🎨 UI Components
 
 #### **4 Stat Cards:**
+
 1. **Total Domain Aktif**
+
    - Icon: Globe
    - Value: `stats.activeDomainsCount`
    - Description: "Jumlah seluruh domain yang aktif."
 
 2. **Permohonan Perlu Direview**
+
    - Icon: FileText (amber-500)
    - Value: `stats.pendingApplicationsCount`
    - Description: "Permohonan yang menunggu review teknis."
 
 3. **Total Pengguna**
+
    - Icon: Users
    - Value: `stats.totalUsersCount`
    - Description: "Jumlah pengguna terdaftar di sistem."
@@ -168,13 +182,14 @@ const getPageTitle = () => {
 #### **2 Cards dengan Charts/Tables:**
 
 **Card 1: Bar Chart - Aktivitas Permohonan per OPD (Top 5)**
+
 ```typescript
 <BarChart
   data={applicationsByOpd}
   margin={{ top: 20, right: 20, bottom: 0, left: -20 }}
 >
   <CartesianGrid vertical={false} />
-  <XAxis 
+  <XAxis
     dataKey="opd"
     tickFormatter={(value) =>
       value.length > 12 ? `${value.slice(0, 12)}...` : value
@@ -184,19 +199,23 @@ const getPageTitle = () => {
   <Bar dataKey="applications" fill="var(--color-applications)" radius={4} />
 </BarChart>
 ```
+
 - **X-Axis:** Nama OPD (truncated jika > 12 char)
 - **Y-Axis:** Jumlah aplikasi
 - **Data:** Top 5 OPDs dengan aplikasi terbanyak
 
 **Card 2: Table - Permohonan Terbaru untuk Direview**
+
 ```typescript
 <SuperAdminApplicationsTable applications={recentApplications} />
 ```
+
 - Menampilkan 5 permohonan terbaru
 - Columns: Nama Subdomain, OPD, Status
 - Link ke detail application
 
 ### 🔄 Loading State
+
 ```typescript
 if (isLoading) {
   return (
@@ -212,10 +231,12 @@ if (isLoading) {
 ## 📋 SuperAdminApplicationsTable Component
 
 ### 📄 File: `super-admin-applications-table.tsx`
+
 **Lokasi:** `src/frontend/components/features/super-admin/dashboard/`  
 **Baris Code:** 84 lines
 
 ### 🔑 Props Interface
+
 ```typescript
 {
   applications: SubdomainApplication[];
@@ -223,6 +244,7 @@ if (isLoading) {
 ```
 
 ### 🎨 Status Configuration
+
 ```typescript
 const statusConfig = {
   pending: { text: "Menunggu", variant: "default" as const },
@@ -234,6 +256,7 @@ const statusConfig = {
 ```
 
 ### 📊 Table Structure
+
 ```typescript
 <Table>
   <TableHeader>
@@ -264,6 +287,7 @@ const statusConfig = {
 ```
 
 ### ✨ Features
+
 - ✅ Clickable domain names (link to detail page)
 - ✅ Color-coded status badges
 - ✅ Empty state handling
@@ -275,10 +299,12 @@ const statusConfig = {
 ## 🏛️ 2. ADMIN DAERAH DASHBOARD
 
 ### 📄 File: `admin-daerah-dashboard.tsx`
+
 **Lokasi:** `src/frontend/components/features/admin-daerah/dashboard/`  
 **Baris Code:** 324 lines
 
 ### 🔑 Props Interface
+
 ```typescript
 type Props = {
   applications: SubdomainApplication[];
@@ -288,6 +314,7 @@ type Props = {
 ```
 
 ### 🔍 Data Filtering (by OPD)
+
 ```typescript
 // Filter data by user OPD
 const opdApplications = applications.filter((app) => app.opd === userOpd);
@@ -295,6 +322,7 @@ const opdDomains = domains.filter((domain) => domain.opd === userOpd);
 ```
 
 ### 📊 Statistics Calculation
+
 ```typescript
 const stats = {
   totalDomains: opdDomains.length,
@@ -310,6 +338,7 @@ const stats = {
 ### 📈 Fungsi-Fungsi Utama
 
 #### 1. **Calculate Countdown Days**
+
 ```typescript
 const calculateCountdown = (
   activationDate: string
@@ -317,32 +346,35 @@ const calculateCountdown = (
   const activation = new Date(activationDate);
   const now = new Date();
   const year = activation.getFullYear();
-  
+
   // Check leap year
   const isLeapYear = (year % 4 === 0 && year % 100 !== 0) || year % 400 === 0;
   const daysInYear = isLeapYear ? 366 : 365;
-  
+
   // Calculate expiry date (1 year from activation)
   const expiryDate = new Date(activation);
   expiryDate.setDate(expiryDate.getDate() + daysInYear);
-  
+
   // Calculate remaining days
   const diffTime = expiryDate.getTime() - now.getTime();
   const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-  
+
   return {
     days: diffDays > 0 ? diffDays : 0,
     isExpired: diffDays <= 0,
   };
 };
 ```
+
 **Input:** Activation date (string)  
-**Output:** 
+**Output:**
+
 - `days`: Sisa hari sebelum expired (0 jika sudah expired)
 - `isExpired`: Boolean status expired
 - Memperhitungkan leap year (366 hari) vs normal year (365 hari)
 
 #### 2. **Application Status Chart Data**
+
 ```typescript
 const applicationStatusData = [
   {
@@ -357,7 +389,8 @@ const applicationStatusData = [
   },
   {
     name: "pending_approval",
-    value: opdApplications.filter((a) => a.status === "pending_approval").length,
+    value: opdApplications.filter((a) => a.status === "pending_approval")
+      .length,
     fill: "var(--color-pending_approval)",
   },
   {
@@ -367,9 +400,11 @@ const applicationStatusData = [
   },
 ].filter((item) => item.value > 0);
 ```
+
 **Output:** Array untuk Pie Chart, hanya status dengan value > 0
 
 #### 3. **Active Domains with Countdown**
+
 ```typescript
 const activeDomainsWithCountdown = opdDomains
   .filter((d) => d.status === "active" && d.activationDate)
@@ -379,7 +414,9 @@ const activeDomainsWithCountdown = opdDomains
   }))
   .sort((a, b) => a.countdown.days - b.countdown.days);
 ```
-**Output:** 
+
+**Output:**
+
 - Domain yang aktif dan punya activation date
 - Sudah dihitung countdown-nya
 - Di-sort berdasarkan sisa hari (ascending) - yang mau expired duluan di atas
@@ -387,17 +424,21 @@ const activeDomainsWithCountdown = opdDomains
 ### 🎨 UI Components
 
 #### **4 Stat Cards:**
+
 1. **Total Domain**
+
    - Icon: Globe
    - Value: `stats.totalDomains`
    - Description: "Total domain yang Anda kelola."
 
 2. **Domain Aktif**
+
    - Icon: CheckCircle (green-500)
    - Value: `stats.activeDomains`
    - Description: "Domain yang sedang aktif."
 
 3. **Permohonan Pending**
+
    - Icon: Clock (amber-500)
    - Value: `stats.pendingApplications`
    - Description: "Permohonan yang sedang diproses."
@@ -410,6 +451,7 @@ const activeDomainsWithCountdown = opdDomains
 #### **2 Cards dengan Charts/Tables:**
 
 **Card 1: Pie Chart - Status Permohonan**
+
 ```typescript
 <PieChart accessibilityLayer>
   <Pie
@@ -426,11 +468,13 @@ const activeDomainsWithCountdown = opdDomains
   <ChartLegend content={<ChartLegendContent nameKey="name" />} />
 </PieChart>
 ```
+
 - **Type:** Donut Chart (innerRadius=60)
 - **Data:** Status distribution (approved, pending_review, pending_approval, rejected)
 - **Legend:** Shows all status labels
 
 **Card 2: Table - Status Domain (Countdown)**
+
 ```typescript
 <Table>
   <TableHeader>
@@ -445,20 +489,30 @@ const activeDomainsWithCountdown = opdDomains
       <TableRow>
         <TableCell>{domain.hostname}</TableCell>
         <TableCell>
-          <span className={
-            domain.countdown.days <= 30 ? "text-red-600 font-semibold" :
-            domain.countdown.days <= 90 ? "text-amber-600 font-semibold" :
-            "text-green-600"
-          }>
-            {domain.countdown.isExpired ? "Expired" : `${domain.countdown.days} hari`}
+          <span
+            className={
+              domain.countdown.days <= 30
+                ? "text-red-600 font-semibold"
+                : domain.countdown.days <= 90
+                ? "text-amber-600 font-semibold"
+                : "text-green-600"
+            }
+          >
+            {domain.countdown.isExpired
+              ? "Expired"
+              : `${domain.countdown.days} hari`}
           </span>
         </TableCell>
         <TableCell>
-          <Badge variant={
-            domain.countdown.days <= 30 ? "destructive" :
-            domain.countdown.days <= 90 ? "default" :
-            "secondary"
-          }>
+          <Badge
+            variant={
+              domain.countdown.days <= 30
+                ? "destructive"
+                : domain.countdown.days <= 90
+                ? "default"
+                : "secondary"
+            }
+          >
             {/* Status text */}
           </Badge>
         </TableCell>
@@ -469,6 +523,7 @@ const activeDomainsWithCountdown = opdDomains
 ```
 
 #### **Color Coding System:**
+
 - **≤ 30 days:** Red (text-red-600, destructive badge) - "Segera Expired"
 - **≤ 90 days:** Amber (text-amber-600, default badge) - "Perhatian"
 - **> 90 days:** Green (text-green-600, secondary badge) - "Aktif"
@@ -479,15 +534,17 @@ const activeDomainsWithCountdown = opdDomains
 ## 🔀 3. DASHBOARD ROUTER PAGES
 
 ### 📄 File: `src/app/(app)/super-admin/dashboard/page.tsx`
+
 **Role:** Super Admin  
 **Baris Code:** 28 lines
 
 #### Code Structure:
+
 ```typescript
 function SuperAdminDashboardContent() {
   const searchParams = useSearchParams();
   const role = searchParams.get("role") as User["role"];
-  
+
   return <SuperAdminDashboard role={role} />;
 }
 
@@ -501,6 +558,7 @@ export default function SuperAdminDashboardPage() {
 ```
 
 **Flow:**
+
 1. Get `role` from URL query params
 2. Pass `role` to SuperAdminDashboard component
 3. Component fetches data from APIs
@@ -509,17 +567,19 @@ export default function SuperAdminDashboardPage() {
 ---
 
 ### 📄 File: `src/app/(app)/dashboard/page.tsx`
+
 **Role:** Admin Daerah (dan Super Admin sebagai fallback)  
 **Baris Code:** 290 lines
 
 #### Code Structure:
+
 ```typescript
 function OperatorDashboard() {
   const [applications, setApplications] = useState<SubdomainApplication[]>([]);
   const [domains, setDomains] = useState<Domain[]>([]);
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  
+
   useEffect(() => {
     const fetchData = async () => {
       // 1. Fetch data from APIs
@@ -529,13 +589,13 @@ function OperatorDashboard() {
     };
     fetchData();
   }, [role]);
-  
+
   // Render dashboard
 }
 
 function DashboardContent() {
   const role = searchParams.get("role") as User["role"];
-  
+
   switch (role) {
     case "Super Admin":
       return <OperatorDashboard />;
@@ -548,6 +608,7 @@ function DashboardContent() {
 ```
 
 **Special Features:**
+
 - Uses MOCK_USERS to find user by role
 - Filters data by OPD for Admin Daerah
 - Shows all data for Super Admin
@@ -559,29 +620,31 @@ function DashboardContent() {
 
 ## 🆚 PERBANDINGAN: Super Admin vs Admin Daerah
 
-| Aspek | Super Admin Dashboard | Admin Daerah Dashboard |
-|-------|----------------------|------------------------|
-| **Lokasi Component** | `features/super-admin/dashboard/` | `features/admin-daerah/dashboard/` |
-| **Data Scope** | Semua data sistem | Filtered by user's OPD |
-| **Statistics Cards** | 4 cards (Domain, Applications, Users, OPD) | 4 cards (Total/Active Domains, Pending/Approved Apps) |
-| **Chart 1** | Bar Chart - Apps per OPD (Top 5) | Pie Chart - Application Status Distribution |
-| **Chart 2** | Table - Recent Applications | Table - Domain Countdown |
-| **Data Fetching** | Inside component (useEffect) | Props passed from page |
-| **OPD Filter** | ❌ No filtering | ✅ Filtered by userOpd |
-| **Countdown Feature** | ❌ Not implemented | ✅ Leap year aware calculation |
-| **Loading State** | ✅ Loader2 spinner | ✅ Loader2 spinner |
-| **Empty State** | ✅ "Tidak ada data" | ✅ "Belum ada data" |
+| Aspek                 | Super Admin Dashboard                      | Admin Daerah Dashboard                                |
+| --------------------- | ------------------------------------------ | ----------------------------------------------------- |
+| **Lokasi Component**  | `features/super-admin/dashboard/`          | `features/admin-daerah/dashboard/`                    |
+| **Data Scope**        | Semua data sistem                          | Filtered by user's OPD                                |
+| **Statistics Cards**  | 4 cards (Domain, Applications, Users, OPD) | 4 cards (Total/Active Domains, Pending/Approved Apps) |
+| **Chart 1**           | Bar Chart - Apps per OPD (Top 5)           | Pie Chart - Application Status Distribution           |
+| **Chart 2**           | Table - Recent Applications                | Table - Domain Countdown                              |
+| **Data Fetching**     | Inside component (useEffect)               | Props passed from page                                |
+| **OPD Filter**        | ❌ No filtering                            | ✅ Filtered by userOpd                                |
+| **Countdown Feature** | ❌ Not implemented                         | ✅ Leap year aware calculation                        |
+| **Loading State**     | ✅ Loader2 spinner                         | ✅ Loader2 spinner                                    |
+| **Empty State**       | ✅ "Tidak ada data"                        | ✅ "Belum ada data"                                   |
 
 ---
 
 ## 🔧 API ENDPOINTS DIGUNAKAN
 
 ### Super Admin Dashboard:
+
 1. `GET /api/domains` - Fetch all domains
 2. `GET /api/applications` - Fetch all applications
 3. `GET /api/users` - Fetch all users
 
 ### Admin Daerah Dashboard (page.tsx):
+
 1. `GET /api/applications` - Fetch all applications (filtered client-side)
 2. `GET /api/domains` - Fetch all domains (filtered client-side)
 3. `GET /api/users` - Fetch users (to find current user)
@@ -591,16 +654,19 @@ function DashboardContent() {
 ## 📊 DATA PROCESSING PIPELINE
 
 ### Super Admin:
+
 ```
 APIs → Parse JSON → Process Statistics → Process Chart Data → Render
 ```
 
 ### Admin Daerah (Component):
+
 ```
 Props (pre-filtered) → Process Statistics → Process Chart Data → Calculate Countdown → Render
 ```
 
 ### Admin Daerah (Page):
+
 ```
 APIs → Parse JSON → Find User → Filter by OPD → Pass to Component → Render
 ```
@@ -610,6 +676,7 @@ APIs → Parse JSON → Find User → Filter by OPD → Pass to Component → Re
 ## ✨ FUNGSI KHUSUS & ALGORITMA
 
 ### 1. **OPD Ranking Algorithm (Super Admin)**
+
 ```typescript
 // Input: Array of applications
 // Output: Top 5 OPDs by application count
@@ -629,6 +696,7 @@ Step 3: Sort descending and take top 5
 ```
 
 ### 2. **Countdown Calculator (Admin Daerah)**
+
 ```typescript
 // Input: activationDate (string)
 // Output: { days: number, isExpired: boolean }
@@ -642,6 +710,7 @@ Step 5: Return days remaining and expired status
 ```
 
 ### 3. **Recent Applications Sorter (Super Admin)**
+
 ```typescript
 // Input: Array of applications
 // Output: 5 most recent pending_review applications
@@ -654,6 +723,7 @@ Step 3: Take first 5
 ```
 
 ### 4. **Chart Data Filter (Admin Daerah)**
+
 ```typescript
 // Input: Application status counts
 // Output: Only non-zero status counts
@@ -668,25 +738,30 @@ Step 3: Take first 5
 ## 🎨 UI/UX FEATURES
 
 ### Animation Delays:
+
 - Stat Cards: `animate-fade-in` (no delay)
 - Chart Card 1: `animate-fade-in` + `animationDelay: "150ms"`
 - Chart Card 2: `animate-fade-in` + `animationDelay: "300ms"`
 
 ### Responsive Grid:
+
 - Stat Cards: `md:grid-cols-2 lg:grid-cols-4`
 - Chart Cards: `lg:grid-cols-2` (stacked on mobile)
 
 ### Loading States:
+
 ```typescript
 <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
 ```
 
 ### Empty States:
+
 ```typescript
 <p className="text-muted-foreground">Tidak ada data permohonan.</p>
 ```
 
 ### Status Badges:
+
 - Destructive (red): Rejected, Expired, Critical (≤30 days)
 - Default (gray): Pending, Warning (≤90 days)
 - Secondary (green): Approved, Active (>90 days)
@@ -696,19 +771,22 @@ Step 3: Take first 5
 ## 🐛 POTENTIAL ISSUES & IMPROVEMENTS
 
 ### Issues:
+
 1. ⚠️ **Admin Daerah component** requires props, tapi **page.tsx** melakukan filtering sendiri
    - **Solusi:** Component seharusnya fetch data sendiri seperti Super Admin
-   
 2. ⚠️ **MOCK_USERS** digunakan di page.tsx untuk find user
+
    - **Solusi:** Seharusnya ada endpoint `/api/users/me` untuk get current user
 
 3. ⚠️ **Duplicate OperatorDashboard** di page.tsx yang kompleks
+
    - **Solusi:** Extract ke component terpisah
 
 4. ⚠️ **Client-side filtering** di page.tsx (tidak efisien untuk data besar)
    - **Solusi:** API should support OPD filter query param
 
 ### Improvements:
+
 1. ✅ Tambahkan **error handling** untuk API failures
 2. ✅ Tambahkan **refresh button** untuk manual data refresh
 3. ✅ Tambahkan **date range filter** untuk applications
@@ -720,6 +798,7 @@ Step 3: Take first 5
 ## 📝 CHECKLIST MIGRASI
 
 ### Admin Daerah Component Refactoring:
+
 - [ ] Ubah component dari prop-based ke self-fetching
 - [ ] Implement useEffect untuk fetch APIs
 - [ ] Remove dependency on page.tsx filtering
@@ -727,12 +806,14 @@ Step 3: Take first 5
 - [ ] Add refresh functionality
 
 ### API Improvements:
+
 - [ ] Create `/api/users/me` endpoint
 - [ ] Add OPD filter to `/api/applications?opd={opdName}`
 - [ ] Add OPD filter to `/api/domains?opd={opdName}`
 - [ ] Implement proper error responses
 
 ### Code Cleanup:
+
 - [ ] Remove MOCK_USERS usage from page.tsx
 - [ ] Extract OperatorDashboard to separate component file
 - [ ] Consolidate duplicate countdown logic

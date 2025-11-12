@@ -14,10 +14,11 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import React from "react";
 
+// Simplified status config for dashboard - only 3 main statuses
 const statusConfig = {
-  pending: { text: "Menunggu", variant: "default" as const },
-  pending_review: { text: "Review Admin", variant: "default" as const },
-  pending_approval: { text: "Persetujuan Kabid", variant: "default" as const },
+  pending: { text: "Pending", variant: "default" as const },
+  pending_review: { text: "Pending", variant: "default" as const },
+  pending_approval: { text: "Pending", variant: "default" as const },
   approved: { text: "Disetujui", variant: "secondary" as const },
   rejected: { text: "Ditolak", variant: "destructive" as const },
 };

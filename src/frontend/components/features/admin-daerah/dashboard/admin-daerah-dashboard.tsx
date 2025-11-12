@@ -28,7 +28,11 @@ import {
   ChartLegendContent,
 } from "@/components/ui/chart";
 import { Pie, PieChart, Cell } from "recharts";
-import type { SubdomainApplication, Domain, User } from "@/backend/models/types";
+import type {
+  SubdomainApplication,
+  Domain,
+  User,
+} from "@/backend/models/types";
 
 const applicationChartConfig = {
   approved: {
