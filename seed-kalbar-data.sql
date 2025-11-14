@@ -67,35 +67,35 @@ INSERT INTO users (id, username, email, password, role, opd_id, is_active, creat
 -- =========================================
 -- INSERT APPLICATIONS (22 Applications)
 -- =========================================
-INSERT INTO applications (id, application_type, opd_id, submitter_id, status, submitted_at, approved_at, last_updated_by) VALUES
+INSERT INTO applications (id, application_type, requested_domain_name, opd_id, submitter_id, status, submitted_at, approved_at, last_updated_by) VALUES
 -- Domain Approved (10)
-(1, 'domain', 1, 2, 'Approved', '2024-01-15 09:00:00', '2024-01-18 10:30:00', 1),
-(2, 'domain', 2, 3, 'Approved', '2024-02-10 10:15:00', '2024-02-15 14:00:00', 1),
-(3, 'domain', 3, 4, 'Approved', '2024-03-05 08:30:00', '2024-03-10 11:45:00', 1),
-(4, 'domain', 4, 5, 'Approved', '2024-03-20 13:00:00', '2024-03-25 15:30:00', 1),
-(5, 'domain', 5, 6, 'Approved', '2024-04-08 09:20:00', '2024-04-12 10:00:00', 1),
-(6, 'domain', 8, 9, 'Approved', '2024-05-15 11:00:00', '2024-05-20 13:15:00', 1),
-(7, 'domain', 10, 11, 'Approved', '2024-06-20 08:45:00', '2024-06-25 10:30:00', 1),
-(8, 'domain', 11, 12, 'Approved', '2024-07-10 10:00:00', '2024-07-15 14:20:00', 1),
-(9, 'domain', 13, 14, 'Approved', '2024-08-05 09:30:00', '2024-08-10 11:00:00', 1),
-(10, 'domain', 15, 1, 'Approved', '2024-09-01 08:00:00', '2024-09-05 10:00:00', 1),
+(1, 'domain', 'diskominfo.kalbarprov.go.id', 1, 2, 'Approved', '2024-01-15 09:00:00', '2024-01-18 10:30:00', 1),
+(2, 'domain', 'disdikbud.kalbarprov.go.id', 2, 3, 'Approved', '2024-02-10 10:15:00', '2024-02-15 14:00:00', 1),
+(3, 'domain', 'dinkes.kalbarprov.go.id', 3, 4, 'Approved', '2024-03-05 08:30:00', '2024-03-10 11:45:00', 1),
+(4, 'domain', 'dpupr.kalbarprov.go.id', 4, 5, 'Approved', '2024-03-20 13:00:00', '2024-03-25 15:30:00', 1),
+(5, 'domain', 'dinsos.kalbarprov.go.id', 5, 6, 'Approved', '2024-04-08 09:20:00', '2024-04-12 10:00:00', 1),
+(6, 'domain', 'dispar.kalbarprov.go.id', 8, 9, 'Approved', '2024-05-15 11:00:00', '2024-05-20 13:15:00', 1),
+(7, 'domain', 'distanhort.kalbarprov.go.id', 10, 11, 'Approved', '2024-06-20 08:45:00', '2024-06-25 10:30:00', 1),
+(8, 'domain', 'diskan.kalbarprov.go.id', 11, 12, 'Approved', '2024-07-10 10:00:00', '2024-07-15 14:20:00', 1),
+(9, 'domain', 'dlh.kalbarprov.go.id', 13, 14, 'Approved', '2024-08-05 09:30:00', '2024-08-10 11:00:00', 1),
+(10, 'domain', 'bappeda.kalbarprov.go.id', 15, 1, 'Approved', '2024-09-01 08:00:00', '2024-09-05 10:00:00', 1),
 -- Domain Pending (3)
-(11, 'domain', 7, 8, 'Pending', '2025-11-10 10:30:00', NULL, NULL),
-(12, 'domain', 9, 10, 'Pending', '2025-11-12 09:15:00', NULL, NULL),
-(13, 'domain', 6, 7, 'Pending', '2025-11-13 14:00:00', NULL, NULL),
+(11, 'domain', 'dishub.kalbarprov.go.id', 7, 8, 'Pending', '2025-11-10 10:30:00', NULL, NULL),
+(12, 'domain', 'disperindag.kalbarprov.go.id', 9, 10, 'Pending', '2025-11-12 09:15:00', NULL, NULL),
+(13, 'domain', 'disnakertrans.kalbarprov.go.id', 6, 7, 'Pending', '2025-11-13 14:00:00', NULL, NULL),
 -- Domain Rejected (1)
-(14, 'domain', 12, 13, 'Rejected', '2025-10-20 11:30:00', '2025-10-25 14:15:00', 1),
+(14, 'domain', 'dishut-kalbar.go.id', 12, 13, 'Rejected', '2025-10-20 11:30:00', '2025-10-25 14:15:00', 1),
 -- Hosting Approved (5)
-(15, 'hosting', 1, 2, 'Approved', '2024-02-01 10:00:00', '2024-02-05 13:30:00', 1),
-(16, 'hosting', 2, 3, 'Approved', '2024-03-15 11:30:00', '2024-03-20 14:00:00', 1),
-(17, 'hosting', 3, 4, 'Approved', '2024-04-20 09:00:00', '2024-04-25 11:30:00', 1),
-(18, 'hosting', 8, 9, 'Approved', '2024-06-10 10:15:00', '2024-06-15 13:45:00', 1),
-(19, 'hosting', 10, 11, 'Approved', '2024-07-25 08:30:00', '2024-07-30 10:00:00', 1),
+(15, 'hosting', 'portal.diskominfo.kalbarprov.go.id', 1, 2, 'Approved', '2024-02-01 10:00:00', '2024-02-05 13:30:00', 1),
+(16, 'hosting', 'ppdb.disdikbud.kalbarprov.go.id', 2, 3, 'Approved', '2024-03-15 11:30:00', '2024-03-20 14:00:00', 1),
+(17, 'hosting', 'faskes.dinkes.kalbarprov.go.id', 3, 4, 'Approved', '2024-04-20 09:00:00', '2024-04-25 11:30:00', 1),
+(18, 'hosting', 'visit.dispar.kalbarprov.go.id', 8, 9, 'Approved', '2024-06-10 10:15:00', '2024-06-15 13:45:00', 1),
+(19, 'hosting', 'siperta.distanhort.kalbarprov.go.id', 10, 11, 'Approved', '2024-07-25 08:30:00', '2024-07-30 10:00:00', 1),
 -- Hosting Pending (2)
-(20, 'hosting', 11, 12, 'Pending', '2025-11-11 13:20:00', NULL, NULL),
-(21, 'hosting', 13, 14, 'Pending', '2025-11-13 10:45:00', NULL, NULL),
+(20, 'hosting', 'sikanlaut.diskan.kalbarprov.go.id', 11, 12, 'Pending', '2025-11-11 13:20:00', NULL, NULL),
+(21, 'hosting', 'simling.dlh.kalbarprov.go.id', 13, 14, 'Pending', '2025-11-13 10:45:00', NULL, NULL),
 -- Hosting Rejected (1)
-(22, 'hosting', 4, 5, 'Rejected', '2025-10-18 09:00:00', '2025-10-22 11:30:00', 1);
+(22, 'hosting', 'infrastruktur.dpupr.kalbarprov.go.id', 4, 5, 'Rejected', '2025-10-18 09:00:00', '2025-10-22 11:30:00', 1);
 
 -- Update rejection reasons
 UPDATE applications SET reason = 'Nama domain tidak sesuai dengan konvensi penamaan yang ditetapkan. Gunakan format: [nama-dinas].kalbarprov.go.id' WHERE id = 14;
