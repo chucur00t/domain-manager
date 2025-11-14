@@ -30,10 +30,13 @@ export function addDomainAliases(domain: Domain): Domain {
 }
 
 export function addApplicationAliases(app: Application): Application {
+  // Find related domain for domain applications
+  const relatedDomain = MOCK_DOMAINS.find(d => d.application_id === app.id);
   return {
     ...app,
     submittedDate: app.submitted_at,
     submissionDate: app.submitted_at,
+    domainName: relatedDomain?.domain_name || `${app.opd?.toLowerCase().replace(/\s+/g, '-')}.bandung.go.id`,
   };
 }
 
