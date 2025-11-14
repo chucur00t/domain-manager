@@ -1,6 +1,7 @@
 ﻿/**
- * Mock Data for Domain Manager System
+ * Mock Data for Domain Manager System - Kalimantan Barat
  * Aligned with database schema from schema-tables-only.sql
+ * Data OPD dan Diskominfo dari Pemerintah Provinsi Kalimantan Barat
  * Updated: November 14, 2025
  */
 
@@ -36,7 +37,7 @@ export function addApplicationAliases(app: Application): Application {
     ...app,
     submittedDate: app.submitted_at,
     submissionDate: app.submitted_at,
-    domainName: relatedDomain?.domain_name || `${app.opd?.toLowerCase().replace(/\s+/g, '-')}.bandung.go.id`,
+    domainName: relatedDomain?.domain_name || `${app.opd?.toLowerCase().replace(/\s+/g, '-')}.kalbarprov.go.id`,
   };
 }
 
@@ -50,195 +51,325 @@ export function addUserAliases(user: User): User {
 
 export const MOCK_ROLES = ["Super Admin", "Admin Daerah"];
 
-// ============= OPDS DATA =============
+// ============= OPDS DATA - KALIMANTAN BARAT =============
 export const MOCK_OPDS: OPD[] = [
   { 
     id: 1, 
     name: "Dinas Komunikasi dan Informatika", 
-    address: "Jl. Asia Afrika No. 146, Bandung",
-    contact_person: "Ir. Budi Santoso, M.T.",
-    phone_number: "022-4233623",
+    address: "Jl. Ahmad Yani, Pontianak, Kalimantan Barat",
+    contact_person: "Ir. Hartoyo, M.T.",
+    phone_number: "0561-736622",
     created_at: "2024-01-15 08:00:00"
   },
   { 
     id: 2, 
-    name: "Dinas Pendidikan", 
-    address: "Jl. Kawaluyaan Indah II No. 4, Bandung",
-    contact_person: "Dr. Siti Nurhaliza, M.Pd.",
-    phone_number: "022-7275147",
+    name: "Dinas Pendidikan dan Kebudayaan", 
+    address: "Jl. Letjen Sutoyo, Pontianak, Kalimantan Barat",
+    contact_person: "Dr. Sri Wahyuni, M.Pd.",
+    phone_number: "0561-735306",
     created_at: "2024-01-15 08:00:00"
   },
   { 
     id: 3, 
     name: "Dinas Kesehatan", 
-    address: "Jl. Citarum No. 34, Bandung",
-    contact_person: "dr. Ahmad Wijaya, Sp.PD.",
-    phone_number: "022-4222596",
+    address: "Jl. K. H. Wahid Hasyim No. 249, Pontianak, Kalimantan Barat",
+    contact_person: "dr. Harisson, M.Kes., Sp.PD.",
+    phone_number: "0561-736711",
     created_at: "2024-01-15 08:00:00"
   },
   { 
     id: 4, 
     name: "Dinas Pekerjaan Umum dan Penataan Ruang", 
-    address: "Jl. Soekarno Hatta No. 590, Bandung",
-    contact_person: "Ir. Dewi Kartika, M.T.",
-    phone_number: "022-7566155",
+    address: "Jl. Alianyang, Pontianak, Kalimantan Barat",
+    contact_person: "Ir. Andi Wijaya, M.T.",
+    phone_number: "0561-583440",
     created_at: "2024-01-15 08:00:00"
   },
   { 
     id: 5, 
     name: "Dinas Sosial", 
-    address: "Jl. Sancang No. 1, Bandung",
-    contact_person: "Drs. Rudi Hartono, M.Si.",
-    phone_number: "022-5226339",
+    address: "Jl. Dr. Sutomo, Pontianak, Kalimantan Barat",
+    contact_person: "Drs. Bambang Suryanto, M.Si.",
+    phone_number: "0561-732121",
     created_at: "2024-01-15 08:00:00"
   },
   { 
     id: 6, 
-    name: "Dinas Perdagangan", 
-    address: "Jl. Wastukencana No. 2, Bandung",
-    contact_person: "Linda Kusuma, S.E., M.M.",
-    phone_number: "022-4206372",
+    name: "Dinas Tenaga Kerja dan Transmigrasi", 
+    address: "Jl. Sultan Abdurrahman, Pontianak, Kalimantan Barat",
+    contact_person: "Dra. Siti Aminah, M.M.",
+    phone_number: "0561-736449",
     created_at: "2024-01-15 08:00:00"
   },
   { 
     id: 7, 
-    name: "Dinas Perindustrian dan Perdagangan", 
-    address: "Jl. Asia Afrika No. 120, Bandung",
-    contact_person: "Hendra Wijaya, S.T., M.T.",
-    phone_number: "022-4232805",
+    name: "Dinas Perhubungan", 
+    address: "Jl. Jenderal Urip, Pontianak, Kalimantan Barat",
+    contact_person: "Ir. Budiman Santoso, M.T.",
+    phone_number: "0561-765521",
     created_at: "2024-01-15 08:00:00"
   },
   { 
     id: 8, 
-    name: "Dinas Kebudayaan dan Pariwisata", 
-    address: "Jl. Kawaluyaan Indah II No. 7, Bandung",
-    contact_person: "Maya Sari, S.Sn., M.A.",
-    phone_number: "022-7275140",
+    name: "Dinas Pariwisata", 
+    address: "Jl. Sidas, Pontianak, Kalimantan Barat",
+    contact_person: "Agustinus Teras Narang, S.Sos., M.Si.",
+    phone_number: "0561-743415",
     created_at: "2024-01-15 08:00:00"
   },
   { 
     id: 9, 
-    name: "Dinas Kepemudaan dan Olahraga", 
-    address: "Jl. Cicendo No. 2, Bandung",
-    contact_person: "Agus Priyanto, S.Pd., M.Pd.",
-    phone_number: "022-6014581",
+    name: "Dinas Perindustrian dan Perdagangan", 
+    address: "Jl. A. Yani II, Pontianak, Kalimantan Barat",
+    contact_person: "Drs. Hermansyah, M.M.",
+    phone_number: "0561-736183",
     created_at: "2024-01-15 08:00:00"
   },
   { 
     id: 10, 
-    name: "Dinas Pemberdayaan Perempuan dan Perlindungan Anak", 
-    address: "Jl. Surapati No. 186, Bandung",
-    contact_person: "Rina Andriani, S.Sos., M.A.P.",
-    phone_number: "022-4206996",
+    name: "Dinas Pertanian dan Hortikultura", 
+    address: "Jl. Alianyang KM 10, Pontianak, Kalimantan Barat",
+    contact_person: "Ir. Suryadi, M.P.",
+    phone_number: "0561-587711",
+    created_at: "2024-01-15 08:00:00"
+  },
+  { 
+    id: 11, 
+    name: "Dinas Perikanan", 
+    address: "Jl. Alianyang KM 10, Pontianak, Kalimantan Barat",
+    contact_person: "Ir. Muhammad Rizki, M.Si.",
+    phone_number: "0561-587722",
+    created_at: "2024-01-15 08:00:00"
+  },
+  { 
+    id: 12, 
+    name: "Dinas Kehutanan", 
+    address: "Jl. Gusti Sulung Lelanang, Pontianak, Kalimantan Barat",
+    contact_person: "Dr. Ir. Bambang Heryanto, M.Si.",
+    phone_number: "0561-736595",
+    created_at: "2024-01-15 08:00:00"
+  },
+  { 
+    id: 13, 
+    name: "Dinas Lingkungan Hidup", 
+    address: "Jl. Sultan Hamid II, Pontianak, Kalimantan Barat",
+    contact_person: "Ir. Ratna Sari Dewi, M.T.",
+    phone_number: "0561-742444",
+    created_at: "2024-01-15 08:00:00"
+  },
+  { 
+    id: 14, 
+    name: "Dinas Energi dan Sumber Daya Mineral", 
+    address: "Jl. Achmad Yani, Pontianak, Kalimantan Barat",
+    contact_person: "Ir. Hadi Purnomo, M.T.",
+    phone_number: "0561-736211",
+    created_at: "2024-01-15 08:00:00"
+  },
+  { 
+    id: 15, 
+    name: "Badan Perencanaan Pembangunan Daerah", 
+    address: "Jl. Letjen Sutoyo, Pontianak, Kalimantan Barat",
+    contact_person: "Drs. H. Ahmad Fauzi, M.Si.",
+    phone_number: "0561-736519",
+    created_at: "2024-01-15 08:00:00"
+  },
+  { 
+    id: 16, 
+    name: "Badan Kepegawaian Daerah", 
+    address: "Jl. Ahmad Yani, Pontianak, Kalimantan Barat",
+    contact_person: "Dra. Hj. Nurlaila, M.M.",
+    phone_number: "0561-736344",
+    created_at: "2024-01-15 08:00:00"
+  },
+  { 
+    id: 17, 
+    name: "Badan Pengelola Keuangan dan Aset Daerah", 
+    address: "Jl. Letjen Sutoyo, Pontianak, Kalimantan Barat",
+    contact_person: "Drs. Hari Kusuma, M.M., Ak.",
+    phone_number: "0561-735000",
+    created_at: "2024-01-15 08:00:00"
+  },
+  { 
+    id: 18, 
+    name: "Dinas Pemberdayaan Masyarakat dan Desa", 
+    address: "Jl. Sultan Abdurrahman, Pontianak, Kalimantan Barat",
+    contact_person: "Ir. H. Syamsul Bahri, M.Si.",
+    phone_number: "0561-736566",
+    created_at: "2024-01-15 08:00:00"
+  },
+  { 
+    id: 19, 
+    name: "Dinas Kependudukan dan Pencatatan Sipil", 
+    address: "Jl. Ahmad Yani, Pontianak, Kalimantan Barat",
+    contact_person: "Drs. Agus Riyanto, M.Si.",
+    phone_number: "0561-742233",
+    created_at: "2024-01-15 08:00:00"
+  },
+  { 
+    id: 20, 
+    name: "Satuan Polisi Pamong Praja", 
+    address: "Jl. Letjen Sutoyo, Pontianak, Kalimantan Barat",
+    contact_person: "Drs. H. Yusuf Hidayat, M.M.",
+    phone_number: "0561-736455",
     created_at: "2024-01-15 08:00:00"
   },
 ];
 
-// ============= USERS DATA (Legacy format for compatibility) =============
+// ============= USERS DATA - KALIMANTAN BARAT =============
 export const MOCK_USERS: MockUser[] = [
   {
     id: "1",
-    name: "Ahmad Supardi",
-    email: "superadmin@bandung.go.id",
+    name: "Hartoyo",
+    email: "superadmin@kalbarprov.go.id",
     role: "Super Admin",
     status: "active",
-    nip: "198501012010011001",
-    whatsapp: "081234567890",
+    nip: "197805152003121001",
+    whatsapp: "081511223344",
     opd: "Dinas Komunikasi dan Informatika"
   },
   {
     id: "2",
-    name: "Siti Nurhaliza",
-    email: "admin.diskominfo@bandung.go.id",
+    name: "Rina Kusumawati",
+    email: "admin.diskominfo@kalbarprov.go.id",
     role: "Admin Daerah",
     status: "active",
     opd: "Dinas Komunikasi dan Informatika",
-    nip: "198702152011012002",
-    whatsapp: "081234567891",
+    nip: "198205102005012003",
+    whatsapp: "081511223345",
   },
   {
     id: "3",
-    name: "Budi Santoso",
-    email: "admin.disdik@bandung.go.id",
+    name: "Sri Wahyuni",
+    email: "admin.disdikbud@kalbarprov.go.id",
     role: "Admin Daerah",
     status: "active",
-    opd: "Dinas Pendidikan",
-    nip: "198905202012011003",
-    whatsapp: "081234567892",
+    opd: "Dinas Pendidikan dan Kebudayaan",
+    nip: "197909252006042002",
+    whatsapp: "081511223346",
   },
   {
     id: "4",
-    name: "Dewi Kartika",
-    email: "admin.dinkes@bandung.go.id",
+    name: "Harisson",
+    email: "admin.dinkes@kalbarprov.go.id",
     role: "Admin Daerah",
     status: "active",
     opd: "Dinas Kesehatan",
-    nip: "199003102013012004",
-    whatsapp: "081234567893",
+    nip: "198103152007011004",
+    whatsapp: "081511223347",
   },
   {
     id: "5",
-    name: "Rudi Hartono",
-    email: "admin.dpupr@bandung.go.id",
+    name: "Andi Wijaya",
+    email: "admin.dpupr@kalbarprov.go.id",
     role: "Admin Daerah",
     status: "active",
     opd: "Dinas Pekerjaan Umum dan Penataan Ruang",
-    nip: "198801252014011005",
-    whatsapp: "081234567894",
+    nip: "197712202008011005",
+    whatsapp: "081511223348",
   },
   {
     id: "6",
-    name: "Linda Kusuma",
-    email: "admin.dinsos@bandung.go.id",
+    name: "Bambang Suryanto",
+    email: "admin.dinsos@kalbarprov.go.id",
     role: "Admin Daerah",
     status: "active",
     opd: "Dinas Sosial",
-    nip: "199107182015012006",
-    whatsapp: "081234567895",
+    nip: "198006302009011006",
+    whatsapp: "081511223349",
   },
   {
     id: "7",
-    name: "Hendra Wijaya",
-    email: "admin.disdag@bandung.go.id",
+    name: "Siti Aminah",
+    email: "admin.disnakertrans@kalbarprov.go.id",
     role: "Admin Daerah",
-    status: "inactive",
-    opd: "Dinas Perdagangan",
-    nip: "198612302016011007",
-    whatsapp: "081234567896",
+    status: "active",
+    opd: "Dinas Tenaga Kerja dan Transmigrasi",
+    nip: "198304152010012007",
+    whatsapp: "081511223350",
   },
   {
     id: "8",
-    name: "Maya Sari",
-    email: "admin.disperin@bandung.go.id",
+    name: "Budiman Santoso",
+    email: "admin.dishub@kalbarprov.go.id",
     role: "Admin Daerah",
     status: "active",
-    opd: "Dinas Perindustrian dan Perdagangan",
-    nip: "199204152017012008",
-    whatsapp: "081234567897",
+    opd: "Dinas Perhubungan",
+    nip: "197808252011011008",
+    whatsapp: "081511223351",
   },
   {
     id: "9",
-    name: "Agus Priyanto",
-    email: "admin.disbudpar@bandung.go.id",
+    name: "Agustinus Teras Narang",
+    email: "admin.dispar@kalbarprov.go.id",
     role: "Admin Daerah",
     status: "active",
-    opd: "Dinas Kebudayaan dan Pariwisata",
-    nip: "198809222018011009",
-    whatsapp: "081234567898",
+    opd: "Dinas Pariwisata",
+    nip: "198512102012011009",
+    whatsapp: "081511223352",
   },
   {
     id: "10",
-    name: "Rina Andriani",
-    email: "admin.dispora@bandung.go.id",
+    name: "Hermansyah",
+    email: "admin.disperindag@kalbarprov.go.id",
     role: "Admin Daerah",
     status: "active",
-    opd: "Dinas Kepemudaan dan Olahraga",
-    nip: "199306282019012010",
-    whatsapp: "081234567899",
+    opd: "Dinas Perindustrian dan Perdagangan",
+    nip: "198701182013011010",
+    whatsapp: "081511223353",
+  },
+  {
+    id: "11",
+    name: "Suryadi",
+    email: "admin.distanhort@kalbarprov.go.id",
+    role: "Admin Daerah",
+    status: "active",
+    opd: "Dinas Pertanian dan Hortikultura",
+    nip: "197905202014011011",
+    whatsapp: "081511223354",
+  },
+  {
+    id: "12",
+    name: "Muhammad Rizki",
+    email: "admin.diskan@kalbarprov.go.id",
+    role: "Admin Daerah",
+    status: "active",
+    opd: "Dinas Perikanan",
+    nip: "198808152015011012",
+    whatsapp: "081511223355",
+  },
+  {
+    id: "13",
+    name: "Bambang Heryanto",
+    email: "admin.dishut@kalbarprov.go.id",
+    role: "Admin Daerah",
+    status: "active",
+    opd: "Dinas Kehutanan",
+    nip: "197606252016011013",
+    whatsapp: "081511223356",
+  },
+  {
+    id: "14",
+    name: "Ratna Sari Dewi",
+    email: "admin.dlh@kalbarprov.go.id",
+    role: "Admin Daerah",
+    status: "active",
+    opd: "Dinas Lingkungan Hidup",
+    nip: "198403102017012014",
+    whatsapp: "081511223357",
+  },
+  {
+    id: "15",
+    name: "Hadi Purnomo",
+    email: "admin.desdm@kalbarprov.go.id",
+    role: "Admin Daerah",
+    status: "active",
+    opd: "Dinas Energi dan Sumber Daya Mineral",
+    nip: "197910152018011015",
+    whatsapp: "081511223358",
   },
 ];
 
-// ============= APPLICATIONS DATA (matches applications table) =============
+// ============= APPLICATIONS DATA - KALIMANTAN BARAT =============
 export const MOCK_APPLICATIONS: Application[] = [
   // === APPROVED DOMAIN APPLICATIONS ===
   {
@@ -247,12 +378,12 @@ export const MOCK_APPLICATIONS: Application[] = [
     opd_id: 1,
     submitter_id: 2,
     status: "Approved",
-    submitted_at: "2024-09-10 10:00:00",
-    approved_at: "2024-09-12 14:30:00",
+    submitted_at: "2024-01-15 09:00:00",
+    approved_at: "2024-01-18 10:30:00",
     last_updated_by: 1,
     opd: "Dinas Komunikasi dan Informatika",
     submitter_username: "admin.diskominfo",
-    submitter_email: "admin.diskominfo@bandung.go.id"
+    submitter_email: "admin.diskominfo@kalbarprov.go.id"
   },
   {
     id: 2,
@@ -260,12 +391,12 @@ export const MOCK_APPLICATIONS: Application[] = [
     opd_id: 2,
     submitter_id: 3,
     status: "Approved",
-    submitted_at: "2024-10-01 09:15:00",
-    approved_at: "2024-10-05 11:20:00",
+    submitted_at: "2024-02-10 10:15:00",
+    approved_at: "2024-02-15 14:00:00",
     last_updated_by: 1,
-    opd: "Dinas Pendidikan",
-    submitter_username: "admin.disdik",
-    submitter_email: "admin.disdik@bandung.go.id"
+    opd: "Dinas Pendidikan dan Kebudayaan",
+    submitter_username: "admin.disdikbud",
+    submitter_email: "admin.disdikbud@kalbarprov.go.id"
   },
   {
     id: 3,
@@ -273,12 +404,12 @@ export const MOCK_APPLICATIONS: Application[] = [
     opd_id: 3,
     submitter_id: 4,
     status: "Approved",
-    submitted_at: "2024-10-15 08:30:00",
-    approved_at: "2024-10-20 10:15:00",
+    submitted_at: "2024-03-05 08:30:00",
+    approved_at: "2024-03-10 11:45:00",
     last_updated_by: 1,
     opd: "Dinas Kesehatan",
     submitter_username: "admin.dinkes",
-    submitter_email: "admin.dinkes@bandung.go.id"
+    submitter_email: "admin.dinkes@kalbarprov.go.id"
   },
   {
     id: 4,
@@ -286,12 +417,12 @@ export const MOCK_APPLICATIONS: Application[] = [
     opd_id: 4,
     submitter_id: 5,
     status: "Approved",
-    submitted_at: "2024-07-25 14:20:00",
-    approved_at: "2024-07-30 16:45:00",
+    submitted_at: "2024-03-20 13:00:00",
+    approved_at: "2024-03-25 15:30:00",
     last_updated_by: 1,
     opd: "Dinas Pekerjaan Umum dan Penataan Ruang",
     submitter_username: "admin.dpupr",
-    submitter_email: "admin.dpupr@bandung.go.id"
+    submitter_email: "admin.dpupr@kalbarprov.go.id"
   },
   {
     id: 5,
@@ -299,241 +430,557 @@ export const MOCK_APPLICATIONS: Application[] = [
     opd_id: 5,
     submitter_id: 6,
     status: "Approved",
-    submitted_at: "2024-06-10 11:00:00",
-    approved_at: "2024-06-15 13:30:00",
+    submitted_at: "2024-04-08 09:20:00",
+    approved_at: "2024-04-12 10:00:00",
     last_updated_by: 1,
     opd: "Dinas Sosial",
     submitter_username: "admin.dinsos",
-    submitter_email: "admin.dinsos@bandung.go.id"
+    submitter_email: "admin.dinsos@kalbarprov.go.id"
   },
-  // === PENDING DOMAIN APPLICATIONS ===
   {
     id: 6,
     application_type: "domain",
-    opd_id: 3,
-    submitter_id: 4,
-    status: "Pending",
-    submitted_at: "2025-11-10 10:30:00",
-    opd: "Dinas Kesehatan",
-    submitter_username: "admin.dinkes",
-    submitter_email: "admin.dinkes@bandung.go.id"
+    opd_id: 8,
+    submitter_id: 9,
+    status: "Approved",
+    submitted_at: "2024-05-15 11:00:00",
+    approved_at: "2024-05-20 13:15:00",
+    last_updated_by: 1,
+    opd: "Dinas Pariwisata",
+    submitter_username: "admin.dispar",
+    submitter_email: "admin.dispar@kalbarprov.go.id"
   },
   {
     id: 7,
     application_type: "domain",
-    opd_id: 2,
-    submitter_id: 3,
-    status: "Pending",
-    submitted_at: "2025-11-08 09:45:00",
-    opd: "Dinas Pendidikan",
-    submitter_username: "admin.disdik",
-    submitter_email: "admin.disdik@bandung.go.id"
+    opd_id: 10,
+    submitter_id: 11,
+    status: "Approved",
+    submitted_at: "2024-06-20 08:45:00",
+    approved_at: "2024-06-25 10:30:00",
+    last_updated_by: 1,
+    opd: "Dinas Pertanian dan Hortikultura",
+    submitter_username: "admin.distanhort",
+    submitter_email: "admin.distanhort@kalbarprov.go.id"
   },
-  // === REJECTED DOMAIN APPLICATION ===
   {
     id: 8,
     application_type: "domain",
-    opd_id: 5,
-    submitter_id: 6,
-    status: "Rejected",
-    reason: "Nama domain tidak sesuai dengan konvensi penamaan yang ditetapkan",
-    submitted_at: "2025-10-20 13:15:00",
-    approved_at: "2025-10-25 15:40:00",
+    opd_id: 11,
+    submitter_id: 12,
+    status: "Approved",
+    submitted_at: "2024-07-10 10:00:00",
+    approved_at: "2024-07-15 14:20:00",
     last_updated_by: 1,
-    opd: "Dinas Sosial",
-    submitter_username: "admin.dinsos",
-    submitter_email: "admin.dinsos@bandung.go.id"
+    opd: "Dinas Perikanan",
+    submitter_username: "admin.diskan",
+    submitter_email: "admin.diskan@kalbarprov.go.id"
+  },
+  {
+    id: 9,
+    application_type: "domain",
+    opd_id: 13,
+    submitter_id: 14,
+    status: "Approved",
+    submitted_at: "2024-08-05 09:30:00",
+    approved_at: "2024-08-10 11:00:00",
+    last_updated_by: 1,
+    opd: "Dinas Lingkungan Hidup",
+    submitter_username: "admin.dlh",
+    submitter_email: "admin.dlh@kalbarprov.go.id"
+  },
+  {
+    id: 10,
+    application_type: "domain",
+    opd_id: 15,
+    submitter_id: 1,
+    status: "Approved",
+    submitted_at: "2024-09-01 08:00:00",
+    approved_at: "2024-09-05 10:00:00",
+    last_updated_by: 1,
+    opd: "Badan Perencanaan Pembangunan Daerah",
+    submitter_username: "superadmin",
+    submitter_email: "superadmin@kalbarprov.go.id"
+  },
+  // === PENDING DOMAIN APPLICATIONS ===
+  {
+    id: 11,
+    application_type: "domain",
+    opd_id: 7,
+    submitter_id: 8,
+    status: "Pending",
+    submitted_at: "2025-11-10 10:30:00",
+    opd: "Dinas Perhubungan",
+    submitter_username: "admin.dishub",
+    submitter_email: "admin.dishub@kalbarprov.go.id"
+  },
+  {
+    id: 12,
+    application_type: "domain",
+    opd_id: 9,
+    submitter_id: 10,
+    status: "Pending",
+    submitted_at: "2025-11-12 09:15:00",
+    opd: "Dinas Perindustrian dan Perdagangan",
+    submitter_username: "admin.disperindag",
+    submitter_email: "admin.disperindag@kalbarprov.go.id"
+  },
+  {
+    id: 13,
+    application_type: "domain",
+    opd_id: 6,
+    submitter_id: 7,
+    status: "Pending",
+    submitted_at: "2025-11-13 14:00:00",
+    opd: "Dinas Tenaga Kerja dan Transmigrasi",
+    submitter_username: "admin.disnakertrans",
+    submitter_email: "admin.disnakertrans@kalbarprov.go.id"
+  },
+  // === REJECTED DOMAIN APPLICATION ===
+  {
+    id: 14,
+    application_type: "domain",
+    opd_id: 12,
+    submitter_id: 13,
+    status: "Rejected",
+    reason: "Nama domain tidak sesuai dengan konvensi penamaan yang ditetapkan. Gunakan format: [nama-dinas].kalbarprov.go.id",
+    submitted_at: "2025-10-20 11:30:00",
+    approved_at: "2025-10-25 14:15:00",
+    last_updated_by: 1,
+    opd: "Dinas Kehutanan",
+    submitter_username: "admin.dishut",
+    submitter_email: "admin.dishut@kalbarprov.go.id"
   },
   // === APPROVED HOSTING APPLICATIONS ===
   {
-    id: 9,
+    id: 15,
     application_type: "hosting",
     opd_id: 1,
     submitter_id: 2,
     status: "Approved",
-    submitted_at: "2024-09-15 11:00:00",
-    approved_at: "2024-09-18 14:20:00",
+    submitted_at: "2024-02-01 10:00:00",
+    approved_at: "2024-02-05 13:30:00",
     last_updated_by: 1,
     opd: "Dinas Komunikasi dan Informatika",
     submitter_username: "admin.diskominfo",
-    submitter_email: "admin.diskominfo@bandung.go.id"
+    submitter_email: "admin.diskominfo@kalbarprov.go.id"
   },
   {
-    id: 10,
+    id: 16,
     application_type: "hosting",
     opd_id: 2,
     submitter_id: 3,
     status: "Approved",
-    submitted_at: "2024-10-10 10:30:00",
-    approved_at: "2024-10-12 16:00:00",
+    submitted_at: "2024-03-15 11:30:00",
+    approved_at: "2024-03-20 14:00:00",
     last_updated_by: 1,
-    opd: "Dinas Pendidikan",
-    submitter_username: "admin.disdik",
-    submitter_email: "admin.disdik@bandung.go.id"
+    opd: "Dinas Pendidikan dan Kebudayaan",
+    submitter_username: "admin.disdikbud",
+    submitter_email: "admin.disdikbud@kalbarprov.go.id"
   },
-  // === PENDING HOSTING APPLICATION ===
   {
-    id: 11,
+    id: 17,
     application_type: "hosting",
     opd_id: 3,
     submitter_id: 4,
-    status: "Pending",
-    submitted_at: "2025-11-09 14:20:00",
+    status: "Approved",
+    submitted_at: "2024-04-20 09:00:00",
+    approved_at: "2024-04-25 11:30:00",
+    last_updated_by: 1,
     opd: "Dinas Kesehatan",
     submitter_username: "admin.dinkes",
-    submitter_email: "admin.dinkes@bandung.go.id"
+    submitter_email: "admin.dinkes@kalbarprov.go.id"
+  },
+  {
+    id: 18,
+    application_type: "hosting",
+    opd_id: 8,
+    submitter_id: 9,
+    status: "Approved",
+    submitted_at: "2024-06-10 10:15:00",
+    approved_at: "2024-06-15 13:45:00",
+    last_updated_by: 1,
+    opd: "Dinas Pariwisata",
+    submitter_username: "admin.dispar",
+    submitter_email: "admin.dispar@kalbarprov.go.id"
+  },
+  {
+    id: 19,
+    application_type: "hosting",
+    opd_id: 10,
+    submitter_id: 11,
+    status: "Approved",
+    submitted_at: "2024-07-25 08:30:00",
+    approved_at: "2024-07-30 10:00:00",
+    last_updated_by: 1,
+    opd: "Dinas Pertanian dan Hortikultura",
+    submitter_username: "admin.distanhort",
+    submitter_email: "admin.distanhort@kalbarprov.go.id"
+  },
+  // === PENDING HOSTING APPLICATIONS ===
+  {
+    id: 20,
+    application_type: "hosting",
+    opd_id: 11,
+    submitter_id: 12,
+    status: "Pending",
+    submitted_at: "2025-11-11 13:20:00",
+    opd: "Dinas Perikanan",
+    submitter_username: "admin.diskan",
+    submitter_email: "admin.diskan@kalbarprov.go.id"
+  },
+  {
+    id: 21,
+    application_type: "hosting",
+    opd_id: 13,
+    submitter_id: 14,
+    status: "Pending",
+    submitted_at: "2025-11-13 10:45:00",
+    opd: "Dinas Lingkungan Hidup",
+    submitter_username: "admin.dlh",
+    submitter_email: "admin.dlh@kalbarprov.go.id"
+  },
+  // === REJECTED HOSTING APPLICATION ===
+  {
+    id: 22,
+    application_type: "hosting",
+    opd_id: 4,
+    submitter_id: 5,
+    status: "Rejected",
+    reason: "Spesifikasi teknis yang diajukan tidak memenuhi standar minimum untuk aplikasi yang akan di-hosting",
+    submitted_at: "2025-10-18 09:00:00",
+    approved_at: "2025-10-22 11:30:00",
+    last_updated_by: 1,
+    opd: "Dinas Pekerjaan Umum dan Penataan Ruang",
+    submitter_username: "admin.dpupr",
+    submitter_email: "admin.dpupr@kalbarprov.go.id"
   },
 ];
 
-// ============= DOMAINS DATA (matches domains table) =============
+// ============= DOMAINS DATA - KALIMANTAN BARAT =============
 export const MOCK_DOMAINS: Domain[] = [
   {
     id: 1,
     application_id: 1,
-    domain_name: "diskominfo.bandung.go.id",
+    domain_name: "diskominfo.kalbarprov.go.id",
     status: "Active",
-    activated_at: "2024-09-20 08:00:00",
-    expires_at: "2025-09-20 08:00:00",
+    activated_at: "2024-01-20 08:00:00",
+    expires_at: "2026-01-20 08:00:00",
     opd: "Dinas Komunikasi dan Informatika",
     opd_id: 1
   },
   {
     id: 2,
     application_id: 2,
-    domain_name: "disdik.bandung.go.id",
+    domain_name: "disdikbud.kalbarprov.go.id",
     status: "Active",
-    activated_at: "2024-10-15 09:00:00",
-    expires_at: "2025-10-15 09:00:00",
-    opd: "Dinas Pendidikan",
+    activated_at: "2024-02-18 09:00:00",
+    expires_at: "2026-02-18 09:00:00",
+    opd: "Dinas Pendidikan dan Kebudayaan",
     opd_id: 2
   },
   {
     id: 3,
     application_id: 3,
-    domain_name: "dinkes.bandung.go.id",
+    domain_name: "dinkes.kalbarprov.go.id",
     status: "Active",
-    activated_at: "2024-11-01 10:00:00",
-    expires_at: "2025-11-01 10:00:00",
+    activated_at: "2024-03-12 10:00:00",
+    expires_at: "2026-03-12 10:00:00",
     opd: "Dinas Kesehatan",
     opd_id: 3
   },
   {
     id: 4,
     application_id: 4,
-    domain_name: "dpupr.bandung.go.id",
+    domain_name: "dpupr.kalbarprov.go.id",
     status: "Active",
-    activated_at: "2024-08-10 08:30:00",
-    expires_at: "2025-08-10 08:30:00",
+    activated_at: "2024-03-28 08:30:00",
+    expires_at: "2026-03-28 08:30:00",
     opd: "Dinas Pekerjaan Umum dan Penataan Ruang",
     opd_id: 4
   },
   {
     id: 5,
     application_id: 5,
-    domain_name: "dinsos.bandung.go.id",
-    status: "Suspended",
-    activated_at: "2024-06-25 11:00:00",
-    expires_at: "2025-06-25 11:00:00",
+    domain_name: "dinsos.kalbarprov.go.id",
+    status: "Active",
+    activated_at: "2024-04-15 11:00:00",
+    expires_at: "2026-04-15 11:00:00",
     opd: "Dinas Sosial",
     opd_id: 5
   },
+  {
+    id: 6,
+    application_id: 6,
+    domain_name: "dispar.kalbarprov.go.id",
+    status: "Active",
+    activated_at: "2024-05-22 09:30:00",
+    expires_at: "2026-05-22 09:30:00",
+    opd: "Dinas Pariwisata",
+    opd_id: 8
+  },
+  {
+    id: 7,
+    application_id: 7,
+    domain_name: "distanhort.kalbarprov.go.id",
+    status: "Active",
+    activated_at: "2024-06-28 10:00:00",
+    expires_at: "2026-06-28 10:00:00",
+    opd: "Dinas Pertanian dan Hortikultura",
+    opd_id: 10
+  },
+  {
+    id: 8,
+    application_id: 8,
+    domain_name: "diskan.kalbarprov.go.id",
+    status: "Active",
+    activated_at: "2024-07-18 08:00:00",
+    expires_at: "2026-07-18 08:00:00",
+    opd: "Dinas Perikanan",
+    opd_id: 11
+  },
+  {
+    id: 9,
+    application_id: 9,
+    domain_name: "dlh.kalbarprov.go.id",
+    status: "Active",
+    activated_at: "2024-08-12 11:30:00",
+    expires_at: "2026-08-12 11:30:00",
+    opd: "Dinas Lingkungan Hidup",
+    opd_id: 13
+  },
+  {
+    id: 10,
+    application_id: 10,
+    domain_name: "bappeda.kalbarprov.go.id",
+    status: "Active",
+    activated_at: "2024-09-08 09:00:00",
+    expires_at: "2026-09-08 09:00:00",
+    opd: "Badan Perencanaan Pembangunan Daerah",
+    opd_id: 15
+  },
 ];
 
-// ============= HOSTINGS DATA (matches hostings table) =============
+// ============= HOSTINGS DATA - KALIMANTAN BARAT =============
 export const MOCK_HOSTINGS: Hosting[] = [
   {
     id: 1,
-    application_id: 9,
+    application_id: 15,
     domain_id: 1,
-    storage_capacity: "10GB",
-    bandwidth: "100GB/month",
-    server_type: "Shared Hosting",
-    status: "Active",
-    activated_at: "2024-09-20 08:30:00",
-    domain_name: "diskominfo.bandung.go.id",
-    opd: "Dinas Komunikasi dan Informatika",
-    // Compatibility fields for UI
-    applicationName: "Hosting Portal Diskominfo",
-    domainName: "diskominfo.bandung.go.id",
-    submittedDate: "2024-09-15 11:00:00",
-    applicantName: "Siti Nurhaliza",
-    framework: "Laravel 10",
-    description: "Portal website resmi Dinas Komunikasi dan Informatika Kota Bandung"
-  },
-  {
-    id: 2,
-    application_id: 10,
-    domain_id: 2,
     storage_capacity: "20GB",
     bandwidth: "200GB/month",
     server_type: "VPS",
     status: "Active",
-    activated_at: "2024-10-15 09:30:00",
-    domain_name: "disdik.bandung.go.id",
-    opd: "Dinas Pendidikan",
+    activated_at: "2024-02-06 08:30:00",
+    domain_name: "diskominfo.kalbarprov.go.id",
+    opd: "Dinas Komunikasi dan Informatika",
     // Compatibility fields for UI
-    applicationName: "Hosting PPDB Online",
-    domainName: "disdik.bandung.go.id",
-    submittedDate: "2024-10-10 10:30:00",
-    applicantName: "Budi Santoso",
+    applicationName: "Portal Resmi Diskominfo Kalbar",
+    domainName: "diskominfo.kalbarprov.go.id",
+    submittedDate: "2024-02-01 10:00:00",
+    applicantName: "Rina Kusumawati",
+    framework: "Laravel 11",
+    description: "Portal website resmi Dinas Komunikasi dan Informatika Provinsi Kalimantan Barat yang menyediakan informasi layanan publik, berita teknologi informasi, dan sistem pelaporan online untuk masyarakat Kalbar"
+  },
+  {
+    id: 2,
+    application_id: 16,
+    domain_id: 2,
+    storage_capacity: "30GB",
+    bandwidth: "300GB/month",
+    server_type: "VPS",
+    status: "Active",
+    activated_at: "2024-03-22 09:30:00",
+    domain_name: "disdikbud.kalbarprov.go.id",
+    opd: "Dinas Pendidikan dan Kebudayaan",
+    // Compatibility fields for UI
+    applicationName: "Sistem PPDB Online Kalbar",
+    domainName: "disdikbud.kalbarprov.go.id",
+    submittedDate: "2024-03-15 11:30:00",
+    applicantName: "Sri Wahyuni",
     framework: "Next.js 14",
-    description: "Sistem Penerimaan Peserta Didik Baru Online"
+    description: "Sistem Penerimaan Peserta Didik Baru (PPDB) Online untuk seluruh sekolah di Kalimantan Barat, dilengkapi dengan fitur pendaftaran real-time, verifikasi dokumen digital, dan pengumuman hasil seleksi"
+  },
+  {
+    id: 3,
+    application_id: 17,
+    domain_id: 3,
+    storage_capacity: "25GB",
+    bandwidth: "250GB/month",
+    server_type: "VPS",
+    status: "Active",
+    activated_at: "2024-04-28 10:00:00",
+    domain_name: "dinkes.kalbarprov.go.id",
+    opd: "Dinas Kesehatan",
+    // Compatibility fields for UI
+    applicationName: "Sistem Informasi Kesehatan Kalbar",
+    domainName: "dinkes.kalbarprov.go.id",
+    submittedDate: "2024-04-20 09:00:00",
+    applicantName: "dr. Harisson",
+    framework: "React + Express.js",
+    description: "Portal layanan kesehatan masyarakat Kalbar meliputi informasi rumah sakit, puskesmas, jadwal posyandu, program imunisasi, dan sistem pendaftaran online untuk layanan kesehatan di seluruh Kalimantan Barat"
+  },
+  {
+    id: 4,
+    application_id: 18,
+    domain_id: 6,
+    storage_capacity: "40GB",
+    bandwidth: "400GB/month",
+    server_type: "Dedicated Server",
+    status: "Active",
+    activated_at: "2024-06-18 11:00:00",
+    domain_name: "dispar.kalbarprov.go.id",
+    opd: "Dinas Pariwisata",
+    // Compatibility fields for UI
+    applicationName: "Visit Kalimantan Barat",
+    domainName: "dispar.kalbarprov.go.id",
+    submittedDate: "2024-06-10 10:15:00",
+    applicantName: "Agustinus Teras Narang",
+    framework: "WordPress + Custom Plugin",
+    description: "Portal promosi pariwisata Kalimantan Barat yang menampilkan destinasi wisata, budaya lokal, kuliner khas, event pariwisata, paket tour, dan sistem booking online untuk wisatawan domestik dan mancanegara"
+  },
+  {
+    id: 5,
+    application_id: 19,
+    domain_id: 7,
+    storage_capacity: "15GB",
+    bandwidth: "150GB/month",
+    server_type: "Shared Hosting",
+    status: "Active",
+    activated_at: "2024-08-02 09:00:00",
+    domain_name: "distanhort.kalbarprov.go.id",
+    opd: "Dinas Pertanian dan Hortikultura",
+    // Compatibility fields for UI
+    applicationName: "Portal Agrikultur Kalbar",
+    domainName: "distanhort.kalbarprov.go.id",
+    submittedDate: "2024-07-25 08:30:00",
+    applicantName: "Ir. Suryadi",
+    framework: "CodeIgniter 4",
+    description: "Sistem informasi pertanian dan hortikultura Kalbar yang menyediakan data harga komoditas, panduan budidaya, jadwal tanam, informasi hama penyakit, dan layanan konsultasi online untuk petani"
   },
 ];
 
-// ============= DOCUMENTS DATA (matches documents table) =============
+// ============= DOCUMENTS DATA - KALIMANTAN BARAT =============
 export const MOCK_DOCUMENTS: Document[] = [
+  // Domain Application Documents
   {
     id: 1,
     application_id: 1,
-    file_name: "surat_permohonan_diskominfo.pdf",
-    file_path: "/uploads/documents/2024/09/surat_permohonan_1.pdf",
+    file_name: "surat_permohonan_diskominfo_kalbar.pdf",
+    file_path: "/uploads/documents/2024/01/surat_permohonan_diskominfo.pdf",
     file_type: "application/pdf",
-    uploaded_at: "2024-09-10 10:15:00"
+    uploaded_at: "2024-01-15 09:15:00"
   },
   {
     id: 2,
     application_id: 2,
-    file_name: "surat_permohonan_disdik.pdf",
-    file_path: "/uploads/documents/2024/10/surat_permohonan_2.pdf",
+    file_name: "surat_permohonan_disdikbud_kalbar.pdf",
+    file_path: "/uploads/documents/2024/02/surat_permohonan_disdikbud.pdf",
     file_type: "application/pdf",
-    uploaded_at: "2024-10-01 09:30:00"
+    uploaded_at: "2024-02-10 10:30:00"
   },
   {
     id: 3,
     application_id: 3,
-    file_name: "surat_permohonan_dinkes.pdf",
-    file_path: "/uploads/documents/2024/10/surat_permohonan_3.pdf",
+    file_name: "surat_permohonan_dinkes_kalbar.pdf",
+    file_path: "/uploads/documents/2024/03/surat_permohonan_dinkes.pdf",
     file_type: "application/pdf",
-    uploaded_at: "2024-10-15 08:45:00"
+    uploaded_at: "2024-03-05 08:45:00"
   },
   {
     id: 4,
-    application_id: 9,
-    file_name: "spesifikasi_hosting_diskominfo.pdf",
-    file_path: "/uploads/documents/2024/09/spesifikasi_hosting_1.pdf",
+    application_id: 6,
+    file_name: "surat_permohonan_dispar_kalbar.pdf",
+    file_path: "/uploads/documents/2024/05/surat_permohonan_dispar.pdf",
     file_type: "application/pdf",
-    uploaded_at: "2024-09-15 11:20:00"
+    uploaded_at: "2024-05-15 11:15:00"
   },
   {
     id: 5,
     application_id: 10,
-    file_name: "spesifikasi_hosting_disdik.pdf",
-    file_path: "/uploads/documents/2024/10/spesifikasi_hosting_2.pdf",
+    file_name: "surat_permohonan_bappeda_kalbar.pdf",
+    file_path: "/uploads/documents/2024/09/surat_permohonan_bappeda.pdf",
     file_type: "application/pdf",
-    uploaded_at: "2024-10-10 10:45:00"
+    uploaded_at: "2024-09-01 08:20:00"
+  },
+  // Hosting Application Documents
+  {
+    id: 6,
+    application_id: 15,
+    file_name: "spesifikasi_hosting_diskominfo.pdf",
+    file_path: "/uploads/documents/2024/02/spesifikasi_hosting_diskominfo.pdf",
+    file_type: "application/pdf",
+    uploaded_at: "2024-02-01 10:20:00"
+  },
+  {
+    id: 7,
+    application_id: 15,
+    file_name: "arsitektur_aplikasi_diskominfo.pdf",
+    file_path: "/uploads/documents/2024/02/arsitektur_aplikasi_diskominfo.pdf",
+    file_type: "application/pdf",
+    uploaded_at: "2024-02-01 10:25:00"
+  },
+  {
+    id: 8,
+    application_id: 16,
+    file_name: "spesifikasi_ppdb_online.pdf",
+    file_path: "/uploads/documents/2024/03/spesifikasi_ppdb_online.pdf",
+    file_type: "application/pdf",
+    uploaded_at: "2024-03-15 11:45:00"
+  },
+  {
+    id: 9,
+    application_id: 17,
+    file_name: "spesifikasi_sistem_kesehatan.pdf",
+    file_path: "/uploads/documents/2024/04/spesifikasi_sistem_kesehatan.pdf",
+    file_type: "application/pdf",
+    uploaded_at: "2024-04-20 09:15:00"
+  },
+  {
+    id: 10,
+    application_id: 18,
+    file_name: "proposal_visit_kalbar.pdf",
+    file_path: "/uploads/documents/2024/06/proposal_visit_kalbar.pdf",
+    file_type: "application/pdf",
+    uploaded_at: "2024-06-10 10:30:00"
+  },
+  // Pending Application Documents
+  {
+    id: 11,
+    application_id: 11,
+    file_name: "surat_permohonan_dishub_kalbar.pdf",
+    file_path: "/uploads/documents/2025/11/surat_permohonan_dishub.pdf",
+    file_type: "application/pdf",
+    uploaded_at: "2025-11-10 10:45:00"
+  },
+  {
+    id: 12,
+    application_id: 12,
+    file_name: "surat_permohonan_disperindag_kalbar.pdf",
+    file_path: "/uploads/documents/2025/11/surat_permohonan_disperindag.pdf",
+    file_type: "application/pdf",
+    uploaded_at: "2025-11-12 09:30:00"
+  },
+  {
+    id: 13,
+    application_id: 20,
+    file_name: "spesifikasi_aplikasi_perikanan.pdf",
+    file_path: "/uploads/documents/2025/11/spesifikasi_aplikasi_perikanan.pdf",
+    file_type: "application/pdf",
+    uploaded_at: "2025-11-11 13:35:00"
   },
 ];
 
-// ============= AUDIT LOGS DATA (matches audit_logs table) =============
+// ============= AUDIT LOGS DATA - KALIMANTAN BARAT =============
 export const MOCK_AUDIT_LOGS: AuditLog[] = [
+  // Domain Application Approvals
   {
     id: 1,
     user_id: 1,
     application_id: 1,
     action: "APPROVE_APPLICATION",
-    details: "Menyetujui permohonan domain diskominfo.bandung.go.id",
-    timestamp: "2024-09-12 14:30:00",
+    details: "Menyetujui permohonan domain diskominfo.kalbarprov.go.id dari Dinas Komunikasi dan Informatika",
+    timestamp: "2024-01-18 10:30:00",
     username: "superadmin",
     user_role: "Super Admin"
   },
@@ -542,8 +989,8 @@ export const MOCK_AUDIT_LOGS: AuditLog[] = [
     user_id: 1,
     application_id: 2,
     action: "APPROVE_APPLICATION",
-    details: "Menyetujui permohonan domain disdik.bandung.go.id",
-    timestamp: "2024-10-05 11:20:00",
+    details: "Menyetujui permohonan domain disdikbud.kalbarprov.go.id dari Dinas Pendidikan dan Kebudayaan",
+    timestamp: "2024-02-15 14:00:00",
     username: "superadmin",
     user_role: "Super Admin"
   },
@@ -552,145 +999,374 @@ export const MOCK_AUDIT_LOGS: AuditLog[] = [
     user_id: 1,
     application_id: 3,
     action: "APPROVE_APPLICATION",
-    details: "Menyetujui permohonan domain dinkes.bandung.go.id",
-    timestamp: "2024-10-20 10:15:00",
+    details: "Menyetujui permohonan domain dinkes.kalbarprov.go.id dari Dinas Kesehatan",
+    timestamp: "2024-03-10 11:45:00",
     username: "superadmin",
     user_role: "Super Admin"
   },
   {
     id: 4,
     user_id: 1,
-    application_id: 8,
-    action: "REJECT_APPLICATION",
-    details: "Menolak permohonan domain: Nama domain tidak sesuai konvensi",
-    timestamp: "2025-10-25 15:40:00",
+    application_id: 6,
+    action: "APPROVE_APPLICATION",
+    details: "Menyetujui permohonan domain dispar.kalbarprov.go.id dari Dinas Pariwisata",
+    timestamp: "2024-05-20 13:15:00",
+    username: "superadmin",
+    user_role: "Super Admin"
+  },
+  // Hosting Application Approvals
+  {
+    id: 5,
+    user_id: 1,
+    application_id: 15,
+    action: "APPROVE_APPLICATION",
+    details: "Menyetujui permohonan hosting Portal Resmi Diskominfo Kalbar dengan spesifikasi VPS 20GB",
+    timestamp: "2024-02-05 13:30:00",
     username: "superadmin",
     user_role: "Super Admin"
   },
   {
-    id: 5,
-    user_id: 2,
-    application_id: 1,
-    action: "SUBMIT_APPLICATION",
-    details: "Mengajukan permohonan domain diskominfo.bandung.go.id",
-    timestamp: "2024-09-10 10:00:00",
-    username: "admin.diskominfo",
-    user_role: "Admin Daerah"
-  },
-  {
     id: 6,
-    user_id: 3,
-    application_id: 2,
-    action: "SUBMIT_APPLICATION",
-    details: "Mengajukan permohonan domain disdik.bandung.go.id",
-    timestamp: "2024-10-01 09:15:00",
-    username: "admin.disdik",
-    user_role: "Admin Daerah"
+    user_id: 1,
+    application_id: 16,
+    action: "APPROVE_APPLICATION",
+    details: "Menyetujui permohonan hosting Sistem PPDB Online Kalbar dengan spesifikasi VPS 30GB",
+    timestamp: "2024-03-20 14:00:00",
+    username: "superadmin",
+    user_role: "Super Admin"
   },
   {
     id: 7,
-    user_id: 4,
-    application_id: 3,
-    action: "SUBMIT_APPLICATION",
-    details: "Mengajukan permohonan domain dinkes.bandung.go.id",
-    timestamp: "2024-10-15 08:30:00",
-    username: "admin.dinkes",
-    user_role: "Admin Daerah"
+    user_id: 1,
+    application_id: 18,
+    action: "APPROVE_APPLICATION",
+    details: "Menyetujui permohonan hosting Visit Kalimantan Barat dengan spesifikasi Dedicated Server 40GB",
+    timestamp: "2024-06-15 13:45:00",
+    username: "superadmin",
+    user_role: "Super Admin"
   },
+  // Application Rejections
   {
     id: 8,
     user_id: 1,
-    action: "ACTIVATE_DOMAIN",
-    details: "Mengaktifkan domain diskominfo.bandung.go.id",
-    timestamp: "2024-09-20 08:00:00",
+    application_id: 14,
+    action: "REJECT_APPLICATION",
+    details: "Menolak permohonan domain dari Dinas Kehutanan: Nama domain tidak sesuai konvensi penamaan",
+    timestamp: "2025-10-25 14:15:00",
     username: "superadmin",
     user_role: "Super Admin"
   },
   {
     id: 9,
     user_id: 1,
-    action: "SUSPEND_DOMAIN",
-    details: "Menangguhkan domain dinsos.bandung.go.id untuk maintenance",
-    timestamp: "2025-11-09 16:40:00",
+    application_id: 22,
+    action: "REJECT_APPLICATION",
+    details: "Menolak permohonan hosting dari DPUPR: Spesifikasi teknis tidak memenuhi standar minimum",
+    timestamp: "2025-10-22 11:30:00",
+    username: "superadmin",
+    user_role: "Super Admin"
+  },
+  // Domain Submissions
+  {
+    id: 10,
+    user_id: 2,
+    application_id: 1,
+    action: "SUBMIT_APPLICATION",
+    details: "Mengajukan permohonan domain diskominfo.kalbarprov.go.id",
+    timestamp: "2024-01-15 09:00:00",
+    username: "admin.diskominfo",
+    user_role: "Admin Daerah"
+  },
+  {
+    id: 11,
+    user_id: 3,
+    application_id: 2,
+    action: "SUBMIT_APPLICATION",
+    details: "Mengajukan permohonan domain disdikbud.kalbarprov.go.id",
+    timestamp: "2024-02-10 10:15:00",
+    username: "admin.disdikbud",
+    user_role: "Admin Daerah"
+  },
+  {
+    id: 12,
+    user_id: 4,
+    application_id: 3,
+    action: "SUBMIT_APPLICATION",
+    details: "Mengajukan permohonan domain dinkes.kalbarprov.go.id",
+    timestamp: "2024-03-05 08:30:00",
+    username: "admin.dinkes",
+    user_role: "Admin Daerah"
+  },
+  // Domain Activations
+  {
+    id: 13,
+    user_id: 1,
+    action: "ACTIVATE_DOMAIN",
+    details: "Mengaktifkan domain diskominfo.kalbarprov.go.id dengan masa aktif 2 tahun",
+    timestamp: "2024-01-20 08:00:00",
     username: "superadmin",
     user_role: "Super Admin"
   },
   {
-    id: 10,
+    id: 14,
+    user_id: 1,
+    action: "ACTIVATE_DOMAIN",
+    details: "Mengaktifkan domain disdikbud.kalbarprov.go.id dengan masa aktif 2 tahun",
+    timestamp: "2024-02-18 09:00:00",
+    username: "superadmin",
+    user_role: "Super Admin"
+  },
+  {
+    id: 15,
+    user_id: 1,
+    action: "ACTIVATE_DOMAIN",
+    details: "Mengaktifkan domain dispar.kalbarprov.go.id untuk portal pariwisata Visit Kalbar",
+    timestamp: "2024-05-22 09:30:00",
+    username: "superadmin",
+    user_role: "Super Admin"
+  },
+  // Hosting Activations
+  {
+    id: 16,
+    user_id: 1,
+    action: "ACTIVATE_HOSTING",
+    details: "Mengaktifkan hosting Portal Resmi Diskominfo Kalbar pada VPS dengan kapasitas 20GB",
+    timestamp: "2024-02-06 08:30:00",
+    username: "superadmin",
+    user_role: "Super Admin"
+  },
+  {
+    id: 17,
+    user_id: 1,
+    action: "ACTIVATE_HOSTING",
+    details: "Mengaktifkan hosting Sistem PPDB Online pada VPS dengan kapasitas 30GB",
+    timestamp: "2024-03-22 09:30:00",
+    username: "superadmin",
+    user_role: "Super Admin"
+  },
+  // Recent Activities
+  {
+    id: 18,
+    user_id: 8,
+    application_id: 11,
+    action: "SUBMIT_APPLICATION",
+    details: "Mengajukan permohonan domain untuk Dinas Perhubungan Kalbar",
+    timestamp: "2025-11-10 10:30:00",
+    username: "admin.dishub",
+    user_role: "Admin Daerah"
+  },
+  {
+    id: 19,
+    user_id: 10,
+    application_id: 12,
+    action: "SUBMIT_APPLICATION",
+    details: "Mengajukan permohonan domain untuk Dinas Perindustrian dan Perdagangan",
+    timestamp: "2025-11-12 09:15:00",
+    username: "admin.disperindag",
+    user_role: "Admin Daerah"
+  },
+  {
+    id: 20,
     user_id: 1,
     action: "LOGIN",
-    details: "Super Admin masuk ke sistem",
+    details: "Super Admin masuk ke sistem Domain Manager Kalimantan Barat",
     timestamp: "2025-11-14 08:00:00",
     username: "superadmin",
     user_role: "Super Admin"
   },
 ];
 
-// ============= NOTIFICATIONS DATA (matches notifications table) =============
+// ============= NOTIFICATIONS DATA - KALIMANTAN BARAT =============
 export const MOCK_NOTIFICATIONS: Notification[] = [
+  // Domain Approval Notifications
   {
     id: 1,
     user_id: 2,
-    message: "Permohonan domain diskominfo.bandung.go.id telah disetujui",
+    message: "Permohonan domain diskominfo.kalbarprov.go.id telah disetujui oleh Super Admin",
     type: "domain",
     status: "read",
     related_entity_type: "application",
     related_entity_id: 1,
     link: "/applications/1",
-    created_at: "2024-09-12 14:35:00",
-    read_at: "2024-09-12 15:00:00",
-    expires_at: "2025-03-12 14:35:00",
+    created_at: "2024-01-18 10:35:00",
+    read_at: "2024-01-18 11:00:00",
+    expires_at: "2026-01-18 10:35:00",
     is_email_sent: true
   },
   {
     id: 2,
     user_id: 3,
-    message: "Permohonan domain disdik.bandung.go.id telah disetujui",
+    message: "Permohonan domain disdikbud.kalbarprov.go.id telah disetujui dan siap diaktifkan",
     type: "domain",
     status: "read",
     related_entity_type: "application",
     related_entity_id: 2,
     link: "/applications/2",
-    created_at: "2024-10-05 11:25:00",
-    read_at: "2024-10-05 12:00:00",
-    expires_at: "2025-04-05 11:25:00",
+    created_at: "2024-02-15 14:05:00",
+    read_at: "2024-02-15 15:30:00",
+    expires_at: "2026-02-15 14:05:00",
     is_email_sent: true
   },
   {
     id: 3,
-    user_id: 4,
-    message: "Domain dinkes.bandung.go.id akan kedaluwarsa dalam 30 hari",
-    type: "perpanjangan",
-    status: "unread",
-    related_entity_type: "domain",
-    related_entity_id: 3,
-    link: "/domains/3",
-    created_at: "2025-11-01 08:00:00",
-    expires_at: "2026-05-01 08:00:00",
+    user_id: 9,
+    message: "Permohonan domain dispar.kalbarprov.go.id telah disetujui untuk portal Visit Kalimantan Barat",
+    type: "domain",
+    status: "read",
+    related_entity_type: "application",
+    related_entity_id: 6,
+    link: "/applications/6",
+    created_at: "2024-05-20 13:20:00",
+    read_at: "2024-05-20 14:00:00",
+    expires_at: "2026-05-20 13:20:00",
     is_email_sent: true
   },
+  // Hosting Approval Notifications
   {
     id: 4,
-    user_id: 6,
-    message: "Domain dinsos.bandung.go.id telah ditangguhkan",
-    type: "suspensi",
-    status: "unread",
-    related_entity_type: "domain",
-    related_entity_id: 5,
-    link: "/domains/5",
-    created_at: "2025-11-09 16:45:00",
-    expires_at: "2026-05-09 16:45:00",
+    user_id: 2,
+    message: "Permohonan hosting Portal Resmi Diskominfo Kalbar telah disetujui dengan spesifikasi VPS 20GB",
+    type: "hosting",
+    status: "read",
+    related_entity_type: "application",
+    related_entity_id: 15,
+    link: "/hosting-applications/15",
+    created_at: "2024-02-05 13:35:00",
+    read_at: "2024-02-05 14:00:00",
+    expires_at: "2026-02-05 13:35:00",
     is_email_sent: true
   },
   {
     id: 5,
+    user_id: 3,
+    message: "Hosting Sistem PPDB Online Kalbar telah aktif dan siap digunakan",
+    type: "hosting",
+    status: "read",
+    related_entity_type: "hosting",
+    related_entity_id: 2,
+    link: "/hosting/2",
+    created_at: "2024-03-22 09:35:00",
+    read_at: "2024-03-22 10:00:00",
+    expires_at: "2026-03-22 09:35:00",
+    is_email_sent: true
+  },
+  // Domain Expiry Warning Notifications
+  {
+    id: 6,
+    user_id: 2,
+    message: "Domain diskominfo.kalbarprov.go.id akan kedaluwarsa dalam 90 hari. Segera lakukan perpanjangan",
+    type: "perpanjangan",
+    status: "unread",
+    related_entity_type: "domain",
+    related_entity_id: 1,
+    link: "/domains/1",
+    created_at: "2025-10-22 08:00:00",
+    expires_at: "2026-04-22 08:00:00",
+    is_email_sent: true
+  },
+  {
+    id: 7,
+    user_id: 3,
+    message: "Domain disdikbud.kalbarprov.go.id akan kedaluwarsa dalam 90 hari. Harap segera perpanjang domain",
+    type: "perpanjangan",
+    status: "unread",
+    related_entity_type: "domain",
+    related_entity_id: 2,
+    link: "/domains/2",
+    created_at: "2025-11-20 08:00:00",
+    expires_at: "2026-05-20 08:00:00",
+    is_email_sent: true
+  },
+  // Application Rejection Notifications
+  {
+    id: 8,
+    user_id: 13,
+    message: "Permohonan domain Dinas Kehutanan ditolak. Nama domain tidak sesuai konvensi penamaan",
+    type: "domain",
+    status: "read",
+    related_entity_type: "application",
+    related_entity_id: 14,
+    link: "/applications/14",
+    created_at: "2025-10-25 14:20:00",
+    read_at: "2025-10-25 15:00:00",
+    expires_at: "2026-04-25 14:20:00",
+    is_email_sent: true
+  },
+  {
+    id: 9,
+    user_id: 5,
+    message: "Permohonan hosting DPUPR ditolak. Spesifikasi teknis tidak memenuhi standar minimum",
+    type: "hosting",
+    status: "read",
+    related_entity_type: "application",
+    related_entity_id: 22,
+    link: "/hosting-applications/22",
+    created_at: "2025-10-22 11:35:00",
+    read_at: "2025-10-22 13:00:00",
+    expires_at: "2026-04-22 11:35:00",
+    is_email_sent: true
+  },
+  // Pending Application Notifications for Super Admin
+  {
+    id: 10,
     user_id: 1,
-    message: "Ada 2 permohonan domain baru menunggu persetujuan",
+    message: "Ada 3 permohonan domain baru menunggu persetujuan dari Dishub, Disperindag, dan Disnakertrans",
     type: "system",
     status: "unread",
-    link: "/applications",
-    created_at: "2025-11-10 11:00:00",
-    expires_at: "2026-05-10 11:00:00",
+    link: "/applications?status=Pending&type=domain",
+    created_at: "2025-11-13 15:00:00",
+    expires_at: "2026-05-13 15:00:00",
+    is_email_sent: false
+  },
+  {
+    id: 11,
+    user_id: 1,
+    message: "Ada 2 permohonan hosting menunggu persetujuan dari Dinas Perikanan dan Dinas Lingkungan Hidup",
+    type: "system",
+    status: "unread",
+    link: "/hosting-applications?status=Pending",
+    created_at: "2025-11-13 15:05:00",
+    expires_at: "2026-05-13 15:05:00",
+    is_email_sent: false
+  },
+  // Recent Submission Confirmations
+  {
+    id: 12,
+    user_id: 8,
+    message: "Permohonan domain untuk Dinas Perhubungan telah diterima dan sedang dalam proses review",
+    type: "domain",
+    status: "read",
+    related_entity_type: "application",
+    related_entity_id: 11,
+    link: "/applications/11",
+    created_at: "2025-11-10 10:35:00",
+    read_at: "2025-11-10 11:00:00",
+    expires_at: "2026-05-10 10:35:00",
+    is_email_sent: true
+  },
+  {
+    id: 13,
+    user_id: 12,
+    message: "Permohonan hosting aplikasi perikanan telah diterima dan sedang dalam proses evaluasi",
+    type: "hosting",
+    status: "unread",
+    related_entity_type: "application",
+    related_entity_id: 20,
+    link: "/hosting-applications/20",
+    created_at: "2025-11-11 13:25:00",
+    expires_at: "2026-05-11 13:25:00",
+    is_email_sent: true
+  },
+  // System Maintenance Notification
+  {
+    id: 14,
+    user_id: 1,
+    message: "Maintenance server dijadwalkan pada 20 November 2025 pukul 01:00 - 05:00 WIB",
+    type: "system",
+    status: "unread",
+    link: "/settings/maintenance",
+    created_at: "2025-11-14 09:00:00",
+    expires_at: "2025-11-20 05:00:00",
     is_email_sent: false
   },
 ];
