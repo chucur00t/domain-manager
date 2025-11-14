@@ -13,7 +13,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, Search, FileText, ExternalLink } from "lucide-react";
+import { Loader2, Search, FileText } from "lucide-react";
 import type { SubdomainApplication } from "@/backend/models/types";
 import {
   Select,
@@ -291,14 +291,11 @@ function SuperAdminApplicationsContent() {
                             <Link
                               href={`/applications/${app.id}?role=${
                                 role || "Super Admin"
-                              }`}
-                              target="_blank"
-                              rel="noopener noreferrer"
+                              }&from=super-admin-applications`}
                               className="inline-flex items-center gap-1"
                             >
                               <FileText className="h-4 w-4" />
                               Lihat Detail
-                              <ExternalLink className="h-3 w-3" />
                             </Link>
                           </Button>
                         </td>
