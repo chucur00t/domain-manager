@@ -259,7 +259,19 @@ export const getHostingApplications = async () => {
 };
 
 export const getHostingApplicationById = async (id: string) => {
-  return await hostingService.getHosting(parseInt(id));
+  try {
+    // First check if it's an application (pending hosting request)
+    const application = await applicationService.getApplication(parseInt(id));
+    if (application && (application as any).application_type === 'hosting') {
+      return application;
+    }
+    
+    // If not found in applications, check hostings table
+    return await hostingService.getHosting(parseInt(id));
+  } catch (error) {
+    console.error('Error fetching hosting application:', error);
+    return null;
+  }
 };
 
 export const createHostingApplication = async (
