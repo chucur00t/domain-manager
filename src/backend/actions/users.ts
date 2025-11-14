@@ -106,7 +106,7 @@ export async function updateUser(
     // Check if email is being changed and if new email is already in use
     if (data.email !== existingUser.email) {
       const allUsers = await userService.getUsers(1, 1000, { search: data.email });
-      const emailInUse = allUsers.users.find(u => u.email === data.email);
+      const emailInUse = allUsers.users.find(u => u.email === data.email && u.id !== parseInt(id));
       
       if (emailInUse) {
         return {
@@ -116,11 +116,24 @@ export async function updateUser(
       }
     }
 
+    // Parse OPD ID - it could be either an ID string or OPD name
+    let opdId: number | undefined;
+    if (data.opd) {
+      const parsedOpd = parseInt(data.opd);
+      if (!isNaN(parsedOpd)) {
+        opdId = parsedOpd;
+      } else {
+        // If it's a name, try to find the OPD ID
+        // For now, just use undefined if it's not a number
+        opdId = undefined;
+      }
+    }
+
     await userService.updateUser(parseInt(id), {
       username: data.name,
       email: data.email,
       role: data.role,
-      opd_id: data.opd ? parseInt(data.opd) : undefined
+      opd_id: opdId
     });
 
     // Log the audit
@@ -137,7 +150,7 @@ export async function updateUser(
     console.error('Error updating user:', error);
     return {
       success: false,
-      message: 'Terjadi kesalahan saat memperbarui pengguna.',
+      message: `Terjadi kesalahan saat memperbarui pengguna: ${error instanceof Error ? error.message : 'Unknown error'}`,
     };
   }
 }
