@@ -113,8 +113,10 @@ function DomainDetailContent({ domain }: { domain: Domain }) {
   const isAdministrator = currentUserRole === 'Admin Daerah';
 
   const ActionButton = () => {
-    if (!isAdministrator) return null;
+    // Only Super Admin and Admin Daerah can manage domain status
+    if (!isSuperAdmin && !isAdministrator) return null;
 
+    // Show Deactivate button only when domain is Active
     if (domain.status === 'Active') {
       return (
         <Button size="sm" variant="destructive" className="gap-1" onClick={() => handleActionClick('deactivate')} disabled={isPending}>
@@ -123,14 +125,17 @@ function DomainDetailContent({ domain }: { domain: Domain }) {
         </Button>
       );
     }
+    
+    // Show Activate button only when domain is Suspended or Deactivated
     if (domain.status === 'Suspended' || domain.status === 'Deactivated') {
       return (
         <Button size="sm" className="gap-1" onClick={() => handleActionClick('activate')} disabled={isPending}>
            {isPending && actionType === 'activate' ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <PlayCircle className="h-3.5 w-3.5" />}
-          Aktifkan Domain
+          Aktifkan
         </Button>
       );
     }
+    
     return null;
   };
 
