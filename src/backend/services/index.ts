@@ -119,7 +119,7 @@ export const updateDomain = async (
   // Map ServiceDomain to DomainService format
   const updateData: any = {};
   if (domain.status) updateData.status = domain.status;
-  if (domain.expiryDate) updateData.expires_at = new Date(domain.expiryDate);
+  if (domain.expires_at) updateData.expires_at = new Date(domain.expires_at);
 
   await domainService.updateDomain(parseInt(id), updateData);
 };

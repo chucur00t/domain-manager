@@ -1,132 +1,151 @@
-﻿export type UserRole = 'Super Admin' | 'Admin Daerah' | 'Administrator' | 'Operator' | 'Auditor' | 'Kepala Bidang' | 'Pengelola Sistem';
-export type UserStatus = 'active' | 'inactive' | 'blocked';
+﻿export type UserRole = 'Super Admin' | 'Admin Daerah';
+export type UserStatus = 'active' | 'inactive';
 
+// Database User interface - matches users table
 export interface User {
-  id: string;
-  name: string;
+  id: number;
+  username: string;
   email: string;
   role: UserRole;
-  status: UserStatus;
+  opd_id?: number;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+  // Joined fields
   opd?: string;
-  nip?: string;
-  whatsapp?: string;
 }
 
-export interface AuditLogInput {
-  userId: string;
+// OPD interface - matches opds table
+export interface OPD {
+  id: number;
+  name: string;
+  address?: string;
+  contact_person?: string;
+  phone_number?: string;
+  created_at: string;
+}
+
+// AuditLog interface - matches audit_logs table
+export interface AuditLog {
+  id: number;
+  user_id: number;
+  application_id?: number;
   action: string;
-  resourceType: string;
-  resourceId: string;
-  description: string;
-}
-
-export interface AuditLog extends AuditLogInput {
-  id: string;
-  timestamp: string;
-  resourceId: string;
-  description: string;
-  user?: string;
-  userRole?: string;
   details?: string;
+  timestamp: string;
+  // Joined fields
+  username?: string;
+  user_role?: string;
 }
 
 export interface ChangeUserStatusRequest {
-  status: UserStatus;
+  is_active: boolean;
 }
 
-export type DomainStatus = 'active' | 'inactive' | 'expired' | 'pending';
+export type DomainStatus = 'Active' | 'Suspended' | 'Deactivated';
+export type ApplicationStatus = 'Pending' | 'Approved' | 'Rejected';
+export type ApplicationType = 'domain' | 'hosting';
 
 import { RowDataPacket } from 'mysql2';
 
 export interface DatabaseRow extends RowDataPacket {}
 
-export interface Domain extends DatabaseRow {
-  id: string;
-  hostname: string;
+// Domain interface - matches domains table
+export interface Domain {
+  id: number;
+  application_id: number;
+  domain_name: string;
   status: DomainStatus;
-  expiryDate: string;
-  opd: string;
-  parentDomain?: string;
-  activationDate?: string;
-  ttl?: string;
-  recordType?: string;
-  priority?: string;
-  destination?: string;
+  activated_at: string;
+  expires_at: string;
+  // Joined fields
+  opd?: string;
+  opd_id?: number;
 }
 
-// Service-friendly Domain interface for mock data and services
-export interface ServiceDomain {
-  id: string;
-  hostname: string;
-  status: DomainStatus;
-  expiryDate: string;
-  opd: string;
-  parentDomain?: string;
-  activationDate?: string;
-  ttl?: string;
-  recordType?: string;
-  priority?: string;
-  destination?: string;
-}
-
-export type ApplicationStatus = 'pending' | 'approved' | 'rejected' | 'pending_review' | 'pending_approval';
-
-export interface SubdomainApplication {
-  id: string;
-  userId: string;
-  domainName: string;
-  purpose: string;
+// Application interface - matches applications table
+export interface Application {
+  id: number;
+  application_type: ApplicationType;
+  opd_id: number;
+  submitter_id: number;
   status: ApplicationStatus;
-  submissionDate: string;
-  submittedDate?: string;
-  approvalDate?: string;
-  opd: string;
-  applicantName?: string;
-  description?: string;
-  documents?: string[];
-  rejectionReason?: string;
+  reason?: string;
+  submitted_at: string;
+  approved_at?: string;
+  last_updated_by?: number;
+  // Joined fields
+  opd?: string;
+  submitter_username?: string;
+  submitter_email?: string;
 }
 
-export interface HostingApplication {
-  id: string;
-  userId: string;
-  applicationName: string;
-  description: string;
-  framework: string;
-  domainName: string;
-  opd: string;
-  applicantName: string;
-  status: ApplicationStatus;
-  submittedDate: string;
-  rejectionReason?: string;
+// Hosting interface - matches hostings table
+export interface Hosting {
+  id: number;
+  application_id: number;
+  domain_id: number;
+  storage_capacity?: string;
+  bandwidth?: string;
+  server_type?: string;
+  status: 'Active' | 'Deactivated';
+  activated_at: string;
+  // Joined fields
+  domain_name?: string;
+  opd?: string;
+}
+
+// Document interface - matches documents table
+export interface Document {
+  id: number;
+  application_id: number;
+  file_name: string;
+  file_path: string;
+  file_type: string;
+  uploaded_at: string;
+}
+
+// Notification interface - matches notifications table
+export interface Notification {
+  id: number;
+  user_id: number;
+  message: string;
+  type: 'domain' | 'hosting' | 'perpanjangan' | 'suspensi' | 'deaktivasi' | 'system';
+  status: 'unread' | 'read';
+  related_entity_type?: string;
+  related_entity_id?: number;
+  link?: string;
+  created_at: string;
+  read_at?: string;
+  expires_at?: string;
+  is_email_sent: boolean;
 }
 
 // Domain Health Monitoring interface
 export interface DomainHealth {
-  id: string;
-  hostname: string;
-  isUp: boolean;
-  responseTime: number;
-  lastChecked: string;
-  ssl: {
-    isValid: boolean;
-    expiryDate?: string;
-    issuer?: string;
-  };
-  dns: {
-    hasValidRecords: boolean;
-    aRecords?: string[];
-    aaaaRecords?: string[];
-    txtRecords?: string[][];
-  };
+  id: number;
+  domain_id: number;
+  is_up: boolean;
+  response_time?: number;
+  status_code?: number;
+  ssl_valid: boolean;
+  ssl_expiry_date?: string;
+  last_checked: string;
+  error_message?: string;
 }
 
-// Role Permissions interface (for super admin roles)
-export interface RolePermissions {
-  [key: string]: {
-    c: boolean;
-    r: boolean;
-    u: boolean;
-    d: boolean;
-  };
+// Legacy compatibility types for gradual migration
+export type SubdomainApplication = Application;
+export type HostingApplication = Hosting;
+
+// Mock data compatibility interfaces (will be deprecated)
+export interface MockUser {
+  id: string;
+  name: string;
+  email: string;
+  role: UserRole;
+  status: 'active' | 'inactive';
+  opd?: string;
+  nip?: string;
+  whatsapp?: string;
 }

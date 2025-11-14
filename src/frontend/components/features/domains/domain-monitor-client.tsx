@@ -118,7 +118,7 @@ function DomainMonitorContent({ domain }: { domain: Domain }) {
         </Link>
         <div className="flex-1">
             <h1 className="text-xl font-semibold tracking-tight">
-                Monitoring: {domain.hostname}
+                Monitoring: {domain.domain_name}
             </h1>
              <p className="text-sm text-muted-foreground">
                 Ringkasan performa dan status teknis.

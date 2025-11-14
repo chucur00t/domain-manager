@@ -120,7 +120,7 @@ function HostingRegistrationFormContent() {
                     </FormControl>
                     <SelectContent>
                       {MOCK_DOMAINS.map(domain => (
-                        <SelectItem key={domain.id} value={domain.hostname}>{domain.hostname}</SelectItem>
+                        <SelectItem key={domain.id} value={domain.domain_name}>{domain.domain_name}</SelectItem>
                       ))}
                     </SelectContent>
                   </Select>

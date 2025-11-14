@@ -33,7 +33,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { useRouter, useSearchParams } from 'next/navigation';
 
 const formSchema = z.object({
-  hostname: z.string().min(3, { message: 'Hostname minimal 3 karakter.' }),
+  domain_name: z.string().min(3, { message: 'Nama domain minimal 3 karakter.' }),
   ttl: z.string().optional(),
   recordType: z.string().optional(),
   priority: z.string().optional(),
@@ -56,7 +56,7 @@ export function EditDomainForm({ domain, children }: EditDomainFormProps) {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      hostname: domain.hostname || '',
+      domain_name: domain.domain_name || '',
       ttl: domain.ttl || '',
       recordType: domain.recordType || '',
       priority: domain.priority || '',
@@ -68,7 +68,7 @@ export function EditDomainForm({ domain, children }: EditDomainFormProps) {
     startTransition(async () => {
       const result = await updateDomainInfo(
         domain.id, 
-        values.hostname,
+        values.domain_name,
         values.ttl || '',
         values.recordType || '',
         values.priority || '',
@@ -107,10 +107,10 @@ export function EditDomainForm({ domain, children }: EditDomainFormProps) {
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 py-4 max-h-[70vh] overflow-y-auto pr-6">
             <FormField
               control={form.control}
-              name="hostname"
+              name="domain_name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Hostname</FormLabel>
+                  <FormLabel>Nama Domain</FormLabel>
                   <FormControl>
                     <Input placeholder="cth: subdomain.kalbarprov.go.id" {...field} />
                   </FormControl>

@@ -82,12 +82,12 @@ export class DomainHealthService {
       }
 
       const certificate = cert.getPeerCertificate();
-      const expiryDate = new Date(certificate.valid_to).toISOString();
+      const expires_at = new Date(certificate.valid_to).toISOString();
       const isValid = Date.now() < new Date(certificate.valid_to).getTime();
 
       return {
         isValid,
-        expiryDate,
+        expiryDate: expires_at,
         issuer: certificate.issuer.CN,
       };
     } catch (error) {

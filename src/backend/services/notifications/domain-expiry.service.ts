@@ -7,11 +7,11 @@ export class DomainExpiryService {
 
   async checkDomainExpiry(domain: Domain): Promise<void> {
     const daysUntilExpiry = Math.ceil(
-      (new Date(domain.expiryDate).getTime() - new Date().getTime()) / (1000 * 3600 * 24)
+      (new Date(domain.expires_at).getTime() - new Date().getTime()) / (1000 * 3600 * 24)
     );
 
     // If domain is already expired, mark it as expired
-    if (daysUntilExpiry <= 0 && domain.status !== 'expired') {
+    if (daysUntilExpiry <= 0 && domain.status !== 'Deactivated') {
       await this.markDomainAsExpired(domain);
       await this.notifyAdminsAboutExpiredDomain(domain);
       return;
@@ -29,7 +29,7 @@ export class DomainExpiryService {
 
   private async markDomainAsExpired(domain: Domain): Promise<void> {
     // TODO: Implement the actual update in the database
-    domain.status = 'expired';
+    domain.status = 'Deactivated';
   }
 
   private async sendExpiryNotifications(domain: Domain, daysUntilExpiry: number): Promise<void> {
@@ -51,14 +51,14 @@ export class DomainExpiryService {
     for (const admin of adminUsers) {
       await emailService.sendEmail({
         to: admin.email,
-        subject: `[URGENT] Domain ${domain.hostname} has expired`,
+        subject: `[URGENT] Domain ${domain.domain_name} has expired`,
         html: `
           <h1>Domain Expiry Alert</h1>
           <p>The following domain has expired:</p>
           <ul>
-            <li>Domain: ${domain.hostname}</li>
+            <li>Domain: ${domain.domain_name}</li>
             <li>OPD: ${domain.opd}</li>
-            <li>Expiry Date: ${new Date(domain.expiryDate).toLocaleDateString('id-ID')}</li>
+            <li>Expiry Date: ${new Date(domain.expires_at).toLocaleDateString('id-ID')}</li>
           </ul>
           <p>Immediate action is required.</p>
         `

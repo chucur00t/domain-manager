@@ -13,7 +13,7 @@ interface DomainExpiryAlertProps {
 
 export function DomainExpiryAlert({ domain }: DomainExpiryAlertProps) {
   const daysUntilExpiry = Math.ceil(
-    (new Date(domain.expiryDate).getTime() - new Date().getTime()) / (1000 * 3600 * 24)
+    (new Date(domain.expires_at).getTime() - new Date().getTime()) / (1000 * 3600 * 24)
   );
 
   if (daysUntilExpiry > 30) return null;
@@ -42,9 +42,9 @@ export function DomainExpiryAlert({ domain }: DomainExpiryAlertProps) {
       <AlertDescription>
         <p>{message}</p>
         <p className="mt-2">
-          <strong>Domain:</strong> {domain.hostname}<br />
+          <strong>Domain:</strong> {domain.domain_name}<br />
           <strong>OPD:</strong> {domain.opd}<br />
-          <strong>Tanggal Kedaluwarsa:</strong> {new Date(domain.expiryDate).toLocaleDateString('id-ID')}
+          <strong>Tanggal Kedaluwarsa:</strong> {new Date(domain.expires_at).toLocaleDateString('id-ID')}
         </p>
       </AlertDescription>
     </Alert>

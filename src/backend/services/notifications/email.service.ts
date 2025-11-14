@@ -38,16 +38,16 @@ class EmailService {
 
   async sendDomainExpiryNotification(domain: Domain, user: User): Promise<boolean> {
     const daysUntilExpiry = Math.ceil(
-      (new Date(domain.expiryDate).getTime() - new Date().getTime()) / (1000 * 3600 * 24)
+      (new Date(domain.expires_at).getTime() - new Date().getTime()) / (1000 * 3600 * 24)
     );
 
     const html = `
       <h1>Pemberitahuan Kedaluwarsa Domain</h1>
-      <p>Domain <strong>${domain.hostname}</strong> akan kedaluwarsa dalam ${daysUntilExpiry} hari.</p>
+      <p>Domain <strong>${domain.domain_name}</strong> akan kedaluwarsa dalam ${daysUntilExpiry} hari.</p>
       <p>Detail domain:</p>
       <ul>
         <li>OPD: ${domain.opd}</li>
-        <li>Tanggal Kedaluwarsa: ${new Date(domain.expiryDate).toLocaleDateString('id-ID')}</li>
+        <li>Tanggal Kedaluwarsa: ${new Date(domain.expires_at).toLocaleDateString('id-ID')}</li>
         <li>Status: ${domain.status}</li>
       </ul>
       <p>Mohon segera lakukan perpanjangan domain untuk menghindari gangguan layanan.</p>
@@ -56,7 +56,7 @@ class EmailService {
 
     return this.sendEmail({
       to: user.email,
-      subject: `[PENTING] Domain ${domain.hostname} akan kedaluwarsa dalam ${daysUntilExpiry} hari`,
+      subject: `[PENTING] Domain ${domain.domain_name} akan kedaluwarsa dalam ${daysUntilExpiry} hari`,
       html,
     });
   }
