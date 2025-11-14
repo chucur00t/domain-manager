@@ -166,7 +166,7 @@ function HostingApplicationDetailContent({
           <Button
             size="sm"
             variant="destructive"
-            className="gap-1"
+            className="gap-1 w-full md:w-auto"
             onClick={() => handleActionClick("reject")}
             disabled={isPending}
           >
@@ -179,7 +179,7 @@ function HostingApplicationDetailContent({
           </Button>
           <Button
             size="sm"
-            className="gap-1"
+            className="gap-1 w-full md:w-auto"
             onClick={() => handleActionClick("approve")}
             disabled={isPending}
           >
@@ -200,7 +200,7 @@ function HostingApplicationDetailContent({
           <Button
             size="sm"
             variant="destructive"
-            className="gap-1"
+            className="gap-1 w-full md:w-auto"
             onClick={() => handleActionClick("reject")}
             disabled={isPending}
           >
@@ -213,7 +213,7 @@ function HostingApplicationDetailContent({
           </Button>
           <Button
             size="sm"
-            className="gap-1"
+            className="gap-1 w-full md:w-auto"
             onClick={() => handleActionClick("approve")}
             disabled={isPending}
           >
@@ -250,12 +250,12 @@ function HostingApplicationDetailContent({
         </div>
 
         <Card>
-          <CardContent className="p-0">
+          <CardHeader>
             <WorkflowStepper
               currentStep={currentStatusInfo.step}
               isRejected={application.status === "rejected"}
             />
-          </CardContent>
+          </CardHeader>
         </Card>
 
         {application.status === "rejected" && application.rejectionReason && (
@@ -322,7 +322,7 @@ function HostingApplicationDetailContent({
           </CardContent>
         </Card>
 
-        <div className="items-center gap-2 md:ml-auto flex md:hidden mt-6">
+        <div className="mt-6 flex items-center justify-end gap-2 md:hidden">
           {renderActionButtons()}
         </div>
       </div>
