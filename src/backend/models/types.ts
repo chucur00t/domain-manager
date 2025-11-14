@@ -13,6 +13,9 @@ export interface User {
   updated_at: string;
   // Joined fields
   opd?: string;
+  // Computed/compatibility fields
+  name?: string; // For display purposes, usually same as username
+  status?: UserStatus; // Computed from is_active
 }
 
 // OPD interface - matches opds table
@@ -61,6 +64,16 @@ export interface Domain {
   // Joined fields
   opd?: string;
   opd_id?: number;
+  // Technical/DNS fields (optional, for DNS management)
+  ttl?: string;
+  recordType?: string;
+  priority?: string;
+  destination?: string;
+  parentDomain?: string;
+  // Compatibility aliases
+  hostname?: string; // Alias for domain_name
+  expiryDate?: string; // Alias for expires_at
+  activationDate?: string; // Alias for activated_at
 }
 
 // Application interface - matches applications table
@@ -78,6 +91,10 @@ export interface Application {
   opd?: string;
   submitter_username?: string;
   submitter_email?: string;
+  // Compatibility fields
+  domainName?: string; // For display
+  submittedDate?: string; // Alias for submitted_at
+  submissionDate?: string; // Alias for submitted_at
 }
 
 // Hosting interface - matches hostings table
@@ -91,6 +108,17 @@ export interface Hosting {
   status: 'Active' | 'Deactivated';
   activated_at: string;
   // Joined fields
+  domain_name?: string;
+  opd?: string;
+  // Compatibility fields
+  applicationName?: string; // For display
+  domainName?: string; // Alias for domain_name
+  submittedDate?: string; // For display
+  rejectionReason?: string; // For rejected applications
+  applicantName?: string; // For display
+  framework?: string; // For application details
+  description?: string; // For application details
+}
   domain_name?: string;
   opd?: string;
 }
@@ -132,6 +160,20 @@ export interface DomainHealth {
   ssl_expiry_date?: string;
   last_checked: string;
   error_message?: string;
+  // Compatibility aliases
+  isUp?: boolean; // Alias for is_up
+  responseTime?: number; // Alias for response_time
+  lastChecked?: string; // Alias for last_checked
+  ssl?: {
+    isValid: boolean;
+    expiryDate?: string;
+    issuer?: string;
+  };
+  dns?: {
+    hasValidRecords: boolean;
+    aRecords?: string[];
+    aaaaRecords?: string[];
+  };
 }
 
 // Legacy compatibility types for gradual migration

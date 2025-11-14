@@ -40,23 +40,18 @@ const statusConfig: Record<DomainStatus, {
   variant: "default" | "secondary" | "destructive" | "outline";
   className: string;
 }> = {
-  pending: { 
-    text: 'Pending', 
-    variant: 'default', 
-    className: "bg-amber-500 hover:bg-amber-600" 
-  },
-  active: { 
+  Active: { 
     text: 'Aktif', 
     variant: 'secondary', 
     className: "bg-green-500 hover:bg-green-600 text-secondary-foreground" 
   },
-  inactive: { 
-    text: 'Tidak Aktif', 
+  Suspended: { 
+    text: 'Ditangguhkan', 
     variant: 'outline',
     className: "bg-gray-100 hover:bg-gray-200"
   },
-  expired: {
-    text: 'Kadaluarsa',
+  Deactivated: {
+    text: 'Tidak Aktif',
     variant: 'destructive',
     className: "bg-red-500 hover:bg-red-600"
   }
@@ -83,8 +78,8 @@ function DomainDetailContent({ domain }: { domain: Domain }) {
     
     startTransition(async () => {
       const result = actionType === 'activate' 
-        ? await activateDomain(domain.id, currentUserRole)
-        : await deactivateDomain(domain.id, currentUserRole);
+        ? await activateDomain(String(domain.id), currentUserRole)
+        : await deactivateDomain(String(domain.id), currentUserRole);
 
       if (result.success) {
         toast({ title: 'Sukses', description: result.message });
@@ -100,14 +95,14 @@ function DomainDetailContent({ domain }: { domain: Domain }) {
     if (actionType === 'activate') {
       return {
         title: 'Konfirmasi Aktivasi Domain',
-        description: `Apakah Anda yakin ingin mengaktifkan domain "${domain.hostname}"? Ini akan membuatnya dapat diakses publik.`,
+        description: `Apakah Anda yakin ingin mengaktifkan domain "${domain.domain_name}"? Ini akan membuatnya dapat diakses publik.`,
         confirmText: 'Ya, Aktifkan',
         variant: 'default' as const,
       };
     }
     return {
       title: 'Konfirmasi Penonaktifan Domain',
-      description: `Apakah Anda yakin ingin menonaktifkan domain "${domain.hostname}"? Tindakan ini dapat mengganggu layanan yang terkait.`,
+      description: `Apakah Anda yakin ingin menonaktifkan domain "${domain.domain_name}"? Tindakan ini dapat mengganggu layanan yang terkait.`,
       confirmText: 'Ya, Nonaktifkan',
       variant: 'destructive' as const,
     };
@@ -120,7 +115,7 @@ function DomainDetailContent({ domain }: { domain: Domain }) {
   const ActionButton = () => {
     if (!isAdministrator) return null;
 
-    if (domain.status === 'active') {
+    if (domain.status === 'Active') {
       return (
         <Button size="sm" variant="destructive" className="gap-1" onClick={() => handleActionClick('deactivate')} disabled={isPending}>
           {isPending && actionType === 'deactivate' ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Trash2 className="h-3.5 w-3.5" />}
@@ -128,7 +123,7 @@ function DomainDetailContent({ domain }: { domain: Domain }) {
         </Button>
       );
     }
-    if (domain.status === 'pending' || domain.status === 'inactive') {
+    if (domain.status === 'Suspended' || domain.status === 'Deactivated') {
       return (
         <Button size="sm" className="gap-1" onClick={() => handleActionClick('activate')} disabled={isPending}>
            {isPending && actionType === 'activate' ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <PlayCircle className="h-3.5 w-3.5" />}
@@ -187,7 +182,7 @@ function DomainDetailContent({ domain }: { domain: Domain }) {
         </div>
         <Card>
           <CardHeader>
-            <CardTitle>{domain.hostname}</CardTitle>
+            <CardTitle>{domain.domain_name}</CardTitle>
             <CardDescription>
               Subdomain milik {domain.opd}.
             </CardDescription>
@@ -199,7 +194,7 @@ function DomainDetailContent({ domain }: { domain: Domain }) {
                 <div className="grid md:grid-cols-2 gap-4 text-sm">
                   <div>
                     <p className="text-muted-foreground">Domain Induk</p>
-                    <p className="font-medium">{domain.parentDomain}</p>
+                    <p className="font-medium">{domain.parentDomain || 'bandung.go.id'}</p>
                   </div>
                   <div>
                     <p className="text-muted-foreground">Organisasi Perangkat Daerah (OPD)</p>
@@ -211,7 +206,7 @@ function DomainDetailContent({ domain }: { domain: Domain }) {
                   </div>
                   <div>
                     <p className="text-muted-foreground">Tanggal Dibuat/Aktivasi</p>
-                    <p className="font-medium">{domain.activationDate}</p>
+                    <p className="font-medium">{domain.activated_at}</p>
                   </div>
                 </div>
               </div>
@@ -221,7 +216,7 @@ function DomainDetailContent({ domain }: { domain: Domain }) {
                   <div className="grid md:grid-cols-2 gap-4 text-sm">
                   <div>
                     <p className="text-muted-foreground">Hostname</p>
-                    <p className="font-mono">{domain.hostname || 'N/A'}</p>
+                    <p className="font-mono">{domain.domain_name || 'N/A'}</p>
                   </div>
                   <div>
                     <p className="text-muted-foreground">TTL</p>

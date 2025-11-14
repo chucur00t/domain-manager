@@ -19,6 +19,32 @@ import type {
   DomainStatus,
 } from "@/backend/models/types";
 
+// Helper functions to add compatibility aliases
+export function addDomainAliases(domain: Domain): Domain {
+  return {
+    ...domain,
+    hostname: domain.domain_name,
+    expiryDate: domain.expires_at,
+    activationDate: domain.activated_at,
+  };
+}
+
+export function addApplicationAliases(app: Application): Application {
+  return {
+    ...app,
+    submittedDate: app.submitted_at,
+    submissionDate: app.submitted_at,
+  };
+}
+
+export function addUserAliases(user: User): User {
+  return {
+    ...user,
+    name: user.username,
+    status: user.is_active ? 'active' : 'inactive',
+  };
+}
+
 export const MOCK_ROLES = ["Super Admin", "Admin Daerah"];
 
 // ============= OPDS DATA =============
@@ -651,6 +677,10 @@ export const MOCK_NOTIFICATIONS: Notification[] = [
     is_email_sent: false
   },
 ];
+
+// Export with compatibility aliases automatically added
+export const MOCK_DOMAINS_WITH_ALIASES = MOCK_DOMAINS.map(addDomainAliases);
+export const MOCK_APPLICATIONS_WITH_ALIASES = MOCK_APPLICATIONS.map(addApplicationAliases);
 
 // Export legacy compatibility
 export const MOCK_APPLICATIONS_LEGACY = MOCK_APPLICATIONS;
