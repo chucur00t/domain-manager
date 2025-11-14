@@ -138,13 +138,13 @@ function HostingApplicationDetailContent({
         };
       case "approve":
         return {
-          title: "Konfirmasi Persetujuan Final",
-          description: `Setujui secara final permohonan hosting untuk "${application.applicationName}"?`,
+          title: "Konfirmasi Persetujuan",
+          description: `Apakah Anda yakin ingin menyetujui permohonan hosting untuk aplikasi "${application.applicationName}" dari ${application.opd}? Hosting akan segera diaktifkan setelah disetujui.`,
         };
       case "reject":
         return {
           title: "Konfirmasi Penolakan",
-          description: `Tolak permohonan hosting untuk aplikasi "${application.applicationName}"?`,
+          description: `Apakah Anda yakin ingin menolak permohonan hosting untuk aplikasi "${application.applicationName}" dari ${application.opd}? Harap berikan alasan penolakan yang jelas di bawah ini.`,
         };
       default:
         return { title: "", description: "" };
@@ -159,7 +159,8 @@ function HostingApplicationDetailContent({
   const currentStatusInfo = statusConfig[normalizedStatus] || statusConfig.pending;
 
   const renderActionButtons = () => {
-    if (isSuperAdmin && application.status === "pending_review") {
+    // Super Admin can approve/reject Pending applications
+    if (isSuperAdmin && normalizedStatus === "pending") {
       return (
         <>
           <Button
@@ -179,21 +180,21 @@ function HostingApplicationDetailContent({
           <Button
             size="sm"
             className="gap-1"
-            onClick={() => handleActionClick("forward")}
+            onClick={() => handleActionClick("approve")}
             disabled={isPending}
           >
-            {isPending && actionType === "forward" ? (
+            {isPending && actionType === "approve" ? (
               <Loader2 className="h-3.5 w-3.5 animate-spin" />
             ) : (
-              <Send className="h-3.5 w-3.5" />
+              <Check className="h-3.5 w-3.5" />
             )}
-            Lanjutkan ke Persetujuan
+            Setujui
           </Button>
         </>
       );
     }
 
-    if (isAdministrator && application.status === "pending_approval") {
+    if (isAdministrator && normalizedStatus === "pending_approval") {
       return (
         <>
           <Button
