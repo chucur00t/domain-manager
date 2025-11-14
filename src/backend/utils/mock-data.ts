@@ -448,7 +448,14 @@ export const MOCK_HOSTINGS: Hosting[] = [
     status: "Active",
     activated_at: "2024-09-20 08:30:00",
     domain_name: "diskominfo.bandung.go.id",
-    opd: "Dinas Komunikasi dan Informatika"
+    opd: "Dinas Komunikasi dan Informatika",
+    // Compatibility fields for UI
+    applicationName: "Hosting Portal Diskominfo",
+    domainName: "diskominfo.bandung.go.id",
+    submittedDate: "2024-09-15 11:00:00",
+    applicantName: "Siti Nurhaliza",
+    framework: "Laravel 10",
+    description: "Portal website resmi Dinas Komunikasi dan Informatika Kota Bandung"
   },
   {
     id: 2,
@@ -460,7 +467,14 @@ export const MOCK_HOSTINGS: Hosting[] = [
     status: "Active",
     activated_at: "2024-10-15 09:30:00",
     domain_name: "disdik.bandung.go.id",
-    opd: "Dinas Pendidikan"
+    opd: "Dinas Pendidikan",
+    // Compatibility fields for UI
+    applicationName: "Hosting PPDB Online",
+    domainName: "disdik.bandung.go.id",
+    submittedDate: "2024-10-10 10:30:00",
+    applicantName: "Budi Santoso",
+    framework: "Next.js 14",
+    description: "Sistem Penerimaan Peserta Didik Baru Online"
   },
 ];
 

@@ -82,7 +82,7 @@ function HostingApplicationsTableContent({ applications }: HostingApplicationsTa
   const [rejectionReason, setRejectionReason] = useState('');
 
   const isSuperAdmin = currentUserRole === 'Super Admin';
-  const isAdministrator = currentUserRole === 'Administrator';
+  const isAdministrator = currentUserRole === 'Admin Daerah';
 
   useEffect(() => {
     setCurrentPage(0);
@@ -115,11 +115,11 @@ function HostingApplicationsTableContent({ applications }: HostingApplicationsTa
     startTransition(async () => {
       let result;
       if (actionType === 'forward') {
-        result = await forwardHostingForApproval(selectedApplication.id, currentUserRole);
+        result = await forwardHostingForApproval(String(selectedApplication.id), currentUserRole);
       } else if (actionType === 'approve') {
-        result = await approveHostingApplication(selectedApplication.id, currentUserRole);
+        result = await approveHostingApplication(String(selectedApplication.id), currentUserRole);
       } else {
-        result = await rejectHostingApplication(selectedApplication.id, rejectionReason, currentUserRole);
+        result = await rejectHostingApplication(String(selectedApplication.id), rejectionReason, currentUserRole);
       }
 
       if (result.success) {

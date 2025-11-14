@@ -72,7 +72,7 @@ function HostingApplicationDetailContent({
   const [rejectionReason, setRejectionReason] = useState("");
 
   const isSuperAdmin = currentUserRole === "Super Admin";
-  const isAdministrator = currentUserRole === "Administrator";
+  const isAdministrator = currentUserRole === "Admin Daerah";
 
   const handleActionClick = (action: "forward" | "approve" | "reject") => {
     setActionType(action);
@@ -96,17 +96,17 @@ function HostingApplicationDetailContent({
       let result;
       if (actionType === "forward") {
         result = await forwardHostingForApproval(
-          application.id,
+          String(application.id),
           currentUserRole
         );
       } else if (actionType === "approve") {
         result = await approveHostingApplication(
-          application.id,
+          String(application.id),
           currentUserRole
         );
       } else {
         result = await rejectHostingApplication(
-          application.id,
+          String(application.id),
           rejectionReason,
           currentUserRole
         );
