@@ -121,7 +121,7 @@ function UsersTableContent({ users, onUserAction }: UsersTableProps) {
                 {currentUsers.length > 0 ? (
                   currentUsers.map((user) => (
                     <TableRow key={user.id}>
-                      <TableCell className="font-medium">{user.name}</TableCell>
+                      <TableCell className="font-medium">{user.username || user.name}</TableCell>
                       <TableCell>{user.email}</TableCell>
                       <TableCell>
                         <Badge

@@ -113,7 +113,7 @@ function EditUserFormContent({
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      name: user?.name || "",
+      name: user?.username || user?.name || "",
       email: user?.email || "",
       role:
         user?.role === "Super Admin" || user?.role === "Admin Daerah"
@@ -140,7 +140,7 @@ function EditUserFormContent({
           : "Admin Daerah";
 
       form.reset({
-        name: user.name,
+        name: user.username || user.name,
         email: user.email,
         role: validRole,
         opd: user.opd || "",
@@ -160,7 +160,7 @@ function EditUserFormContent({
         formData.append("opd", values.opd);
       }
 
-      const result = await updateUser(user!.id, {
+      const result = await updateUser(String(user!.id), {
         name: values.name,
         email: values.email,
         role: values.role,
@@ -188,7 +188,7 @@ function EditUserFormContent({
     if (!user) return;
 
     startDeleteTransition(async () => {
-      const result = await deleteUser(user.id);
+      const result = await deleteUser(String(user.id));
 
       if (result.success) {
         toast({
@@ -211,8 +211,9 @@ function EditUserFormContent({
   const handleToggleStatus = () => {
     if (!user) return;
     startStatusUpdateTransition(async () => {
-      const newStatus = user.status === "active" ? "inactive" : "active";
-      const result = await updateUserStatus(user.id, newStatus);
+      const currentStatus = user.is_active ? "active" : "inactive";
+      const newStatus = currentStatus === "active" ? "inactive" : "active";
+      const result = await updateUserStatus(String(user.id), newStatus);
       if (result.success) {
         toast({
           title: "Status Diperbarui",
@@ -238,24 +239,24 @@ function EditUserFormContent({
           <DialogHeader>
             <DialogTitle>Ubah Pengguna</DialogTitle>
             <DialogDescription>
-              Perbarui detail untuk pengguna {user.name}.
+              Perbarui detail untuk pengguna {user.username || user.name}.
             </DialogDescription>
           </DialogHeader>
           <div className="flex flex-col sm:flex-row gap-4 py-4">
             <div className="w-full sm:w-1/2 flex flex-col gap-4">
               <Button
-                variant={user.status === "active" ? "outline" : "default"}
+                variant={(user.is_active ?? user.status === "active") ? "outline" : "default"}
                 onClick={handleToggleStatus}
                 disabled={isProcessing}
               >
                 {isStatusUpdating ? (
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                ) : user.status === "active" ? (
+                ) : (user.is_active ?? user.status === "active") ? (
                   <ToggleLeft className="mr-2 h-4 w-4" />
                 ) : (
                   <ToggleRight className="mr-2 h-4 w-4" />
                 )}
-                {user.status === "active"
+                {(user.is_active ?? user.status === "active")
                   ? "Nonaktifkan Akun"
                   : "Aktifkan Akun"}
               </Button>
@@ -401,7 +402,7 @@ function EditUserFormContent({
           <AlertDialogHeader>
             <AlertDialogTitle>Konfirmasi Penghapusan</AlertDialogTitle>
             <AlertDialogDescription>
-              Apakah Anda yakin ingin menghapus pengguna "{user?.name}"?
+              Apakah Anda yakin ingin menghapus pengguna "{user?.username || user?.name}"?
               Tindakan ini tidak dapat dibatalkan.
             </AlertDialogDescription>
           </AlertDialogHeader>
