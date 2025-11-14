@@ -538,13 +538,13 @@ function SuperAdminOPDsContent() {
                   <div>{selectedOPD.contactPerson}</div>
 
                   <div className="text-muted-foreground">Email:</div>
-                  <div>{selectedOPD.email}</div>
+                  <div className="break-all">{selectedOPD.email}</div>
 
                   <div className="text-muted-foreground">Telepon:</div>
                   <div>{selectedOPD.phone}</div>
 
                   <div className="text-muted-foreground">Alamat:</div>
-                  <div className="col-span-1">{selectedOPD.address}</div>
+                  <div className="col-span-1 break-words">{selectedOPD.address}</div>
                 </div>
 
                 <div className="border-t pt-4">
