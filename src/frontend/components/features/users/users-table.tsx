@@ -23,6 +23,7 @@ import { EditUserForm } from "./edit-user-form";
 import { useSearchParams } from "next/navigation";
 import React from "react";
 import { cn } from "@/utils/utils";
+import { MOCK_USERS } from "@/backend/utils/mock-data";
 
 type UsersTableProps = {
   users: User[];
@@ -47,9 +48,10 @@ function UsersTableContent({ users, onUserAction }: UsersTableProps) {
   const [currentPage, setCurrentPage] = useState(0);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
 
+  // Get current logged-in user from MOCK_USERS
   const currentUser = useMemo(
-    () => users.find((u) => u.role === currentUserRole),
-    [users, currentUserRole]
+    () => MOCK_USERS.find((u) => u.role === currentUserRole),
+    [currentUserRole]
   );
 
   const canManageUsers = useMemo(() => {
@@ -90,12 +92,13 @@ function UsersTableContent({ users, onUserAction }: UsersTableProps) {
 
     if (currentUser.role === "Super Admin") {
       // Super Admin can edit anyone but themselves
-      return userToEdit.id !== currentUser.id;
+      // Compare email instead of ID since MOCK_USERS use string IDs and database users use number IDs
+      return userToEdit.email !== currentUser.email;
     }
 
     if (currentUser.role === "Admin Daerah") {
       // Admin Daerah can only edit users in their own OPD
-      return userToEdit.opd === currentUser.opd;
+      return userToEdit.opd === currentUser.opd && userToEdit.email !== currentUser.email;
     }
     return false;
   };
