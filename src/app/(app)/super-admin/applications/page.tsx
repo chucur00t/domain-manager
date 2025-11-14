@@ -289,7 +289,11 @@ function SuperAdminApplicationsContent() {
                         <td className="px-4 py-3 text-right">
                           <Button size="sm" variant="outline" asChild>
                             <Link
-                              href={`/applications/${app.id}?role=${
+                              href={`${
+                                (app as any).application_type === "hosting"
+                                  ? "/hosting"
+                                  : "/applications"
+                              }/${app.id}?role=${
                                 role || "Super Admin"
                               }&from=super-admin-applications`}
                               className="inline-flex items-center gap-1"
