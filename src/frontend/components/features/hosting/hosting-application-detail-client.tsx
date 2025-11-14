@@ -153,7 +153,10 @@ function HostingApplicationDetailContent({
 
   const { title: dialogTitle, description: dialogDescription } =
     getDialogContent();
-  const currentStatusInfo = statusConfig[application.status];
+  
+  // Normalize status to lowercase to match statusConfig keys
+  const normalizedStatus = application.status.toLowerCase() as keyof typeof statusConfig;
+  const currentStatusInfo = statusConfig[normalizedStatus] || statusConfig.pending;
 
   const renderActionButtons = () => {
     if (isSuperAdmin && application.status === "pending_review") {

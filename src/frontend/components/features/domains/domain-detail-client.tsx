@@ -143,10 +143,10 @@ function DomainDetailContent({ domain }: { domain: Domain }) {
               Detail Domain
           </h1>
           <Badge 
-            variant={statusConfig[domain.status].variant} 
-            className={cn("ml-auto sm:ml-0", statusConfig[domain.status].className)}
+            variant={statusConfig[domain.status]?.variant || "default"} 
+            className={cn("ml-auto sm:ml-0", statusConfig[domain.status]?.className)}
         >
-              {statusConfig[domain.status].text}
+              {statusConfig[domain.status]?.text || domain.status}
           </Badge>
           <div className="hidden items-center gap-2 md:ml-auto md:flex">
               <ActionButton />
@@ -202,7 +202,7 @@ function DomainDetailContent({ domain }: { domain: Domain }) {
                   </div>
                   <div>
                     <p className="text-muted-foreground">Status</p>
-                    <p className="font-medium capitalize">{statusConfig[domain.status].text}</p>
+                    <p className="font-medium capitalize">{statusConfig[domain.status]?.text || domain.status}</p>
                   </div>
                   <div>
                     <p className="text-muted-foreground">Tanggal Dibuat/Aktivasi</p>
