@@ -40,8 +40,10 @@ function SuperAdminApplicationsTableContent({
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>Nama Subdomain</TableHead>
+            <TableHead>Tanggal</TableHead>
+            <TableHead>Domain</TableHead>
             <TableHead>OPD</TableHead>
+            <TableHead>Tujuan</TableHead>
             <TableHead>Status</TableHead>
           </TableRow>
         </TableHeader>
@@ -49,15 +51,25 @@ function SuperAdminApplicationsTableContent({
           {applications.length > 0 ? (
             applications.map((app) => (
               <TableRow key={app.id}>
+                <TableCell className="text-sm">
+                  {app.submittedDate || app.submissionDate
+                    ? new Date(app.submittedDate || app.submissionDate || "").toLocaleDateString("id-ID")
+                    : "-"}
+                </TableCell>
                 <TableCell className="font-medium">
                   <Link
                     href={`/applications/${app.id}${roleQuery}`}
                     className="hover:underline"
                   >
-                    {app.domainName || `Application ${app.id}`}
+                    <code className="bg-muted px-2 py-1 rounded text-xs">
+                      {app.domainName || `Application ${app.id}`}
+                    </code>
                   </Link>
                 </TableCell>
-                <TableCell>{app.opd}</TableCell>
+                <TableCell className="text-sm">{app.opd}</TableCell>
+                <TableCell className="text-sm max-w-xs truncate">
+                  {app.description || app.purpose || "-"}
+                </TableCell>
                 <TableCell>
                   <Badge variant={statusConfig[app.status]?.variant || "default"}>
                     {statusConfig[app.status]?.text || app.status}
@@ -67,7 +79,7 @@ function SuperAdminApplicationsTableContent({
             ))
           ) : (
             <TableRow>
-              <TableCell colSpan={3} className="h-24 text-center">
+              <TableCell colSpan={5} className="h-24 text-center">
                 Tidak ada data permohonan.
               </TableCell>
             </TableRow>

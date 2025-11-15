@@ -33,7 +33,7 @@ function AppLayoutContent({ children }: { children: ReactNode }) {
     return (
         <SidebarProvider>
         <Sidebar>
-            <SidebarHeader>
+            <SidebarHeader className="border-b">
                 <div className="flex items-center gap-3 w-full">
                     <Logo />
                     <div className="flex flex-col">

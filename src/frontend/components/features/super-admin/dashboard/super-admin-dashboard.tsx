@@ -62,9 +62,12 @@ export function SuperAdminDashboard({ role }: Props) {
           fetch("/api/users"),
         ]);
 
-        const domains: Domain[] = await domainsRes.json();
-        const applications: SubdomainApplication[] = await appsRes.json();
-        const users: User[] = await usersRes.json();
+        const domainsData = await domainsRes.json();
+        const domains: Domain[] = Array.isArray(domainsData) ? domainsData : [];
+        const applicationsData = await appsRes.json();
+        const applications: SubdomainApplication[] = Array.isArray(applicationsData) ? applicationsData : [];
+        const usersData = await usersRes.json();
+        const users: User[] = Array.isArray(usersData) ? usersData : [];
 
         console.log("Dashboard data fetched:", {
           domainsCount: domains.length,
