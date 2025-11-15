@@ -43,6 +43,8 @@ export function SuperAdminDashboard({ role }: Props) {
     totalUsersCount: 0,
     totalOpdCount: 0,
   });
+
+  console.log("SuperAdminDashboard rendered with stats:", stats);
   const [applicationsByOpd, setApplicationsByOpd] = useState<
     { opd: string; applications: number }[]
   >([]);
@@ -64,6 +66,12 @@ export function SuperAdminDashboard({ role }: Props) {
         const applications: SubdomainApplication[] = await appsRes.json();
         const users: User[] = await usersRes.json();
 
+        console.log("Dashboard data fetched:", {
+          domainsCount: domains.length,
+          applicationsCount: applications.length,
+          usersCount: users.length,
+        });
+
         const opdList = [...new Set(applications.map((app) => app.opd))];
         const appCounts = opdList
           .map((opd) => ({
@@ -73,20 +81,32 @@ export function SuperAdminDashboard({ role }: Props) {
           .sort((a, b) => b.applications - a.applications)
           .slice(0, 5);
 
-        setStats({
+        const calculatedStats = {
           activeDomainsCount: domains.filter((d) => d.status === "active")
             .length,
           pendingApplicationsCount: applications.filter(
-            (a) => a.status === "pending_review"
+            (a) =>
+              a.status === "pending" ||
+              a.status === "pending_review" ||
+              a.status === "pending_approval"
           ).length,
           totalUsersCount: users.length,
           totalOpdCount: opdList.length,
-        });
+        };
+
+        console.log("Calculated stats:", calculatedStats);
+
+        setStats(calculatedStats);
 
         setApplicationsByOpd(appCounts);
 
         const sortedRecent = [...applications]
-          .filter((a) => a.status === "pending_review")
+          .filter(
+            (a) =>
+              a.status === "pending" ||
+              a.status === "pending_review" ||
+              a.status === "pending_approval"
+          )
           .sort((a, b) => {
             const dateA = a.submittedDate || a.submissionDate || "";
             const dateB = b.submittedDate || b.submissionDate || "";
@@ -142,7 +162,7 @@ export function SuperAdminDashboard({ role }: Props) {
           description="Jumlah seluruh domain yang aktif."
         />
         <StatCard
-          title="Permohonan Perlu Direview"
+          title="Permohonan Belum Disetujui"
           value={stats.pendingApplicationsCount}
           icon={<FileText className="h-4 w-4 text-amber-500" />}
           description="Permohonan yang menunggu review teknis."
@@ -202,9 +222,9 @@ export function SuperAdminDashboard({ role }: Props) {
         </Card>
         <Card className="animate-fade-in" style={{ animationDelay: "300ms" }}>
           <CardHeader>
-            <CardTitle>Permohonan Terbaru untuk Direview</CardTitle>
+            <CardTitle>Permohonan Belum Disetujui</CardTitle>
             <CardDescription>
-              5 permohonan terakhir yang membutuhkan review.
+              5 permohonan terakhir yang masih dalam status pending.
             </CardDescription>
           </CardHeader>
           <CardContent>

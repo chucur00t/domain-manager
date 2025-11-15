@@ -1,20 +1,28 @@
+"use client";
 
-'use client';
-
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter, useSearchParams } from "next/navigation";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button, buttonVariants } from '@/components/ui/button';
-import { ArrowLeft, Check, X, Loader2, Info, Server, Code, Send } from 'lucide-react';
-import { Separator } from '@/components/ui/separator';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { useState, useTransition, Suspense } from 'react';
+} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button, buttonVariants } from "@/components/ui/button";
+import {
+  ArrowLeft,
+  Check,
+  X,
+  Loader2,
+  Info,
+  Server,
+  Code,
+  Send,
+} from "lucide-react";
+import { Separator } from "@/components/ui/separator";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { useState, useTransition, Suspense } from "react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -24,78 +32,97 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
-import { useToast } from '@/hooks/use-toast';
-import { approveHostingApplication, rejectHostingApplication, forwardHostingForApproval } from '@/backend/actions/hosting';
-import { cn } from '@/utils/utils';
-import { Textarea } from '@/components/ui/textarea';
-import { Label } from '@/components/ui/label';
-import type { HostingApplication, User } from '@/backend/models/types';
-import { WorkflowStepper } from '@/components/shared/workflow-stepper';
-import { BackButton } from '@/components/shared/back-button';
+} from "@/components/ui/alert-dialog";
+import { useToast } from "@/hooks/use-toast";
+import {
+  approveHostingApplication,
+  rejectHostingApplication,
+  forwardHostingForApproval,
+} from "@/backend/actions/hosting";
+import { cn } from "@/utils/utils";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import type { HostingApplication, User } from "@/backend/models/types";
+import { WorkflowStepper } from "@/components/shared/workflow-stepper";
+import { BackButton } from "@/components/shared/back-button";
 
-
+// Simplified status config - only 3 main statuses
 const statusConfig = {
-  pending: { text: 'Menunggu', variant: 'default' as const, step: 0 },
-  pending_review: { text: 'Menunggu Review Admin', variant: 'default' as const, step: 1 },
-  pending_approval: { text: 'Menunggu Persetujuan', variant: 'default' as const, step: 2 },
-  approved: { text: 'Disetujui', variant: 'secondary' as const, step: 3 },
-  rejected: { text: 'Ditolak', variant: 'destructive' as const, step: 0 },
+  pending: { text: "Pending", variant: "default" as const, step: 0 },
+  pending_review: { text: "Pending", variant: "default" as const, step: 1 },
+  pending_approval: { text: "Pending", variant: "default" as const, step: 2 },
+  approved: { text: "Disetujui", variant: "secondary" as const, step: 3 },
+  rejected: { text: "Ditolak", variant: "destructive" as const, step: 0 },
 };
 
-function HostingApplicationDetailContent({ application }: { application: HostingApplication }) {
+function HostingApplicationDetailContent({
+  application,
+}: {
+  application: HostingApplication;
+}) {
   const { toast } = useToast();
   const router = useRouter();
   const searchParams = useSearchParams();
-  const currentUserRole = searchParams.get('role') as User['role'];
+  const currentUserRole = searchParams.get("role") as User["role"];
   const [isPending, startTransition] = useTransition();
   const [isAlertOpen, setIsAlertOpen] = useState(false);
-  const [actionType, setActionType] = useState<'forward' | 'approve' | 'reject' | null>(null);
-  const [rejectionReason, setRejectionReason] = useState('');
+  const [actionType, setActionType] = useState<
+    "forward" | "approve" | "reject" | null
+  >(null);
+  const [rejectionReason, setRejectionReason] = useState("");
 
-  const isSuperAdmin = currentUserRole === 'Super Admin';
-  const isAdministrator = currentUserRole === 'Administrator';
+  const isSuperAdmin = currentUserRole === "Super Admin";
+  const isAdministrator = currentUserRole === "Administrator";
 
-
-  const handleActionClick = (action: 'forward' | 'approve' | 'reject') => {
+  const handleActionClick = (action: "forward" | "approve" | "reject") => {
     setActionType(action);
-    setRejectionReason('');
+    setRejectionReason("");
     setIsAlertOpen(true);
   };
 
   const handleConfirmAction = async () => {
     if (!actionType || !currentUserRole) return;
-    
-    if (actionType === 'reject' && !rejectionReason.trim()) {
-        toast({
-            title: 'Validasi Gagal',
-            description: 'Alasan penolakan harus diisi.',
-            variant: 'destructive'
-        });
-        return;
+
+    if (actionType === "reject" && !rejectionReason.trim()) {
+      toast({
+        title: "Validasi Gagal",
+        description: "Alasan penolakan harus diisi.",
+        variant: "destructive",
+      });
+      return;
     }
 
     startTransition(async () => {
       let result;
-       if (actionType === 'forward') {
-        result = await forwardHostingForApproval(application.id, currentUserRole);
-      } else if (actionType === 'approve') {
-        result = await approveHostingApplication(application.id, currentUserRole);
+      if (actionType === "forward") {
+        result = await forwardHostingForApproval(
+          application.id,
+          currentUserRole
+        );
+      } else if (actionType === "approve") {
+        result = await approveHostingApplication(
+          application.id,
+          currentUserRole
+        );
       } else {
-        result = await rejectHostingApplication(application.id, rejectionReason, currentUserRole);
+        result = await rejectHostingApplication(
+          application.id,
+          rejectionReason,
+          currentUserRole
+        );
       }
 
       if (result.success) {
         toast({
-          title: 'Sukses',
+          title: "Sukses",
           description: result.message,
         });
-        router.refresh(); 
+        router.refresh();
       } else {
         toast({
-          title: 'Error',
+          title: "Error",
           description: result.message,
-          variant: 'destructive',
+          variant: "destructive",
         });
       }
       setIsAlertOpen(false);
@@ -103,175 +130,225 @@ function HostingApplicationDetailContent({ application }: { application: Hosting
   };
 
   const getDialogContent = () => {
-    switch(actionType) {
-        case 'forward':
-            return {
-                title: 'Konfirmasi Lanjutkan Permohonan',
-                description: `Lanjutkan permohonan hosting untuk "${application.applicationName}" ke tahap persetujuan final?`,
-            };
-        case 'approve':
-            return {
-                title: 'Konfirmasi Persetujuan Final',
-                description: `Setujui secara final permohonan hosting untuk "${application.applicationName}"?`,
-            };
-        case 'reject':
-            return {
-                title: 'Konfirmasi Penolakan',
-                description: `Tolak permohonan hosting untuk aplikasi "${application.applicationName}"?`,
-            };
-        default:
-            return { title: '', description: '' };
+    switch (actionType) {
+      case "forward":
+        return {
+          title: "Konfirmasi Lanjutkan Permohonan",
+          description: `Lanjutkan permohonan hosting untuk "${application.applicationName}" ke tahap persetujuan final?`,
+        };
+      case "approve":
+        return {
+          title: "Konfirmasi Persetujuan Final",
+          description: `Setujui secara final permohonan hosting untuk "${application.applicationName}"?`,
+        };
+      case "reject":
+        return {
+          title: "Konfirmasi Penolakan",
+          description: `Tolak permohonan hosting untuk aplikasi "${application.applicationName}"?`,
+        };
+      default:
+        return { title: "", description: "" };
     }
-  }
+  };
 
-  const { title: dialogTitle, description: dialogDescription } = getDialogContent();
+  const { title: dialogTitle, description: dialogDescription } =
+    getDialogContent();
   const currentStatusInfo = statusConfig[application.status];
 
   const renderActionButtons = () => {
-    if (isSuperAdmin && application.status === 'pending_review') {
-        return (
-            <>
-                <Button size="sm" variant="destructive" className="gap-1" onClick={() => handleActionClick('reject')} disabled={isPending}>
-                    {isPending && actionType === 'reject' ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <X className="h-3.5 w-3.5" />}
-                    Tolak
-                </Button>
-                <Button size="sm" className="gap-1" onClick={() => handleActionClick('forward')} disabled={isPending}>
-                    {isPending && actionType === 'forward' ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Send className="h-3.5 w-3.5" />}
-                    Lanjutkan ke Persetujuan
-                </Button>
-            </>
-        )
+    if (isSuperAdmin && application.status === "pending_review") {
+      return (
+        <>
+          <Button
+            size="sm"
+            variant="destructive"
+            className="gap-1"
+            onClick={() => handleActionClick("reject")}
+            disabled={isPending}
+          >
+            {isPending && actionType === "reject" ? (
+              <Loader2 className="h-3.5 w-3.5 animate-spin" />
+            ) : (
+              <X className="h-3.5 w-3.5" />
+            )}
+            Tolak
+          </Button>
+          <Button
+            size="sm"
+            className="gap-1"
+            onClick={() => handleActionClick("forward")}
+            disabled={isPending}
+          >
+            {isPending && actionType === "forward" ? (
+              <Loader2 className="h-3.5 w-3.5 animate-spin" />
+            ) : (
+              <Send className="h-3.5 w-3.5" />
+            )}
+            Lanjutkan ke Persetujuan
+          </Button>
+        </>
+      );
     }
 
-    if (isAdministrator && application.status === 'pending_approval') {
-         return (
-            <>
-                <Button size="sm" variant="destructive" className="gap-1" onClick={() => handleActionClick('reject')} disabled={isPending}>
-                    {isPending && actionType === 'reject' ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <X className="h-3.5 w-3.5" />}
-                    Tolak
-                </Button>
-                <Button size="sm" className="gap-1" onClick={() => handleActionClick('approve')} disabled={isPending}>
-                    {isPending && actionType === 'approve' ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Check className="h-3.5 w-3.5" />}
-                    Setujui (Final)
-                </Button>
-            </>
-         )
+    if (isAdministrator && application.status === "pending_approval") {
+      return (
+        <>
+          <Button
+            size="sm"
+            variant="destructive"
+            className="gap-1"
+            onClick={() => handleActionClick("reject")}
+            disabled={isPending}
+          >
+            {isPending && actionType === "reject" ? (
+              <Loader2 className="h-3.5 w-3.5 animate-spin" />
+            ) : (
+              <X className="h-3.5 w-3.5" />
+            )}
+            Tolak
+          </Button>
+          <Button
+            size="sm"
+            className="gap-1"
+            onClick={() => handleActionClick("approve")}
+            disabled={isPending}
+          >
+            {isPending && actionType === "approve" ? (
+              <Loader2 className="h-3.5 w-3.5 animate-spin" />
+            ) : (
+              <Check className="h-3.5 w-3.5" />
+            )}
+            Setujui (Final)
+          </Button>
+        </>
+      );
     }
     return null;
-  }
+  };
 
   return (
     <>
-    <div className="flex flex-col gap-6">
-       <div className="flex items-center gap-4">
-        <BackButton />
-        <h1 className="flex-1 shrink-0 whitespace-nowrap text-xl font-semibold tracking-tight sm:grow-0">
+      <div className="flex flex-col gap-6">
+        <div className="flex items-center gap-4">
+          <BackButton />
+          <h1 className="flex-1 shrink-0 whitespace-nowrap text-xl font-semibold tracking-tight sm:grow-0">
             Detail Permohonan Hosting
-        </h1>
-        <Badge variant={currentStatusInfo.variant} className="ml-auto sm:ml-0">
+          </h1>
+          <Badge
+            variant={currentStatusInfo.variant}
+            className="ml-auto sm:ml-0"
+          >
             {currentStatusInfo.text}
-        </Badge>
-        <div className="hidden items-center gap-2 md:ml-auto md:flex">
+          </Badge>
+          <div className="hidden items-center gap-2 md:ml-auto md:flex">
             {renderActionButtons()}
+          </div>
         </div>
-      </div>
-      
-       <Card>
+
+        <Card>
           <CardContent className="p-0">
             <WorkflowStepper
-                currentStep={currentStatusInfo.step}
-                isRejected={application.status === 'rejected'}
-              />
+              currentStep={currentStatusInfo.step}
+              isRejected={application.status === "rejected"}
+            />
           </CardContent>
-      </Card>
+        </Card>
 
-       {application.status === 'rejected' && application.rejectionReason && (
-        <Alert variant="destructive">
-          <Info className="h-4 w-4" />
-          <AlertTitle>Alasan Penolakan</AlertTitle>
-          <AlertDescription>
-            {application.rejectionReason}
-          </AlertDescription>
-        </Alert>
-      )}
+        {application.status === "rejected" && application.rejectionReason && (
+          <Alert variant="destructive">
+            <Info className="h-4 w-4" />
+            <AlertTitle>Alasan Penolakan</AlertTitle>
+            <AlertDescription>{application.rejectionReason}</AlertDescription>
+          </Alert>
+        )}
 
-      <Card>
+        <Card>
           <CardHeader>
-              <CardTitle>{application.applicationName}</CardTitle>
-              <CardDescription>
-                  Permohonan untuk domain {application.domainName} oleh {application.opd} pada {application.submittedDate}.
-              </CardDescription>
+            <CardTitle>{application.applicationName}</CardTitle>
+            <CardDescription>
+              Permohonan untuk domain {application.domainName} oleh{" "}
+              {application.opd} pada {application.submittedDate}.
+            </CardDescription>
           </CardHeader>
           <CardContent>
-          <div className="space-y-6">
+            <div className="space-y-6">
               <div>
-              <h3 className="font-semibold text-lg mb-2">Detail Pemohon</h3>
-              <div className="grid md:grid-cols-2 gap-4 text-sm">
+                <h3 className="font-semibold text-lg mb-2">Detail Pemohon</h3>
+                <div className="grid md:grid-cols-2 gap-4 text-sm">
                   <div>
-                  <p className="text-muted-foreground">Nama Pemohon</p>
-                  <p className="font-medium">{application.applicantName}</p>
+                    <p className="text-muted-foreground">Nama Pemohon</p>
+                    <p className="font-medium">{application.applicantName}</p>
                   </div>
                   <div>
-                  <p className="text-muted-foreground">Organisasi Perangkat Daerah (OPD)</p>
-                  <p className="font-medium">{application.opd}</p>
+                    <p className="text-muted-foreground">
+                      Organisasi Perangkat Daerah (OPD)
+                    </p>
+                    <p className="font-medium">{application.opd}</p>
                   </div>
-              </div>
-              </div>
-              <Separator />
-                <div>
-              <h3 className="font-semibold text-lg mb-2">Detail Teknis</h3>
-              <div className="grid md:grid-cols-2 gap-4 text-sm">
-                  <div>
-                      <p className="text-muted-foreground flex items-center gap-2"><Server className="h-4 w-4" /> Domain Terkait</p>
-                      <p className="font-medium">{application.domainName}</p>
-                  </div>
-                  <div>
-                      <p className="text-muted-foreground flex items-center gap-2"><Code className="h-4 w-4" /> Framework/Teknologi</p>
-                      <p className="font-medium">{application.framework}</p>
-                  </div>
-              </div>
+                </div>
               </div>
               <Separator />
               <div>
-              <h3 className="font-semibold text-lg mb-2">Deskripsi Kebutuhan</h3>
-              <p className="text-sm text-muted-foreground">
+                <h3 className="font-semibold text-lg mb-2">Detail Teknis</h3>
+                <div className="grid md:grid-cols-2 gap-4 text-sm">
+                  <div>
+                    <p className="text-muted-foreground flex items-center gap-2">
+                      <Server className="h-4 w-4" /> Domain Terkait
+                    </p>
+                    <p className="font-medium">{application.domainName}</p>
+                  </div>
+                  <div>
+                    <p className="text-muted-foreground flex items-center gap-2">
+                      <Code className="h-4 w-4" /> Framework/Teknologi
+                    </p>
+                    <p className="font-medium">{application.framework}</p>
+                  </div>
+                </div>
+              </div>
+              <Separator />
+              <div>
+                <h3 className="font-semibold text-lg mb-2">
+                  Deskripsi Kebutuhan
+                </h3>
+                <p className="text-sm text-muted-foreground">
                   {application.description}
-              </p>
+                </p>
               </div>
-          </div>
+            </div>
           </CardContent>
-      </Card>
-      
-      <div className="items-center gap-2 md:ml-auto flex md:hidden mt-6">
+        </Card>
+
+        <div className="items-center gap-2 md:ml-auto flex md:hidden mt-6">
           {renderActionButtons()}
+        </div>
       </div>
-    </div>
-    <AlertDialog open={isAlertOpen} onOpenChange={setIsAlertOpen}>
+      <AlertDialog open={isAlertOpen} onOpenChange={setIsAlertOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>{dialogTitle}</AlertDialogTitle>
-            <AlertDialogDescription>
-              {dialogDescription}
-            </AlertDialogDescription>
+            <AlertDialogDescription>{dialogDescription}</AlertDialogDescription>
           </AlertDialogHeader>
-          {actionType === 'reject' && (
-              <div className="grid w-full gap-1.5 pt-2">
-                <Label htmlFor="rejection-reason">Alasan Penolakan</Label>
-                <Textarea 
-                    id="rejection-reason" 
-                    placeholder="Berikan alasan yang jelas mengapa permohonan ini ditolak..." 
-                    value={rejectionReason}
-                    onChange={(e) => setRejectionReason(e.target.value)}
-                    disabled={isPending}
-                />
-              </div>
-            )}
+          {actionType === "reject" && (
+            <div className="grid w-full gap-1.5 pt-2">
+              <Label htmlFor="rejection-reason">Alasan Penolakan</Label>
+              <Textarea
+                id="rejection-reason"
+                placeholder="Berikan alasan yang jelas mengapa permohonan ini ditolak..."
+                value={rejectionReason}
+                onChange={(e) => setRejectionReason(e.target.value)}
+                disabled={isPending}
+              />
+            </div>
+          )}
           <AlertDialogFooter className="pt-4">
             <AlertDialogCancel disabled={isPending}>Batal</AlertDialogCancel>
-            <AlertDialogAction 
-              onClick={handleConfirmAction} 
+            <AlertDialogAction
+              onClick={handleConfirmAction}
               disabled={isPending}
-              className={cn(actionType === 'reject' && buttonVariants({ variant: "destructive" }))}
+              className={cn(
+                actionType === "reject" &&
+                  buttonVariants({ variant: "destructive" })
+              )}
             >
               {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               Ya, Lanjutkan
@@ -283,12 +360,20 @@ function HostingApplicationDetailContent({ application }: { application: Hosting
   );
 }
 
-
-export function HostingApplicationDetailClient({ application }: { application: HostingApplication }) {
-    return (
-        <Suspense fallback={<div className="flex w-full h-full items-center justify-center"><Loader2 className="h-8 w-8 animate-spin text-muted-foreground" /></div>}>
-            <HostingApplicationDetailContent application={application} />
-        </Suspense>
-    )
+export function HostingApplicationDetailClient({
+  application,
+}: {
+  application: HostingApplication;
+}) {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex w-full h-full items-center justify-center">
+          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+        </div>
+      }
+    >
+      <HostingApplicationDetailContent application={application} />
+    </Suspense>
+  );
 }
-

@@ -17,9 +17,7 @@ import {
   Search,
   Building2,
   Plus,
-  Edit,
   Trash2,
-  BarChart3,
   Users,
   Globe,
   Server,
@@ -65,6 +63,7 @@ interface OPD {
     totalHosting: number;
     totalUsers: number;
   };
+  hostedDomains?: HostingApplication[];
 }
 
 type ActionType = "add" | "edit" | "delete" | "view";
@@ -171,9 +170,12 @@ function SuperAdminOPDsContent() {
         opd.statistics.totalApplications = applications.filter(
           (a) => a.opd === opdName
         ).length;
-        opd.statistics.totalHosting = hostingApps.filter(
-          (h) => h.opd === opdName
-        ).length;
+
+        // Filter hosting applications for this OPD
+        const opdHostingApps = hostingApps.filter((h) => h.opd === opdName);
+        opd.statistics.totalHosting = opdHostingApps.length;
+        opd.hostedDomains = opdHostingApps;
+
         opd.statistics.totalUsers = 1; // Placeholder - ideally fetch from users API
       });
 
@@ -211,11 +213,6 @@ function SuperAdminOPDsContent() {
       total: opds.length,
       active: opds.filter((o) => o.isActive).length,
       inactive: opds.filter((o) => !o.isActive).length,
-      totalDomains: opds.reduce((sum, o) => sum + o.statistics.totalDomains, 0),
-      totalApplications: opds.reduce(
-        (sum, o) => sum + o.statistics.totalApplications,
-        0
-      ),
     };
   }, [opds]);
 
@@ -345,7 +342,7 @@ function SuperAdminOPDsContent() {
     <>
       <div className="space-y-6">
         {/* Statistics Cards */}
-        <div className="grid gap-4 md:grid-cols-4">
+        <div className="grid gap-4 md:grid-cols-3">
           <Card>
             <CardHeader className="pb-3">
               <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
@@ -356,43 +353,36 @@ function SuperAdminOPDsContent() {
             <CardContent>
               <div className="text-2xl font-bold">{stats.total}</div>
               <p className="text-xs text-muted-foreground mt-1">
-                {stats.active} aktif, {stats.inactive} tidak aktif
+                Organisasi Perangkat Daerah terdaftar
               </p>
             </CardContent>
           </Card>
           <Card>
             <CardHeader className="pb-3">
               <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-                <Globe className="h-4 w-4" />
-                Total Domain
+                <Building2 className="h-4 w-4" />
+                OPD Aktif
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{stats.totalDomains}</div>
+              <div className="text-2xl font-bold">{stats.active}</div>
+              <p className="text-xs text-muted-foreground mt-1">
+                OPD yang sedang aktif
+              </p>
             </CardContent>
           </Card>
           <Card>
             <CardHeader className="pb-3">
               <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-                <BarChart3 className="h-4 w-4" />
-                Total Permohonan
+                <Building2 className="h-4 w-4" />
+                OPD Tidak Aktif
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">
-                {stats.totalApplications}
-              </div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-                <Users className="h-4 w-4" />
-                Total Pengguna
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{stats.total}</div>
+              <div className="text-2xl font-bold">{stats.inactive}</div>
+              <p className="text-xs text-muted-foreground mt-1">
+                OPD yang tidak aktif
+              </p>
             </CardContent>
           </Card>
         </div>
@@ -440,9 +430,6 @@ function SuperAdminOPDsContent() {
                   <thead className="bg-muted/50">
                     <tr className="border-b">
                       <th className="px-4 py-3 text-left text-sm font-medium">
-                        Kode
-                      </th>
-                      <th className="px-4 py-3 text-left text-sm font-medium">
                         Nama OPD
                       </th>
                       <th className="px-4 py-3 text-left text-sm font-medium">
@@ -450,9 +437,6 @@ function SuperAdminOPDsContent() {
                       </th>
                       <th className="px-4 py-3 text-left text-sm font-medium">
                         Email
-                      </th>
-                      <th className="px-4 py-3 text-left text-sm font-medium">
-                        Statistik
                       </th>
                       <th className="px-4 py-3 text-right text-sm font-medium">
                         Aksi
@@ -463,7 +447,7 @@ function SuperAdminOPDsContent() {
                     {filteredOPDs.length === 0 ? (
                       <tr>
                         <td
-                          colSpan={6}
+                          colSpan={4}
                           className="px-4 py-8 text-center text-muted-foreground"
                         >
                           Tidak ada OPD yang ditemukan
@@ -472,11 +456,6 @@ function SuperAdminOPDsContent() {
                     ) : (
                       filteredOPDs.map((opd) => (
                         <tr key={opd.id} className="border-b hover:bg-muted/30">
-                          <td className="px-4 py-3 text-sm">
-                            <Badge variant="outline" className="font-mono">
-                              {opd.code}
-                            </Badge>
-                          </td>
                           <td className="px-4 py-3 text-sm font-medium">
                             {opd.name}
                           </td>
@@ -491,37 +470,14 @@ function SuperAdminOPDsContent() {
                               {opd.email}
                             </a>
                           </td>
-                          <td className="px-4 py-3 text-sm">
-                            <div className="flex gap-2">
-                              <Badge variant="secondary" className="text-xs">
-                                <Globe className="h-3 w-3 mr-1" />
-                                {opd.statistics.totalDomains}
-                              </Badge>
-                              <Badge variant="secondary" className="text-xs">
-                                <BarChart3 className="h-3 w-3 mr-1" />
-                                {opd.statistics.totalApplications}
-                              </Badge>
-                              <Badge variant="secondary" className="text-xs">
-                                <Server className="h-3 w-3 mr-1" />
-                                {opd.statistics.totalHosting}
-                              </Badge>
-                            </div>
-                          </td>
                           <td className="px-4 py-3">
-                            <div className="flex justify-end gap-1">
+                            <div className="flex justify-end gap-2">
                               <Button
                                 size="sm"
                                 variant="outline"
                                 onClick={() => handleOpenDialog("view", opd)}
                               >
-                                <BarChart3 className="h-4 w-4" />
-                              </Button>
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                onClick={() => handleOpenDialog("edit", opd)}
-                              >
-                                <Edit className="h-4 w-4" />
+                                Lihat Detail
                               </Button>
                               <Button
                                 size="sm"
@@ -529,7 +485,8 @@ function SuperAdminOPDsContent() {
                                 className="text-red-600 hover:bg-red-50"
                                 onClick={() => handleOpenDialog("delete", opd)}
                               >
-                                <Trash2 className="h-4 w-4" />
+                                <Trash2 className="h-4 w-4 mr-2" />
+                                Hapus
                               </Button>
                             </div>
                           </td>
@@ -596,36 +553,6 @@ function SuperAdminOPDsContent() {
                     <Card>
                       <CardContent className="pt-4">
                         <div className="flex items-center gap-2">
-                          <Globe className="h-4 w-4 text-muted-foreground" />
-                          <div>
-                            <p className="text-xs text-muted-foreground">
-                              Domain
-                            </p>
-                            <p className="text-2xl font-bold">
-                              {selectedOPD.statistics.totalDomains}
-                            </p>
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                    <Card>
-                      <CardContent className="pt-4">
-                        <div className="flex items-center gap-2">
-                          <BarChart3 className="h-4 w-4 text-muted-foreground" />
-                          <div>
-                            <p className="text-xs text-muted-foreground">
-                              Permohonan
-                            </p>
-                            <p className="text-2xl font-bold">
-                              {selectedOPD.statistics.totalApplications}
-                            </p>
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                    <Card>
-                      <CardContent className="pt-4">
-                        <div className="flex items-center gap-2">
                           <Server className="h-4 w-4 text-muted-foreground" />
                           <div>
                             <p className="text-xs text-muted-foreground">
@@ -655,6 +582,72 @@ function SuperAdminOPDsContent() {
                     </Card>
                   </div>
                 </div>
+
+                {/* Domain yang Sudah Hosting */}
+                {selectedOPD.hostedDomains &&
+                  selectedOPD.hostedDomains.length > 0 && (
+                    <div className="border-t pt-4">
+                      <h4 className="font-semibold mb-3 flex items-center gap-2">
+                        <Server className="h-4 w-4" />
+                        Domain yang Sudah Hosting (
+                        {selectedOPD.hostedDomains.length})
+                      </h4>
+                      <div className="space-y-2 max-h-64 overflow-y-auto">
+                        {selectedOPD.hostedDomains.map((hosting, index) => (
+                          <div
+                            key={hosting.id || index}
+                            className="flex items-center justify-between p-3 bg-muted/30 rounded-lg hover:bg-muted/50 transition-colors"
+                          >
+                            <div className="flex-1">
+                              <div className="flex items-center gap-2">
+                                <Globe className="h-3 w-3 text-muted-foreground" />
+                                <p className="font-medium text-sm">
+                                  {hosting.domainName}
+                                </p>
+                              </div>
+                              <p className="text-xs text-muted-foreground mt-1 ml-5">
+                                {hosting.applicationName}
+                              </p>
+                              {hosting.framework && (
+                                <p className="text-xs text-muted-foreground ml-5">
+                                  Framework: {hosting.framework}
+                                </p>
+                              )}
+                            </div>
+                            <div className="flex items-center gap-2">
+                              {hosting.status === "approved" && (
+                                <Badge
+                                  variant="default"
+                                  className="text-xs bg-green-600"
+                                >
+                                  Aktif
+                                </Badge>
+                              )}
+                              {hosting.status === "pending" && (
+                                <Badge variant="secondary" className="text-xs">
+                                  Pending
+                                </Badge>
+                              )}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                {selectedOPD.hostedDomains &&
+                  selectedOPD.hostedDomains.length === 0 && (
+                    <div className="border-t pt-4">
+                      <h4 className="font-semibold mb-3 flex items-center gap-2">
+                        <Server className="h-4 w-4" />
+                        Domain yang Sudah Hosting
+                      </h4>
+                      <div className="text-center py-8 text-muted-foreground text-sm">
+                        <Server className="h-8 w-8 mx-auto mb-2 opacity-30" />
+                        <p>Belum ada domain yang di-hosting</p>
+                      </div>
+                    </div>
+                  )}
               </div>
             ) : (
               <div className="grid gap-4">

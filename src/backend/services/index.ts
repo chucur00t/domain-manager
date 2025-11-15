@@ -135,12 +135,19 @@ export const updateDomainStatus = async (
   await domainService.updateDomain(parseInt(id), { status });
 };
 
+/**
+ * @deprecated Fungsi ini tidak lagi digunakan dalam alur baru.
+ * Domain sekarang dibuat langsung saat hosting disetujui (di hosting.ts)
+ * Bukan saat application disetujui.
+ *
+ * Alur baru: Application Approved → Admin pilih hosting → Hosting Approved → Domain Created (active)
+ */
 export const createDomainFromApplication = async (
   application: SubdomainApplication
 ): Promise<ServiceDomain> => {
   const domainData = {
     domain_name: application.domainName,
-    status: "active" as const,
+    status: "active" as const, // Jika fungsi ini dipanggil, langsung active
     expires_at: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000), // 1 year from now
   };
 
@@ -163,8 +170,18 @@ export const createDomainFromApplication = async (
 // ===========================================
 
 export const getUsers = async () => {
-  const result = await userService.getUsers(1, 100);
-  return result.users;
+  try {
+    const result = await userService.getUsers(1, 100);
+    return result.users;
+  } catch (error) {
+    console.error(
+      "Error fetching users from database, using mock data:",
+      error
+    );
+    // Fallback to mock data
+    const { MOCK_USERS } = await import("@/backend/utils/mock-data");
+    return MOCK_USERS;
+  }
 };
 
 export const getUserById = async (id: string) => {

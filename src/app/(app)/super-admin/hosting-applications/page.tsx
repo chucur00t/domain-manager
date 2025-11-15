@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useMemo, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
+import Link from "next/link";
 import {
   Card,
   CardContent,
@@ -12,15 +13,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import {
-  Loader2,
-  Search,
-  CheckCircle,
-  XCircle,
-  Server,
-  HardDrive,
-  Gauge,
-} from "lucide-react";
+import { Loader2, Search, FileText, ExternalLink } from "lucide-react";
 import type { HostingApplication } from "@/backend/models/types";
 import {
   Select,
@@ -29,43 +22,17 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
 
 type StatusFilter = "all" | "pending_review" | "approved" | "rejected";
 
 function SuperAdminHostingApplicationsContent() {
   const searchParams = useSearchParams();
+  const role = searchParams.get("role");
   const [applications, setApplications] = useState<HostingApplication[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
   const [opdFilter, setOpdFilter] = useState<string>("all");
-
-  // Dialog states
-  const [selectedApp, setSelectedApp] = useState<HostingApplication | null>(
-    null
-  );
-  const [actionType, setActionType] = useState<"approve" | "reject" | null>(
-    null
-  );
-  const [comment, setComment] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
-
-  // Resource allocation states (for approve action)
-  const [allocatedStorage, setAllocatedStorage] = useState<number>(10); // GB
-  const [allocatedBandwidth, setAllocatedBandwidth] = useState<number>(100); // GB/month
-  const [hostingType, setHostingType] = useState<"cPanel" | "Container">(
-    "Container"
-  );
 
   const fetchApplications = async () => {
     setIsLoading(true);
@@ -130,103 +97,6 @@ function SuperAdminHostingApplicationsContent() {
         app.status === "pending_review" || app.status === "pending_approval"
     ).length;
   }, [applications]);
-
-  const handleOpenDialog = (
-    app: HostingApplication,
-    action: "approve" | "reject"
-  ) => {
-    setSelectedApp(app);
-    setActionType(action);
-    setComment("");
-
-    // Reset allocation values untuk approve
-    if (action === "approve") {
-      setAllocatedStorage(10);
-      setAllocatedBandwidth(100);
-      setHostingType("Container");
-    }
-  };
-
-  const handleCloseDialog = () => {
-    setSelectedApp(null);
-    setActionType(null);
-    setComment("");
-    setAllocatedStorage(10);
-    setAllocatedBandwidth(100);
-    setHostingType("Container");
-  };
-
-  const handleSubmitAction = async () => {
-    if (!selectedApp || !actionType) return;
-
-    // Validation
-    if (actionType === "reject" && !comment.trim()) {
-      alert("Alasan penolakan harus diisi!");
-      return;
-    }
-
-    if (actionType === "approve") {
-      if (allocatedStorage <= 0) {
-        alert("Kapasitas storage harus lebih dari 0 GB!");
-        return;
-      }
-      if (allocatedBandwidth <= 0) {
-        alert("Bandwidth harus lebih dari 0 GB!");
-        return;
-      }
-    }
-
-    setIsSubmitting(true);
-    try {
-      // TODO: Call API to update hosting application status
-      const newStatus = actionType === "approve" ? "approved" : "rejected";
-
-      const requestBody: any = {
-        status: newStatus,
-        comment: comment || undefined,
-      };
-
-      // Add resource allocation for approve
-      if (actionType === "approve") {
-        requestBody.allocatedStorage = allocatedStorage;
-        requestBody.allocatedBandwidth = allocatedBandwidth;
-        requestBody.hostingType = hostingType;
-      }
-
-      const response = await fetch(
-        `/api/hosting-applications/${selectedApp.id}`,
-        {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(requestBody),
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error("Failed to update hosting application");
-      }
-
-      // Refresh data
-      await fetchApplications();
-
-      // Close dialog
-      handleCloseDialog();
-
-      // Show success message
-      alert(
-        `Permohonan hosting berhasil ${
-          actionType === "approve" ? "disetujui & dialokasikan" : "ditolak"
-        }!`
-      );
-    } catch (error) {
-      console.error(error);
-      alert("Gagal memproses permohonan. Silakan coba lagi.");
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
 
   const getStatusBadge = (status: string) => {
     switch (status) {
@@ -408,35 +278,20 @@ function SuperAdminHostingApplicationsContent() {
                           {getStatusBadge(app.status || "pending_review")}
                         </td>
                         <td className="px-4 py-3 text-right">
-                          {app.status === "pending_review" ||
-                          app.status === "pending_approval" ? (
-                            <div className="flex justify-end gap-2">
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                className="text-green-600 border-green-200 hover:bg-green-50"
-                                onClick={() => handleOpenDialog(app, "approve")}
-                              >
-                                <CheckCircle className="h-4 w-4 mr-1" />
-                                Setujui
-                              </Button>
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                className="text-red-600 border-red-200 hover:bg-red-50"
-                                onClick={() => handleOpenDialog(app, "reject")}
-                              >
-                                <XCircle className="h-4 w-4 mr-1" />
-                                Tolak
-                              </Button>
-                            </div>
-                          ) : (
-                            <span className="text-sm text-muted-foreground">
-                              {app.status === "approved"
-                                ? "Sudah Disetujui"
-                                : "Sudah Ditolak"}
-                            </span>
-                          )}
+                          <Button size="sm" variant="outline" asChild>
+                            <Link
+                              href={`/hosting/${app.id}?role=${
+                                role || "Super Admin"
+                              }`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="inline-flex items-center gap-1"
+                            >
+                              <FileText className="h-4 w-4" />
+                              Lihat Detail
+                              <ExternalLink className="h-3 w-3" />
+                            </Link>
+                          </Button>
                         </td>
                       </tr>
                     ))
@@ -447,216 +302,6 @@ function SuperAdminHostingApplicationsContent() {
           </div>
         </CardContent>
       </Card>
-
-      {/* Confirmation Dialog */}
-      <Dialog
-        open={!!selectedApp && !!actionType}
-        onOpenChange={(open) => !open && handleCloseDialog()}
-      >
-        <DialogContent className="max-w-2xl">
-          <DialogHeader>
-            <DialogTitle>
-              {actionType === "approve"
-                ? "Setujui & Alokasikan Hosting"
-                : "Tolak Permohonan Hosting"}
-            </DialogTitle>
-            <DialogDescription>
-              {actionType === "approve"
-                ? "Atur alokasi sumber daya hosting untuk aplikasi ini"
-                : "Mohon berikan alasan penolakan yang jelas"}
-            </DialogDescription>
-          </DialogHeader>
-
-          {selectedApp && (
-            <div className="space-y-4 py-4">
-              {/* Application Details */}
-              <div className="grid grid-cols-2 gap-3 text-sm bg-muted/50 p-4 rounded-lg">
-                <div className="text-muted-foreground">OPD:</div>
-                <div className="font-medium">{selectedApp.opd}</div>
-
-                <div className="text-muted-foreground">Aplikasi:</div>
-                <div className="font-medium">{selectedApp.applicationName}</div>
-
-                <div className="text-muted-foreground">Domain:</div>
-                <div className="font-mono text-xs bg-background px-2 py-1 rounded">
-                  {selectedApp.domainName}
-                </div>
-
-                <div className="text-muted-foreground">Framework:</div>
-                <div>
-                  <Badge variant="secondary">{selectedApp.framework}</Badge>
-                </div>
-
-                <div className="text-muted-foreground">Deskripsi:</div>
-                <div className="col-span-1 text-sm">
-                  {selectedApp.description || "-"}
-                </div>
-              </div>
-
-              {/* Resource Allocation Form (for approve) */}
-              {actionType === "approve" && (
-                <div className="space-y-4 border-t pt-4">
-                  <h4 className="font-semibold text-sm flex items-center gap-2">
-                    <Server className="h-4 w-4" />
-                    Alokasi Sumber Daya Hosting
-                  </h4>
-
-                  <div className="grid grid-cols-2 gap-4">
-                    {/* Hosting Type */}
-                    <div className="space-y-2 col-span-2">
-                      <Label htmlFor="hostingType">Jenis Hosting *</Label>
-                      <Select
-                        value={hostingType}
-                        onValueChange={(value: "cPanel" | "Container") =>
-                          setHostingType(value)
-                        }
-                      >
-                        <SelectTrigger id="hostingType">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="Container">
-                            Container Hosting (Docker)
-                          </SelectItem>
-                          <SelectItem value="cPanel">cPanel Hosting</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-
-                    {/* Storage */}
-                    <div className="space-y-2">
-                      <Label
-                        htmlFor="storage"
-                        className="flex items-center gap-2"
-                      >
-                        <HardDrive className="h-4 w-4" />
-                        Kapasitas Storage (GB) *
-                      </Label>
-                      <Input
-                        id="storage"
-                        type="number"
-                        min="1"
-                        max="1000"
-                        value={allocatedStorage}
-                        onChange={(e) =>
-                          setAllocatedStorage(Number(e.target.value))
-                        }
-                        placeholder="10"
-                      />
-                      <p className="text-xs text-muted-foreground">
-                        Minimal 1 GB, Maksimal 1000 GB
-                      </p>
-                    </div>
-
-                    {/* Bandwidth */}
-                    <div className="space-y-2">
-                      <Label
-                        htmlFor="bandwidth"
-                        className="flex items-center gap-2"
-                      >
-                        <Gauge className="h-4 w-4" />
-                        Bandwidth (GB/bulan) *
-                      </Label>
-                      <Input
-                        id="bandwidth"
-                        type="number"
-                        min="1"
-                        max="10000"
-                        value={allocatedBandwidth}
-                        onChange={(e) =>
-                          setAllocatedBandwidth(Number(e.target.value))
-                        }
-                        placeholder="100"
-                      />
-                      <p className="text-xs text-muted-foreground">
-                        Minimal 1 GB, Maksimal 10000 GB
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Summary */}
-                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
-                    <p className="text-sm text-blue-900 font-medium mb-2">
-                      Ringkasan Alokasi:
-                    </p>
-                    <ul className="text-sm text-blue-700 space-y-1">
-                      <li>
-                        • Jenis: <strong>{hostingType}</strong>
-                      </li>
-                      <li>
-                        • Storage: <strong>{allocatedStorage} GB</strong>
-                      </li>
-                      <li>
-                        • Bandwidth:{" "}
-                        <strong>{allocatedBandwidth} GB/bulan</strong>
-                      </li>
-                    </ul>
-                  </div>
-                </div>
-              )}
-
-              {/* Comment/Reason */}
-              <div className="space-y-2">
-                <Label htmlFor="comment">
-                  {actionType === "reject"
-                    ? "Alasan Penolakan *"
-                    : "Catatan (Opsional)"}
-                </Label>
-                <Textarea
-                  id="comment"
-                  placeholder={
-                    actionType === "reject"
-                      ? "Jelaskan alasan penolakan..."
-                      : "Tambahkan catatan jika diperlukan..."
-                  }
-                  value={comment}
-                  onChange={(e) => setComment(e.target.value)}
-                  rows={3}
-                  required={actionType === "reject"}
-                />
-              </div>
-            </div>
-          )}
-
-          <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={handleCloseDialog}
-              disabled={isSubmitting}
-            >
-              Batal
-            </Button>
-            <Button
-              onClick={handleSubmitAction}
-              disabled={
-                isSubmitting || (actionType === "reject" && !comment.trim())
-              }
-              variant={actionType === "approve" ? "default" : "destructive"}
-            >
-              {isSubmitting ? (
-                <>
-                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                  Memproses...
-                </>
-              ) : (
-                <>
-                  {actionType === "approve" ? (
-                    <>
-                      <CheckCircle className="h-4 w-4 mr-2" />
-                      Setujui & Alokasikan
-                    </>
-                  ) : (
-                    <>
-                      <XCircle className="h-4 w-4 mr-2" />
-                      Tolak Permohonan
-                    </>
-                  )}
-                </>
-              )}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
     </>
   );
 }

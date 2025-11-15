@@ -43,12 +43,6 @@ import {
 } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 
 type StatusFilter = "all" | "active" | "inactive" | "expired";
 type ActionType = "activate" | "suspend" | "deactivate" | "health-check";
@@ -121,8 +115,7 @@ function SuperAdminDomainsContent() {
         const search = searchTerm.toLowerCase();
         return (
           domain.hostname?.toLowerCase().includes(search) ||
-          domain.opd?.toLowerCase().includes(search) ||
-          domain.parentDomain?.toLowerCase().includes(search)
+          domain.opd?.toLowerCase().includes(search)
         );
       }
 
@@ -267,7 +260,7 @@ function SuperAdminDomainsContent() {
         return (
           <Badge
             variant="outline"
-            className="bg-gray-50 text-gray-700 border-gray-200"
+            className="bg-orange-50 text-orange-500 border-orange-200"
           >
             Tidak Aktif
           </Badge>
@@ -293,102 +286,6 @@ function SuperAdminDomainsContent() {
       default:
         return <Badge variant="outline">{status}</Badge>;
     }
-  };
-
-  const getActionButtons = (domain: Domain) => {
-    const buttons = [];
-
-    // Activate button (for inactive/expired/pending domains)
-    if (domain.status !== "active") {
-      buttons.push(
-        <TooltipProvider key="activate">
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                size="sm"
-                variant="outline"
-                className="text-green-600 border-green-200 hover:bg-green-50"
-                onClick={() => handleOpenDialog(domain, "activate")}
-              >
-                <PlayCircle className="h-4 w-4" />
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>Aktifkan Domain</TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
-      );
-    }
-
-    // Suspend button (for active domains)
-    if (domain.status === "active") {
-      buttons.push(
-        <TooltipProvider key="suspend">
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                size="sm"
-                variant="outline"
-                className="text-orange-600 border-orange-200 hover:bg-orange-50"
-                onClick={() => handleOpenDialog(domain, "suspend")}
-              >
-                <PauseCircle className="h-4 w-4" />
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>Suspen Domain</TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
-      );
-    }
-
-    // Deactivate button (for any active/inactive domain)
-    if (domain.status !== "expired") {
-      buttons.push(
-        <TooltipProvider key="deactivate">
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                size="sm"
-                variant="outline"
-                className="text-red-600 border-red-200 hover:bg-red-50"
-                onClick={() => handleOpenDialog(domain, "deactivate")}
-              >
-                <XCircle className="h-4 w-4" />
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>Nonaktifkan Domain</TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
-      );
-    }
-
-    // Health check button (always available for active/inactive domains)
-    if (domain.status === "active" || domain.status === "inactive") {
-      const isChecking = isCheckingHealth.has(domain.id);
-      buttons.push(
-        <TooltipProvider key="health">
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                size="sm"
-                variant="outline"
-                className="text-blue-600 border-blue-200 hover:bg-blue-50"
-                onClick={() => handleCheckHealth(domain)}
-                disabled={isChecking}
-              >
-                {isChecking ? (
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                ) : (
-                  <Activity className="h-4 w-4" />
-                )}
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>Cek Kesehatan Domain</TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
-      );
-    }
-
-    return buttons;
   };
 
   if (isLoading) {
@@ -418,7 +315,7 @@ function SuperAdminDomainsContent() {
             <CardHeader className="pb-3">
               <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
                 <CheckCircle2 className="h-4 w-4 text-green-600" />
-                Aktif
+                Aktif (Di-hosting)
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -430,12 +327,12 @@ function SuperAdminDomainsContent() {
           <Card>
             <CardHeader className="pb-3">
               <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-                <PauseCircle className="h-4 w-4 text-gray-600" />
+                <PauseCircle className="h-4 w-4 text-orange-500" />
                 Tidak Aktif
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-gray-600">
+              <div className="text-2xl font-bold text-orange-500">
                 {stats.inactive}
               </div>
             </CardContent>
@@ -475,7 +372,7 @@ function SuperAdminDomainsContent() {
               <div className="flex-1 relative">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
-                  placeholder="Cari hostname, OPD, atau parent domain..."
+                  placeholder="Cari hostname atau OPD..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="pl-10"
@@ -530,9 +427,6 @@ function SuperAdminDomainsContent() {
                         OPD
                       </th>
                       <th className="px-4 py-3 text-left text-sm font-medium">
-                        Parent Domain
-                      </th>
-                      <th className="px-4 py-3 text-left text-sm font-medium">
                         Status
                       </th>
                       <th className="px-4 py-3 text-left text-sm font-medium">
@@ -550,7 +444,7 @@ function SuperAdminDomainsContent() {
                     {filteredDomains.length === 0 ? (
                       <tr>
                         <td
-                          colSpan={7}
+                          colSpan={6}
                           className="px-4 py-8 text-center text-muted-foreground"
                         >
                           Tidak ada domain yang ditemukan
@@ -569,15 +463,6 @@ function SuperAdminDomainsContent() {
                           </td>
                           <td className="px-4 py-3 text-sm font-medium">
                             {domain.opd || "-"}
-                          </td>
-                          <td className="px-4 py-3 text-sm">
-                            {domain.parentDomain ? (
-                              <code className="text-xs text-muted-foreground">
-                                {domain.parentDomain}
-                              </code>
-                            ) : (
-                              "-"
-                            )}
                           </td>
                           <td className="px-4 py-3">
                             {getStatusBadge(domain.status)}
@@ -607,8 +492,16 @@ function SuperAdminDomainsContent() {
                             )}
                           </td>
                           <td className="px-4 py-3">
-                            <div className="flex justify-end gap-1">
-                              {getActionButtons(domain)}
+                            <div className="flex justify-end">
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() =>
+                                  handleOpenDialog(domain, "health-check")
+                                }
+                              >
+                                Lihat Detail
+                              </Button>
                             </div>
                           </td>
                         </tr>
@@ -633,8 +526,7 @@ function SuperAdminDomainsContent() {
               {actionType === "activate" && "Aktifkan Domain"}
               {actionType === "suspend" && "Suspen Domain"}
               {actionType === "deactivate" && "Nonaktifkan Domain"}
-              {actionType === "health-check" &&
-                "Hasil Pemeriksaan Kesehatan Domain"}
+              {actionType === "health-check" && "Detail Domain"}
             </DialogTitle>
             <DialogDescription>
               {actionType === "activate" &&
@@ -644,7 +536,7 @@ function SuperAdminDomainsContent() {
               {actionType === "deactivate" &&
                 "Domain akan dinonaktifkan secara permanen"}
               {actionType === "health-check" &&
-                "Informasi status kesehatan domain"}
+                "Informasi lengkap dan status kesehatan domain"}
             </DialogDescription>
           </DialogHeader>
 
@@ -848,57 +740,104 @@ function SuperAdminDomainsContent() {
           )}
 
           <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={handleCloseDialog}
-              disabled={isSubmitting && actionType !== "health-check"}
-            >
-              {actionType === "health-check" ? "Tutup" : "Batal"}
-            </Button>
-            {actionType !== "health-check" && (
-              <Button
-                onClick={handleSubmitAction}
-                disabled={
-                  isSubmitting ||
-                  ((actionType === "suspend" || actionType === "deactivate") &&
-                    !reason.trim())
-                }
-                variant={
-                  actionType === "activate"
-                    ? "default"
-                    : actionType === "suspend"
-                    ? "secondary"
-                    : "destructive"
-                }
-              >
-                {isSubmitting ? (
-                  <>
-                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                    Memproses...
-                  </>
-                ) : (
-                  <>
-                    {actionType === "activate" && (
-                      <>
-                        <PlayCircle className="h-4 w-4 mr-2" />
-                        Aktifkan
-                      </>
-                    )}
-                    {actionType === "suspend" && (
-                      <>
-                        <PauseCircle className="h-4 w-4 mr-2" />
-                        Suspen
-                      </>
-                    )}
-                    {actionType === "deactivate" && (
-                      <>
-                        <XCircle className="h-4 w-4 mr-2" />
-                        Nonaktifkan
-                      </>
-                    )}
-                  </>
-                )}
-              </Button>
+            {actionType === "health-check" && selectedDomain ? (
+              <div className="flex items-center justify-between w-full">
+                <div className="flex gap-2">
+                  {selectedDomain.status !== "active" && (
+                    <Button
+                      variant="default"
+                      size="sm"
+                      onClick={() => {
+                        setActionType("activate");
+                      }}
+                    >
+                      <PlayCircle className="h-4 w-4 mr-2" />
+                      Aktifkan
+                    </Button>
+                  )}
+                  {selectedDomain.status === "active" && (
+                    <Button
+                      variant="secondary"
+                      size="sm"
+                      onClick={() => {
+                        setActionType("suspend");
+                      }}
+                    >
+                      <PauseCircle className="h-4 w-4 mr-2" />
+                      Suspen
+                    </Button>
+                  )}
+                  {selectedDomain.status !== "expired" && (
+                    <Button
+                      variant="destructive"
+                      size="sm"
+                      onClick={() => {
+                        setActionType("deactivate");
+                      }}
+                    >
+                      <XCircle className="h-4 w-4 mr-2" />
+                      Nonaktifkan
+                    </Button>
+                  )}
+                </div>
+                <Button variant="outline" onClick={handleCloseDialog}>
+                  Tutup
+                </Button>
+              </div>
+            ) : (
+              <>
+                <Button
+                  variant="outline"
+                  onClick={handleCloseDialog}
+                  disabled={isSubmitting}
+                >
+                  Batal
+                </Button>
+                <Button
+                  onClick={handleSubmitAction}
+                  disabled={
+                    isSubmitting ||
+                    ((actionType === "suspend" ||
+                      actionType === "deactivate") &&
+                      !reason.trim())
+                  }
+                  variant={
+                    actionType === "activate"
+                      ? "default"
+                      : actionType === "suspend"
+                      ? "secondary"
+                      : "destructive"
+                  }
+                >
+                  {isSubmitting ? (
+                    <>
+                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                      Memproses...
+                    </>
+                  ) : (
+                    <>
+                      {actionType === "activate" && (
+                        <>
+                          <PlayCircle className="h-4 w-4 mr-2" />
+                          Aktifkan
+                        </>
+                      )}
+                      {actionType === "suspend" && (
+                        <>
+                          <PauseCircle className="h-4 w-4 mr-2" />
+                          Suspen
+                        </>
+                      )}
+                      {actionType === "deactivate" && (
+                        <>
+                          <XCircle className="h-4 w-4 mr-2" />
+                          Nonaktifkan
+                        </>
+                      )}
+                    </>
+                  )}
+                </Button>
+              </>
             )}
           </DialogFooter>
         </DialogContent>
