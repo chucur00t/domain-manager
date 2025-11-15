@@ -32,7 +32,8 @@ export async function getDomainById(domainId: string) {
 }
 
 export async function activateDomain(domainId: string, currentUserRole: User['role']): Promise<{ success: boolean; message: string }> {
-  if (currentUserRole !== 'Kepala Bidang') {
+  const allowedRoles: User['role'][] = ['Kepala Bidang', 'Super Admin'];
+  if (!allowedRoles.includes(currentUserRole)) {
     return { success: false, message: 'Anda tidak memiliki izin untuk melakukan tindakan ini.' };
   }
 
@@ -74,7 +75,8 @@ export async function activateDomain(domainId: string, currentUserRole: User['ro
 }
 
 export async function deactivateDomain(domainId: string, currentUserRole: User['role']): Promise<{ success: boolean; message: string }> {
-  if (currentUserRole !== 'Kepala Bidang') {
+  const allowedRoles: User['role'][] = ['Kepala Bidang', 'Super Admin'];
+  if (!allowedRoles.includes(currentUserRole)) {
     return { success: false, message: 'Anda tidak memiliki izin untuk melakukan tindakan ini.' };
   }
 
@@ -146,7 +148,8 @@ export async function updateDomainInfo(
   currentUserRole: User['role']
   ): Promise<{ success: boolean; message: string }> {
   
-  if (currentUserRole !== 'Pengelola Sistem') {
+  const allowedRoles: User['role'][] = ['Pengelola Sistem', 'Super Admin'];
+  if (!allowedRoles.includes(currentUserRole)) {
     return { success: false, message: 'Anda tidak memiliki izin untuk melakukan tindakan ini.' };
   }
   

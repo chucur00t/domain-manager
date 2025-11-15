@@ -342,12 +342,13 @@ export async function createHostingApplication(data: Omit<HostingApplication, 'i
 
 export async function getHostingApplication(id: string): Promise<HostingApplication | null> {
   try {
-    // Implementation pending: Type mismatch between HostingApplication and database schema
-    // Database uses: storage_capacity, bandwidth, server_type
-    // Type uses: applicationName, description, framework, domainName
-    return null;
+    // Use the MySQL service implementation
+    const { getHostingApplicationById } = await import('@/backend/services');
+    const hosting = await getHostingApplicationById(id);
+    return hosting;
   } catch (error) {
-    throw new Error(`Failed to get hosting application: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    console.error('Error fetching hosting application:', error);
+    return null;
   }
 }
 

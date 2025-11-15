@@ -122,7 +122,7 @@ function AddUserFormContent({ allOpds, allUsers, onUserAdded }: AddUserFormProps
       if ((values.role === 'Admin Daerah') && values.opd) {
           formData.append('opd', values.opd);
       }
-      formData.append('currentUserId', currentUser.id);
+      formData.append('currentUserId', String(currentUser.id));
 
       const userData = {
         name: values.name,

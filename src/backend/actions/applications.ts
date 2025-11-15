@@ -133,7 +133,7 @@ export async function approveApplication(
   applicationId: string,
   currentUserRole: User["role"]
 ): Promise<{ success: boolean; message: string }> {
-  const allowedRoles: User["role"][] = ["Administrator", "Kepala Bidang"];
+  const allowedRoles: User["role"][] = ["Administrator", "Kepala Bidang", "Super Admin"];
   if (!allowedRoles.includes(currentUserRole)) {
     return {
       success: false,

@@ -36,23 +36,26 @@ type DomainsTableProps = {
 import { DomainStatus } from "@/backend/models/types";
 
 const statusConfig: Record<
-  DomainStatus | "Active" | "Inactive" | "Expired",
+  DomainStatus,
   {
     text: string;
     variant: "default" | "secondary" | "destructive" | "outline";
     className: string;
   }
 > = {
-  pending: {
-    text: "Pending",
-    variant: "default",
-    className: "bg-amber-500 hover:bg-amber-600",
-  },
-  active: {
+  Active: {
     text: "Aktif",
     variant: "secondary",
     className: "bg-green-500 hover:bg-green-600 text-secondary-foreground",
   },
+  Suspended: {
+    text: "Ditangguhkan",
+    variant: "outline",
+    className: "bg-gray-100 hover:bg-gray-200",
+  },
+  Deactivated: {
+    text: "Tidak Aktif",
+    variant: "destructive",
   inactive: {
     text: "Tidak Aktif",
     variant: "outline",
@@ -129,7 +132,7 @@ function DomainsTableContent({ domains, currentUser }: DomainsTableProps) {
                 currentDomains.map((domain) => (
                   <TableRow key={domain.id}>
                     <TableCell className="font-medium">
-                      {domain.hostname}
+                      {domain.domain_name}
                     </TableCell>
                     <TableCell>
                       <Badge
@@ -139,7 +142,7 @@ function DomainsTableContent({ domains, currentUser }: DomainsTableProps) {
                         {getStatusConfig(domain.status).text}
                       </Badge>
                     </TableCell>
-                    <TableCell>{domain.activationDate}</TableCell>
+                    <TableCell>{domain.activated_at}</TableCell>
                     <TableCell>
                       <div className="flex items-center justify-between gap-2">
                         <Tooltip>

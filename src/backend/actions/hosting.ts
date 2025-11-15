@@ -254,7 +254,7 @@ export async function rejectHostingApplication(
   reason: string,
   currentUserRole: User["role"]
 ): Promise<{ success: boolean; message: string }> {
-  const allowedRoles: UserRole[] = ["Super Admin", "Admin Daerah"];
+  const allowedRoles: User["role"][] = ["Administrator", "Kepala Bidang", "Super Admin"];
   if (!allowedRoles.includes(currentUserRole)) {
     return {
       success: false,

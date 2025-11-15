@@ -57,7 +57,7 @@ export function DomainActions({ domain, currentUser, onAction }: DomainActionsPr
 
       toast({
         title: 'Domain berhasil dinonaktifkan',
-        description: `Domain ${domain.hostname} telah dinonaktifkan.`,
+        description: `Domain ${domain.domain_name} telah dinonaktifkan.`,
       });
       
       setIsDeactivateOpen(false);
@@ -96,7 +96,7 @@ export function DomainActions({ domain, currentUser, onAction }: DomainActionsPr
 
       toast({
         title: 'Domain berhasil diaktifkan',
-        description: `Domain ${domain.hostname} telah diaktifkan.`,
+        description: `Domain ${domain.domain_name} telah diaktifkan.`,
       });
       
       onAction();
@@ -129,7 +129,7 @@ export function DomainActions({ domain, currentUser, onAction }: DomainActionsPr
         <DropdownMenuContent align="end">
           <DropdownMenuLabel>Aksi</DropdownMenuLabel>
           <DropdownMenuSeparator />
-          {domain.status === 'inactive' ? (
+          {domain.status === 'Deactivated' || domain.status === 'Suspended' ? (
             <DropdownMenuItem onClick={handleActivate}>
               <PlayIcon className="mr-2 h-4 w-4" />
               Aktifkan Domain
@@ -149,7 +149,7 @@ export function DomainActions({ domain, currentUser, onAction }: DomainActionsPr
         <DialogHeader>
           <DialogTitle>Nonaktifkan Domain</DialogTitle>
           <DialogDescription>
-            Masukkan alasan penonaktifan domain {domain.hostname}
+            Masukkan alasan penonaktifan domain {domain.domain_name}
           </DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 py-4">

@@ -14,6 +14,7 @@ export interface DocumentRow extends DatabaseRow {
 export interface ApplicationRow extends DatabaseRow {
   id: number;
   application_type: 'domain' | 'hosting';
+  requested_domain_name?: string;
   opd_id?: number;
   submitter_id?: number;
   status: string;
@@ -149,7 +150,7 @@ export class ApplicationService {
       const { offset, limit: paginationLimit } = buildPagination(page, limit);
       
       const applicationsSql = `
-        SELECT a.id, a.application_type, a.opd_id, a.submitter_id, a.status, a.reason,
+        SELECT a.id, a.application_type, a.requested_domain_name, a.opd_id, a.submitter_id, a.status, a.reason,
                a.submitted_at, a.approved_at, a.last_updated_by,
                o.name as opd_name,
                u.username as submitter_name,
@@ -169,7 +170,7 @@ export class ApplicationService {
       const formattedApplications: (SubdomainApplication | HostingApplication)[] = applications.map(app => ({
         id: app.id.toString(),
         userId: app.submitter_id?.toString() || '',
-        domainName: '', // Will be filled by specific service
+        domainName: app.requested_domain_name || '',
         purpose: app.reason || '',
         opd: app.opd_name || '',
         status: app.status as ApplicationStatus,
@@ -178,7 +179,7 @@ export class ApplicationService {
         approvalDate: app.approved_at?.toISOString().split('T')[0],
         applicantName: app.submitter_name,
         description: app.reason || '',
-        applicationName: '', // Will be filled by specific service
+        applicationName: app.requested_domain_name || '',
         framework: '', // Will be filled by specific service
         documents: [],
         rejectionReason: app.status === 'rejected' ? app.reason : undefined
@@ -199,7 +200,7 @@ export class ApplicationService {
   async getApplication(id: number): Promise<(SubdomainApplication | HostingApplication) | null> {
     try {
       const applicationsSql = `
-        SELECT a.id, a.application_type, a.opd_id, a.submitter_id, a.status, a.reason,
+        SELECT a.id, a.application_type, a.requested_domain_name, a.opd_id, a.submitter_id, a.status, a.reason,
                a.submitted_at, a.approved_at, a.last_updated_by,
                o.name as opd_name,
                u.username as submitter_name,
@@ -221,7 +222,7 @@ export class ApplicationService {
       return {
         id: app.id.toString(),
         userId: app.submitter_id?.toString() || '',
-        domainName: '',
+        domainName: app.requested_domain_name || '',
         purpose: app.reason || '',
         opd: app.opd_name || '',
         status: app.status as ApplicationStatus,
@@ -230,7 +231,7 @@ export class ApplicationService {
         approvalDate: app.approved_at?.toISOString().split('T')[0],
         applicantName: app.submitter_name,
         description: app.reason || '',
-        applicationName: '',
+        applicationName: app.requested_domain_name || '',
         framework: '',
         documents: [],
         rejectionReason: app.status === 'rejected' ? app.reason : undefined
@@ -450,7 +451,7 @@ export class ApplicationService {
   async getApplicationsByStatus(status: ApplicationStatus): Promise<(SubdomainApplication | HostingApplication)[]> {
     try {
       const applicationsSql = `
-        SELECT a.id, a.application_type, a.opd_id, a.submitter_id, a.status, a.reason,
+        SELECT a.id, a.application_type, a.requested_domain_name, a.opd_id, a.submitter_id, a.status, a.reason,
                a.submitted_at, a.approved_at, a.last_updated_by,
                o.name as opd_name,
                u.username as submitter_name
@@ -466,7 +467,7 @@ export class ApplicationService {
       return applications.map(app => ({
         id: app.id.toString(),
         userId: app.submitter_id?.toString() || '',
-        domainName: '',
+        domainName: app.requested_domain_name || '',
         purpose: app.reason || '',
         opd: app.opd_name || '',
         status: app.status as ApplicationStatus,
@@ -475,7 +476,7 @@ export class ApplicationService {
         approvalDate: app.approved_at?.toISOString().split('T')[0],
         applicantName: app.submitter_name,
         description: app.reason || '',
-        applicationName: '',
+        applicationName: app.requested_domain_name || '',
         framework: '',
         documents: [],
         rejectionReason: app.status === 'rejected' ? app.reason : undefined

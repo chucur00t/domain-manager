@@ -48,8 +48,8 @@ export function AuditTrailTable({ logs, showPagination = true }: AuditTrailTable
               displayLogs.map((log) => (
                 <TableRow key={log.id}>
                   <TableCell className="font-mono text-xs">{log.timestamp}</TableCell>
-                  <TableCell className="font-medium">{log.user}</TableCell>
-                  <TableCell>{log.userRole}</TableCell>
+                  <TableCell className="font-medium">{log.username || `User ${log.user_id}`}</TableCell>
+                  <TableCell>{log.user_role || 'N/A'}</TableCell>
                   <TableCell>
                     <span className="font-mono text-xs p-1 bg-muted rounded-sm">{log.action}</span>
                   </TableCell>

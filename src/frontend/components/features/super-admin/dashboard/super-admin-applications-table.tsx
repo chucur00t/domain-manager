@@ -15,11 +15,14 @@ import { useSearchParams } from "next/navigation";
 import React from "react";
 
 // Simplified status config for dashboard - only 3 main statuses
-const statusConfig = {
+const statusConfig: Record<string, { text: string; variant: "default" | "secondary" | "destructive" }> = {
+  Pending: { text: "Pending", variant: "default" as const },
   pending: { text: "Pending", variant: "default" as const },
   pending_review: { text: "Pending", variant: "default" as const },
   pending_approval: { text: "Pending", variant: "default" as const },
+  Approved: { text: "Disetujui", variant: "secondary" as const },
   approved: { text: "Disetujui", variant: "secondary" as const },
+  Rejected: { text: "Ditolak", variant: "destructive" as const },
   rejected: { text: "Ditolak", variant: "destructive" as const },
 };
 
@@ -51,13 +54,13 @@ function SuperAdminApplicationsTableContent({
                     href={`/applications/${app.id}${roleQuery}`}
                     className="hover:underline"
                   >
-                    {app.domainName}
+                    {app.domainName || `Application ${app.id}`}
                   </Link>
                 </TableCell>
                 <TableCell>{app.opd}</TableCell>
                 <TableCell>
-                  <Badge variant={statusConfig[app.status].variant}>
-                    {statusConfig[app.status].text}
+                  <Badge variant={statusConfig[app.status]?.variant || "default"}>
+                    {statusConfig[app.status]?.text || app.status}
                   </Badge>
                 </TableCell>
               </TableRow>

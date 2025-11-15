@@ -119,7 +119,7 @@ export const updateDomain = async (
   // Map ServiceDomain to DomainService format
   const updateData: any = {};
   if (domain.status) updateData.status = domain.status;
-  if (domain.expiryDate) updateData.expires_at = new Date(domain.expiryDate);
+  if (domain.expires_at) updateData.expires_at = new Date(domain.expires_at);
 
   await domainService.updateDomain(parseInt(id), updateData);
 };
@@ -259,7 +259,19 @@ export const getHostingApplications = async () => {
 };
 
 export const getHostingApplicationById = async (id: string) => {
-  return await hostingService.getHosting(parseInt(id));
+  try {
+    // First check if it's an application (pending hosting request)
+    const application = await applicationService.getApplication(parseInt(id));
+    if (application && (application as any).application_type === 'hosting') {
+      return application;
+    }
+    
+    // If not found in applications, check hostings table
+    return await hostingService.getHosting(parseInt(id));
+  } catch (error) {
+    console.error('Error fetching hosting application:', error);
+    return null;
+  }
 };
 
 export const createHostingApplication = async (

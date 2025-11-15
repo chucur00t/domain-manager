@@ -131,13 +131,13 @@ function ApplicationDetailContent({
         };
       case "approve":
         return {
-          title: "Konfirmasi Persetujuan Final",
-          description: `Apakah Anda yakin ingin menyetujui secara final permohonan untuk subdomain "${application.domainName}"?`,
+          title: "Konfirmasi Persetujuan",
+          description: `Apakah Anda yakin ingin menyetujui permohonan domain "${application.domainName}" dari ${application.opd}? Domain akan segera diaktifkan setelah disetujui.`,
         };
       case "reject":
         return {
           title: "Konfirmasi Penolakan",
-          description: `Apakah Anda yakin ingin menolak permohonan untuk subdomain "${application.domainName}"?`,
+          description: `Apakah Anda yakin ingin menolak permohonan domain "${application.domainName}" dari ${application.opd}? Harap berikan alasan penolakan yang jelas di bawah ini.`,
         };
       default:
         return { title: "", description: "" };
@@ -146,12 +146,17 @@ function ApplicationDetailContent({
 
   const { title: dialogTitle, description: dialogDescription } =
     getDialogContent();
-  const currentStatusInfo = statusConfig[application.status];
+  
+  // Normalize status to lowercase to match statusConfig keys
+  const normalizedStatus = application.status.toLowerCase() as keyof typeof statusConfig;
+  const currentStatusInfo = statusConfig[normalizedStatus] || statusConfig.pending;
+  
   const isSuperAdmin = currentUserRole === "Super Admin";
   const isAdministrator = currentUserRole === "Administrator";
 
   const renderActionButtons = () => {
-    if (isSuperAdmin && application.status === "pending_review") {
+    // Super Admin can approve/reject Pending applications
+    if (isSuperAdmin && normalizedStatus === "pending") {
       return (
         <>
           <Button
@@ -171,21 +176,21 @@ function ApplicationDetailContent({
           <Button
             size="sm"
             className="gap-1 w-full md:w-auto"
-            onClick={() => handleActionClick("forward")}
+            onClick={() => handleActionClick("approve")}
             disabled={isPending}
           >
-            {isPending && actionType === "forward" ? (
+            {isPending && actionType === "approve" ? (
               <Loader2 className="h-3.5 w-3.5 animate-spin" />
             ) : (
-              <Send className="h-3.5 w-3.5" />
+              <Check className="h-3.5 w-3.5" />
             )}
-            Lanjutkan ke Persetujuan
+            Setujui
           </Button>
         </>
       );
     }
 
-    if (isAdministrator && application.status === "pending_approval") {
+    if (isAdministrator && normalizedStatus === "pending_approval") {
       return (
         <>
           <Button

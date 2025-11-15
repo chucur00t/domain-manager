@@ -90,7 +90,7 @@ function HostingApplicationFormContent() {
   }, [toast]);
 
   const operatorUser = useMemo(
-    () => allUsers.find((user) => user.role === "Operator"),
+    () => allUsers.find((user) => user.role === "Admin Daerah"),
     [allUsers]
   );
   const operatorOpd = operatorUser?.opd;
@@ -238,8 +238,8 @@ function HostingApplicationFormContent() {
                     </FormControl>
                     <SelectContent>
                       {usersInOpd.map((user) => (
-                        <SelectItem key={user.id} value={user.name}>
-                          {user.name}
+                        <SelectItem key={user.id} value={user.username || user.name}>
+                          {user.username || user.name}
                         </SelectItem>
                       ))}
                     </SelectContent>
