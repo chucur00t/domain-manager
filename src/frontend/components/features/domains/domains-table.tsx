@@ -97,6 +97,26 @@ const getStatusConfig = (status: string) => {
 
 const ITEMS_PER_PAGE = 10;
 
+// Helper function to calculate countdown days for domains
+const calculateCountdown = (activatedAt: string): { days: number; isExpired: boolean } => {
+  const activation = new Date(activatedAt);
+  const now = new Date();
+  const year = activation.getFullYear();
+  const isLeapYear = (year % 4 === 0 && year % 100 !== 0) || year % 400 === 0;
+  const daysInYear = isLeapYear ? 366 : 365;
+
+  const expiryDate = new Date(activation);
+  expiryDate.setDate(expiryDate.getDate() + daysInYear);
+
+  const diffTime = expiryDate.getTime() - now.getTime();
+  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+  return {
+    days: diffDays > 0 ? diffDays : 0,
+    isExpired: diffDays <= 0,
+  };
+};
+
 function DomainsTableContent({ domains, currentUser }: DomainsTableProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -104,6 +124,7 @@ function DomainsTableContent({ domains, currentUser }: DomainsTableProps) {
   const [currentPage, setCurrentPage] = useState(0);
 
   const roleQuery = `?role=${currentUserRole || ""}`;
+  const isAdminDaerah = currentUserRole === "Admin Daerah";
 
   useEffect(() => {
     setCurrentPage(0);
@@ -124,53 +145,87 @@ function DomainsTableContent({ domains, currentUser }: DomainsTableProps) {
                 <TableHead>Hostname</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead>Tgl Dibuat</TableHead>
+                {isAdminDaerah && <TableHead>Masa Berlaku</TableHead>}
                 <TableHead className="text-center">Aksi</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {currentDomains.length > 0 ? (
-                currentDomains.map((domain) => (
-                  <TableRow key={domain.id}>
-                    <TableCell className="font-medium">
-                      {domain.domain_name}
-                    </TableCell>
-                    <TableCell>
-                      <Badge
-                        variant={getStatusConfig(domain.status).variant}
-                        className={cn(getStatusConfig(domain.status).className)}
-                      >
-                        {getStatusConfig(domain.status).text}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>{domain.activated_at}</TableCell>
-                    <TableCell>
-                      <div className="flex items-center justify-between gap-2">
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <Link href={`/domains/${domain.id}${roleQuery}`}>
-                              <Button variant="outline" size="icon">
-                                <Eye className="h-4 w-4" />
-                                <span className="sr-only">Lihat Detail</span>
-                              </Button>
-                            </Link>
-                          </TooltipTrigger>
-                          <TooltipContent>
-                            <p>Lihat Detail</p>
-                          </TooltipContent>
-                        </Tooltip>
+                currentDomains.map((domain) => {
+                  const countdown = domain.status === "Active" && domain.activated_at 
+                    ? calculateCountdown(domain.activated_at)
+                    : null;
+                  
+                  return (
+                    <TableRow key={domain.id}>
+                      <TableCell className="font-medium">
+                        {domain.domain_name}
+                      </TableCell>
+                      <TableCell>
+                        <Badge
+                          variant={getStatusConfig(domain.status).variant}
+                          className={cn(getStatusConfig(domain.status).className)}
+                        >
+                          {getStatusConfig(domain.status).text}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>{domain.activated_at}</TableCell>
+                      {isAdminDaerah && (
+                        <TableCell>
+                          {countdown ? (
+                            <div className="flex items-center gap-2">
+                              <span
+                                className={cn(
+                                  "font-semibold",
+                                  countdown.days <= 30
+                                    ? "text-red-600"
+                                    : countdown.days <= 90
+                                    ? "text-amber-600"
+                                    : "text-green-600"
+                                )}
+                              >
+                                {countdown.isExpired ? "Expired" : `${countdown.days} hari`}
+                              </span>
+                              {countdown.days <= 30 && !countdown.isExpired && (
+                                <Badge variant="destructive" className="text-xs">
+                                  Segera Expired
+                                </Badge>
+                              )}
+                            </div>
+                          ) : (
+                            <span className="text-muted-foreground">-</span>
+                          )}
+                        </TableCell>
+                      )}
+                      <TableCell>
+                        <div className="flex items-center justify-between gap-2">
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Link href={`/domains/${domain.id}${roleQuery}`}>
+                                <Button variant="outline" size="icon">
+                                  <Eye className="h-4 w-4" />
+                                  <span className="sr-only">Lihat Detail</span>
+                                </Button>
+                              </Link>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p>Lihat Detail</p>
+                            </TooltipContent>
+                          </Tooltip>
 
-                        <DomainActions
-                          domain={domain}
-                          currentUser={currentUser}
-                          onAction={() => router.refresh()}
-                        />
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))
+                          <DomainActions
+                            domain={domain}
+                            currentUser={currentUser}
+                            onAction={() => router.refresh()}
+                          />
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })
               ) : (
                 <TableRow>
-                  <TableCell colSpan={4} className="h-24 text-center">
+                  <TableCell colSpan={isAdminDaerah ? 5 : 4} className="h-24 text-center">
                     Tidak ada hasil yang ditemukan.
                   </TableCell>
                 </TableRow>

@@ -29,6 +29,26 @@ type NotificationItem = {
   href: string;
 };
 
+// Helper function to calculate countdown days for domains
+const calculateCountdown = (activatedAt: string): { days: number; isExpired: boolean } => {
+  const activation = new Date(activatedAt);
+  const now = new Date();
+  const year = activation.getFullYear();
+  const isLeapYear = (year % 4 === 0 && year % 100 !== 0) || year % 400 === 0;
+  const daysInYear = isLeapYear ? 366 : 365;
+
+  const expiryDate = new Date(activation);
+  expiryDate.setDate(expiryDate.getDate() + daysInYear);
+
+  const diffTime = expiryDate.getTime() - now.getTime();
+  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+  return {
+    days: diffDays > 0 ? diffDays : 0,
+    isExpired: diffDays <= 0,
+  };
+};
+
 function NotificationNavContent() {
   const searchParams = useSearchParams();
   const role = searchParams.get("role") as User["role"];
@@ -36,6 +56,7 @@ function NotificationNavContent() {
 
   const [notifications, setNotifications] = useState<NotificationItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [countdownInfo, setCountdownInfo] = useState<{ nearestExpiry: number | null; totalActive: number }>({ nearestExpiry: null, totalActive: 0 });
 
   useEffect(() => {
     if (!role) {
@@ -47,22 +68,38 @@ function NotificationNavContent() {
       setIsLoading(true);
       try {
         // Fetch data from API routes instead of direct backend services
-        const [usersRes, domainAppsRes, hostingAppsRes] = await Promise.all([
+        const [usersRes, domainAppsRes, hostingAppsRes, domainsRes] = await Promise.all([
           fetch("/api/users"),
           fetch("/api/applications"),
           fetch("/api/hosting-applications"),
+          fetch("/api/domains"),
         ]);
 
-        if (!usersRes.ok || !domainAppsRes.ok || !hostingAppsRes.ok) {
+        if (!usersRes.ok || !domainAppsRes.ok || !hostingAppsRes.ok || !domainsRes.ok) {
           throw new Error("Failed to fetch data");
         }
 
         const users: User[] = await usersRes.json();
         const domainApps: SubdomainApplication[] = await domainAppsRes.json();
         const hostingApps: HostingApplication[] = await hostingAppsRes.json();
+        const domains = await domainsRes.json();
 
         const currentUser = users.find((user) => user.role === role);
         let allNotifications: NotificationItem[] = [];
+
+        // Calculate countdown for Admin Daerah
+        if (role === "Admin Daerah" && currentUser?.opd) {
+          const userOpd = currentUser.opd;
+          const activeDomains = domains.filter(
+            (d: any) => d.opd === userOpd && d.status === "Active" && d.activated_at
+          );
+          
+          if (activeDomains.length > 0) {
+            const countdowns = activeDomains.map((d: any) => calculateCountdown(d.activated_at));
+            const nearestExpiry = Math.min(...countdowns.map(c => c.days).filter(d => d > 0));
+            setCountdownInfo({ nearestExpiry: nearestExpiry !== Infinity ? nearestExpiry : null, totalActive: activeDomains.length });
+          }
+        }
 
         if (role === "Super Admin") {
           const domainNotifications = domainApps
@@ -145,13 +182,14 @@ function NotificationNavContent() {
   }, [role, roleQuery]);
 
   const notificationCount = notifications.length;
+  const showCountdown = role === "Admin Daerah" && countdownInfo.nearestExpiry !== null;
 
   const getSeeAllLink = () => {
     if (role === "Super Admin") {
       return `/applications?role=${role || ""}&status=pending_review`;
     }
     if (role === "Admin Daerah") {
-      return `/notifications?role=${role || ""}`;
+      return `/domains?role=${role || ""}`;
     }
     return "#";
   };
@@ -169,7 +207,7 @@ function NotificationNavContent() {
           ) : (
             <>
               <Bell className="h-5 w-5" />
-              {notificationCount > 0 && (
+              {(notificationCount > 0 || showCountdown) && (
                 <span className="absolute top-0 right-0 flex h-2.5 w-2.5">
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-destructive opacity-75"></span>
                   <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-destructive"></span>
@@ -190,6 +228,30 @@ function NotificationNavContent() {
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
+        
+        {/* Domain Countdown for Admin Daerah */}
+        {showCountdown && (
+          <>
+            <div className="px-2 py-3 bg-muted/50 rounded-md mx-2 my-2">
+              <div className="flex items-center justify-between mb-1">
+                <p className="text-sm font-semibold">Countdown Domain</p>
+                <Badge variant={
+                  countdownInfo.nearestExpiry! <= 30 ? "destructive" : 
+                  countdownInfo.nearestExpiry! <= 90 ? "default" : 
+                  "secondary"
+                }>
+                  {countdownInfo.nearestExpiry} Hari
+                </Badge>
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Domain terdekat akan expired dalam {countdownInfo.nearestExpiry} hari. 
+                Total {countdownInfo.totalActive} domain aktif.
+              </p>
+            </div>
+            <DropdownMenuSeparator />
+          </>
+        )}
+        
         <DropdownMenuGroup>
           {notificationCount > 0 ? (
             notifications.map((item) => (
@@ -211,12 +273,12 @@ function NotificationNavContent() {
             </div>
           )}
         </DropdownMenuGroup>
-        {notificationCount > 0 && (
+        {(notificationCount > 0 || showCountdown) && (
           <>
             <DropdownMenuSeparator />
             <Link href={getSeeAllLink()}>
               <DropdownMenuItem className="justify-center text-sm text-primary hover:text-primary">
-                Lihat semua
+                {showCountdown ? "Lihat Domain" : "Lihat semua"}
               </DropdownMenuItem>
             </Link>
           </>
