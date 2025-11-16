@@ -129,7 +129,9 @@ function SuperAdminAuditTrailContent() {
 
       const isSearchMatch =
         !searchTerm ||
-        (log.user?.toLowerCase() || "").includes(searchTerm.toLowerCase()) ||
+        (log.username?.toLowerCase() || "").includes(
+          searchTerm.toLowerCase()
+        ) ||
         log.action.toLowerCase().includes(searchTerm.toLowerCase()) ||
         (log.details?.toLowerCase() || "").includes(searchTerm.toLowerCase());
 
@@ -189,8 +191,8 @@ function SuperAdminAuditTrailContent() {
         [
           log.id,
           `"${log.timestamp}"`,
-          `"${log.user}"`,
-          `"${log.userRole}"`,
+          `"${log.username}"`,
+          `"${log.user_role}"`,
           `"${log.action}"`,
           `"${log.details?.replace(/"/g, '""') || ""}"`,
         ].join(",")

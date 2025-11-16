@@ -71,9 +71,9 @@ function SuperAdminApplicationsContent() {
         SubdomainApplication["status"] | null
       > = {
         all: null,
-        Pending: "pending_review",
-        Approved: "approved",
-        Rejected: "rejected",
+        Pending: "Pending",
+        Approved: "Approved",
+        Rejected: "Rejected",
       };
       const mappedStatus = statusMap[statusFilter];
       if (mappedStatus && app.status !== mappedStatus) {
@@ -91,7 +91,7 @@ function SuperAdminApplicationsContent() {
         return (
           app.domainName?.toLowerCase().includes(search) ||
           app.opd?.toLowerCase().includes(search) ||
-          app.description?.toLowerCase().includes(search)
+          app.reason?.toLowerCase().includes(search)
         );
       }
 
@@ -101,21 +101,12 @@ function SuperAdminApplicationsContent() {
 
   // Count pending applications (all pending statuses)
   const pendingCount = useMemo(() => {
-    return applications.filter(
-      (app) =>
-        app.status === "pending" ||
-        app.status === "pending_review" ||
-        app.status === "pending_approval"
-    ).length;
+    return applications.filter((app) => app.status === "Pending").length;
   }, [applications]);
 
   const getStatusBadge = (status: SubdomainApplication["status"]) => {
     // Simplify to 3 main statuses
-    if (
-      status === "pending" ||
-      status === "pending_review" ||
-      status === "pending_approval"
-    ) {
+    if (status === "Pending") {
       return (
         <Badge
           variant="outline"
@@ -126,7 +117,7 @@ function SuperAdminApplicationsContent() {
       );
     }
 
-    if (status === "approved") {
+    if (status === "Approved") {
       return (
         <Badge
           variant="outline"
@@ -137,7 +128,7 @@ function SuperAdminApplicationsContent() {
       );
     }
 
-    if (status === "rejected") {
+    if (status === "Rejected") {
       return (
         <Badge
           variant="outline"
@@ -212,7 +203,7 @@ function SuperAdminApplicationsContent() {
               <SelectContent>
                 <SelectItem value="all">Semua OPD</SelectItem>
                 {allOpds.map((opd) => (
-                  <SelectItem key={opd} value={opd}>
+                  <SelectItem key={opd} value={opd || ""}>
                     {opd}
                   </SelectItem>
                 ))}
@@ -281,7 +272,7 @@ function SuperAdminApplicationsContent() {
                           </code>
                         </td>
                         <td className="px-4 py-3 text-sm max-w-xs truncate">
-                          {app.description || "-"}
+                          {app.reason || "-"}
                         </td>
                         <td className="px-4 py-3">
                           {getStatusBadge(app.status)}

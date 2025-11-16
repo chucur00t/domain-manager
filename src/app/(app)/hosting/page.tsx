@@ -10,7 +10,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { HostingApplicationsTable } from "@/components/features/hosting/hosting-applications-table";
+import { HostingApplicationsTable } from "@/frontend/components/features/hosting/hosting-applications-table";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Loader2, PlusCircle, Search } from "lucide-react";
@@ -59,13 +59,13 @@ function HostingPageContent() {
       }
     };
     fetchApplications();
-  }, []);
+  }, [role]);
 
   const currentUser = MOCK_USERS.find((user) => user.role === role);
   const USER_OPD = currentUser?.opd;
 
   const allApplications = useMemo(() => {
-    if (role === "Operator" && USER_OPD) {
+    if (role === "Admin Daerah" && USER_OPD) {
       return applications.filter((app) => app.opd === USER_OPD);
     }
     return applications;
@@ -74,22 +74,18 @@ function HostingPageContent() {
   const filteredApplications = useMemo(() => {
     let apps = allApplications;
 
-    if (statusFilter !== "all") {
-      apps = apps.filter((app) => app.status === statusFilter);
-    }
-
     if (searchTerm) {
       apps = apps.filter(
         (app) =>
           app.applicationName
-            .toLowerCase()
+            ?.toLowerCase()
             .includes(searchTerm.toLowerCase()) ||
-          app.domainName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          app.opd.toLowerCase().includes(searchTerm.toLowerCase())
+          app.domainName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          app.opd?.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
     return apps;
-  }, [allApplications, statusFilter, searchTerm]);
+  }, [allApplications, searchTerm]);
 
   const updateURLParams = (status: StatusFilter, search: string) => {
     const params = new URLSearchParams(searchParams.toString());
@@ -132,17 +128,9 @@ function HostingPageContent() {
           <div>
             <CardTitle>Manajemen Permohonan Hosting</CardTitle>
             <CardDescription>
-              Lihat dan kelola semua permohonan hosting yang masuk.
+              Lihat dan kelola semua permohonan hosting aplikasi
             </CardDescription>
           </div>
-          {role === "Operator" && (
-            <Link href={`/hosting/new?role=${role || ""}`}>
-              <Button size="sm" className="gap-1 w-full sm:w-auto">
-                <PlusCircle className="size-3.5" />
-                Ajukan Hosting Baru
-              </Button>
-            </Link>
-          )}
         </div>
         <div className="flex flex-col sm:flex-row items-center gap-4 pt-4 flex-wrap">
           <div className="relative w-full sm:max-w-xs">

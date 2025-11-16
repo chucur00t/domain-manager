@@ -1,9 +1,8 @@
+import { NextRequest, NextResponse } from "next/server";
+import { getApplications } from "@/backend/services";
+import { applicationService } from "@/backend/database/services/application.service";
 
-import { NextRequest, NextResponse } from 'next/server';
-import { getApplications } from '@/backend/services';
-import { applicationService } from '@/backend/database/services/application.service';
-
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
     const applications = await getApplications();
     // Sort by most recent, handle undefined dates
@@ -14,8 +13,11 @@ export async function GET() {
     });
     return NextResponse.json(applications);
   } catch (error) {
-    console.error('Error fetching applications:', error);
-    return NextResponse.json({ message: 'Internal Server Error' }, { status: 500 });
+    console.error("Error fetching applications:", error);
+    return NextResponse.json(
+      { message: "Internal Server Error" },
+      { status: 500 }
+    );
   }
 }
 
@@ -29,13 +31,13 @@ export async function POST(request: NextRequest) {
       description,
       purpose,
       subdomainType,
-      documents = []
+      documents = [],
     } = body;
 
     // Validate required fields
     if (!domainName || !applicantName || !opd || !description || !purpose) {
       return NextResponse.json(
-        { message: 'Field wajib tidak boleh kosong' },
+        { message: "Field wajib tidak boleh kosong" },
         { status: 400 }
       );
     }
@@ -44,32 +46,32 @@ export async function POST(request: NextRequest) {
     const domainRegex = /^[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?$/;
     if (!domainRegex.test(domainName)) {
       return NextResponse.json(
-        { message: 'Format nama domain tidak valid' },
+        { message: "Format nama domain tidak valid" },
         { status: 400 }
       );
     }
 
     // Create subdomain application
     const applicationId = await applicationService.createSubdomainApplication({
-      userId: '1', // In real app, get from auth token
+      userId: "1", // In real app, get from auth token
       domainName,
       purpose: `${purpose}: ${description}`,
       opd,
       description,
-      documents
+      documents,
     });
 
     return NextResponse.json(
       {
-        message: 'Permohonan domain berhasil dibuat',
-        id: applicationId
+        message: "Permohonan domain berhasil dibuat",
+        id: applicationId,
       },
       { status: 201 }
     );
   } catch (error) {
-    console.error('Error creating application:', error);
+    console.error("Error creating application:", error);
     return NextResponse.json(
-      { message: 'Terjadi kesalahan saat membuat permohonan' },
+      { message: "Terjadi kesalahan saat membuat permohonan" },
       { status: 500 }
     );
   }

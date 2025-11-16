@@ -23,7 +23,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-type StatusFilter = "all" | "pending_review" | "approved" | "rejected";
+type StatusFilter = "all" | "Active" | "Deactivated" | "Expired";
 
 function SuperAdminHostingApplicationsContent() {
   const searchParams = useSearchParams();
@@ -92,40 +92,36 @@ function SuperAdminHostingApplicationsContent() {
 
   // Count pending applications
   const pendingCount = useMemo(() => {
-    return applications.filter(
-      (app) =>
-        app.status === "pending_review" || app.status === "pending_approval"
-    ).length;
+    return applications.filter((app) => app.status === "Deactivated").length;
   }, [applications]);
 
   const getStatusBadge = (status: string) => {
     switch (status) {
-      case "pending_review":
-      case "pending_approval":
-        return (
-          <Badge
-            variant="outline"
-            className="bg-yellow-50 text-yellow-700 border-yellow-200"
-          >
-            Pending
-          </Badge>
-        );
-      case "approved":
+      case "Active":
         return (
           <Badge
             variant="outline"
             className="bg-green-50 text-green-700 border-green-200"
           >
-            Disetujui
+            Aktif
           </Badge>
         );
-      case "rejected":
+      case "Deactivated":
+        return (
+          <Badge
+            variant="outline"
+            className="bg-yellow-50 text-yellow-700 border-yellow-200"
+          >
+            Belum Aktif
+          </Badge>
+        );
+      case "Expired":
         return (
           <Badge
             variant="outline"
             className="bg-red-50 text-red-700 border-red-200"
           >
-            Ditolak
+            Kedaluwarsa
           </Badge>
         );
       default:
@@ -163,7 +159,39 @@ function SuperAdminHostingApplicationsContent() {
           </div>
         </CardHeader>
         <CardContent className="space-y-4">
-          {/* Filters */}
+          {/* Status Filter Buttons */}
+          <div className="flex flex-wrap gap-2">
+            <Button
+              variant={statusFilter === "all" ? "default" : "outline"}
+              onClick={() => setStatusFilter("all")}
+              size="sm"
+            >
+              Semua
+            </Button>
+            <Button
+              variant={statusFilter === "Active" ? "default" : "outline"}
+              onClick={() => setStatusFilter("Active")}
+              size="sm"
+            >
+              Aktif
+            </Button>
+            <Button
+              variant={statusFilter === "Deactivated" ? "default" : "outline"}
+              onClick={() => setStatusFilter("Deactivated")}
+              size="sm"
+            >
+              Belum Aktif
+            </Button>
+            <Button
+              variant={statusFilter === "Expired" ? "default" : "outline"}
+              onClick={() => setStatusFilter("Expired")}
+              size="sm"
+            >
+              Kedaluwarsa
+            </Button>
+          </div>
+
+          {/* Search and OPD Filter */}
           <div className="flex flex-col md:flex-row gap-4">
             <div className="flex-1 relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -174,20 +202,6 @@ function SuperAdminHostingApplicationsContent() {
                 className="pl-10"
               />
             </div>
-            <Select
-              value={statusFilter}
-              onValueChange={(value) => setStatusFilter(value as StatusFilter)}
-            >
-              <SelectTrigger className="w-full md:w-[180px]">
-                <SelectValue placeholder="Filter Status" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Semua Status</SelectItem>
-                <SelectItem value="pending_review">Pending</SelectItem>
-                <SelectItem value="rejected">Ditolak</SelectItem>
-                <SelectItem value="approved">Disetujui</SelectItem>
-              </SelectContent>
-            </Select>
             <Select value={opdFilter} onValueChange={setOpdFilter}>
               <SelectTrigger className="w-full md:w-[200px]">
                 <SelectValue placeholder="Filter OPD" />
@@ -195,7 +209,7 @@ function SuperAdminHostingApplicationsContent() {
               <SelectContent>
                 <SelectItem value="all">Semua OPD</SelectItem>
                 {allOpds.map((opd) => (
-                  <SelectItem key={opd} value={opd}>
+                  <SelectItem key={opd} value={opd || ""}>
                     {opd}
                   </SelectItem>
                 ))}

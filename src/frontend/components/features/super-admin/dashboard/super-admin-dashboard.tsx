@@ -82,13 +82,10 @@ export function SuperAdminDashboard({ role }: Props) {
           .slice(0, 5);
 
         const calculatedStats = {
-          activeDomainsCount: domains.filter((d) => d.status === "active")
+          activeDomainsCount: domains.filter((d) => d.status === "Active")
             .length,
           pendingApplicationsCount: applications.filter(
-            (a) =>
-              a.status === "pending" ||
-              a.status === "pending_review" ||
-              a.status === "pending_approval"
+            (a) => a.status === "Pending"
           ).length,
           totalUsersCount: users.length,
           totalOpdCount: opdList.length,
@@ -98,15 +95,15 @@ export function SuperAdminDashboard({ role }: Props) {
 
         setStats(calculatedStats);
 
-        setApplicationsByOpd(appCounts);
+        setApplicationsByOpd(
+          appCounts.filter((item) => item.opd) as {
+            opd: string;
+            applications: number;
+          }[]
+        );
 
         const sortedRecent = [...applications]
-          .filter(
-            (a) =>
-              a.status === "pending" ||
-              a.status === "pending_review" ||
-              a.status === "pending_approval"
-          )
+          .filter((a) => a.status === "Pending")
           .sort((a, b) => {
             const dateA = a.submittedDate || a.submissionDate || "";
             const dateB = b.submittedDate || b.submissionDate || "";

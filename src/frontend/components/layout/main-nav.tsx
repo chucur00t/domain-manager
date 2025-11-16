@@ -150,13 +150,6 @@ export const navItems: NavItem[] = [
     icon: Globe,
     roles: ["Super Admin"],
   },
-  // Admin Daerah: Hosting Saya
-  {
-    href: (role) => `/hosting?role=${encodeURIComponent(role)}`,
-    label: "Hosting Saya",
-    icon: Server,
-    roles: ["Admin Daerah"],
-  },
   // Admin Daerah: Notifikasi (Interaksi)
   {
     href: (role) => `/notifications?role=${encodeURIComponent(role)}`,

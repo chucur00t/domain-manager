@@ -544,7 +544,9 @@ function SuperAdminOPDsContent() {
                   <div>{selectedOPD.phone}</div>
 
                   <div className="text-muted-foreground">Alamat:</div>
-                  <div className="col-span-1 break-words">{selectedOPD.address}</div>
+                  <div className="col-span-1 break-words">
+                    {selectedOPD.address}
+                  </div>
                 </div>
 
                 <div className="border-t pt-4">
@@ -615,7 +617,7 @@ function SuperAdminOPDsContent() {
                               )}
                             </div>
                             <div className="flex items-center gap-2">
-                              {hosting.status === "approved" && (
+                              {hosting.status === "Active" && (
                                 <Badge
                                   variant="default"
                                   className="text-xs bg-green-600"
@@ -623,9 +625,9 @@ function SuperAdminOPDsContent() {
                                   Aktif
                                 </Badge>
                               )}
-                              {hosting.status === "pending" && (
+                              {hosting.status === "Deactivated" && (
                                 <Badge variant="secondary" className="text-xs">
-                                  Pending
+                                  Non-Aktif
                                 </Badge>
                               )}
                             </div>

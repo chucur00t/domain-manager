@@ -46,40 +46,40 @@ const statusConfig: Record<
   Active: {
     text: "Aktif",
     variant: "secondary",
-    className: "bg-green-500 hover:bg-green-600 text-secondary-foreground",
+    className: "bg-green-100 text-green-800 border-green-300",
   },
   Suspended: {
     text: "Ditangguhkan",
     variant: "outline",
+    className: "bg-yellow-100 text-yellow-800 border-yellow-300",
+  },
+  Deactivated: {
+    text: "Dinonaktifkan",
+    variant: "destructive",
+    className: "bg-red-100 text-red-800 border-red-300",
+  },
+  Expired: {
+    text: "Kedaluwarsa",
+    variant: "outline",
+    className: "bg-gray-100 text-gray-800 border-gray-300",
+  },
+};
+
+// Old status config kept for compatibility - not used
+const statusConfigOldUnused = {
+  Active: {
+    text: "Aktif",
+    variant: "secondary" as const,
+    className: "bg-green-500 hover:bg-green-600 text-secondary-foreground",
+  },
+  Suspended: {
+    text: "Ditangguhkan",
+    variant: "outline" as const,
     className: "bg-gray-100 hover:bg-gray-200",
   },
   Deactivated: {
     text: "Tidak Aktif",
-    variant: "destructive",
-  inactive: {
-    text: "Tidak Aktif",
-    variant: "outline",
-    className: "bg-gray-100 hover:bg-gray-200",
-  },
-  expired: {
-    text: "Kadaluarsa",
-    variant: "destructive",
-    className: "bg-red-500 hover:bg-red-600",
-  },
-  // Database might use different case
-  Active: {
-    text: "Aktif",
-    variant: "secondary",
-    className: "bg-green-500 hover:bg-green-600 text-secondary-foreground",
-  },
-  Inactive: {
-    text: "Tidak Aktif",
-    variant: "outline",
-    className: "bg-gray-100 hover:bg-gray-200",
-  },
-  Expired: {
-    text: "Kadaluarsa",
-    variant: "destructive",
+    variant: "destructive" as const,
     className: "bg-red-500 hover:bg-red-600",
   },
 };

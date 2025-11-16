@@ -1,20 +1,37 @@
+import { notFound } from "next/navigation";
+import { HostingApplicationDetailClient } from "@/frontend/components/features/hosting/hosting-application-detail-client";
+import { getHostingApplicationById } from "@/backend/services";
+import React from "react";
 
-import { notFound } from 'next/navigation';
-import { HostingApplicationDetailClient } from '@/components/features/hosting/hosting-application-detail-client';
-import { getHostingApplication } from '@/lib/firebase/services';
-import { Loader2 } from 'lucide-react';
-import React from 'react';
-
-export default async function HostingApplicationDetailPage({ params }: { params: Promise<{ id: string }> }) {
+export default async function HostingApplicationDetailPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
   const { id } = await params;
-  const application = await getHostingApplication(id);
 
-  if (!application) {
+  console.log("=== HOSTING DETAIL PAGE ===");
+  console.log("Requested ID:", id);
+
+  try {
+    const application = await getHostingApplicationById(id);
+
+    console.log("Application found:", application ? "YES" : "NO");
+    if (application) {
+      console.log("Application data:", JSON.stringify(application, null, 2));
+    }
+
+    if (!application) {
+      console.log("Application not found, calling notFound()");
+      notFound();
+    }
+
+    return <HostingApplicationDetailClient application={application} />;
+  } catch (error) {
+    console.error("Error fetching hosting application:", error);
     notFound();
   }
-
-  return <HostingApplicationDetailClient application={application} />;
 }
 
 // Add a suspense boundary for the page
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";

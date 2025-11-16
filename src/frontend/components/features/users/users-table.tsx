@@ -98,7 +98,10 @@ function UsersTableContent({ users, onUserAction }: UsersTableProps) {
 
     if (currentUser.role === "Admin Daerah") {
       // Admin Daerah can only edit users in their own OPD
-      return userToEdit.opd === currentUser.opd && userToEdit.email !== currentUser.email;
+      return (
+        userToEdit.opd === currentUser.opd &&
+        userToEdit.email !== currentUser.email
+      );
     }
     return false;
   };
@@ -124,7 +127,9 @@ function UsersTableContent({ users, onUserAction }: UsersTableProps) {
                 {currentUsers.length > 0 ? (
                   currentUsers.map((user) => (
                     <TableRow key={user.id}>
-                      <TableCell className="font-medium">{user.username || user.name}</TableCell>
+                      <TableCell className="font-medium">
+                        {user.username || user.name}
+                      </TableCell>
                       <TableCell>{user.email}</TableCell>
                       <TableCell>
                         <Badge
@@ -225,7 +230,7 @@ function UsersTableContent({ users, onUserAction }: UsersTableProps) {
       </TooltipProvider>
       <EditUserForm
         user={selectedUser}
-        currentUser={currentUser || null}
+        currentUser={(currentUser as any) || null}
         allOpds={allOpds}
         onFormAction={() => {
           onUserAction();
