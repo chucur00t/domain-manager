@@ -101,8 +101,15 @@ function SuperAdminDomainsContent() {
   const filteredDomains = useMemo(() => {
     return domains.filter((domain) => {
       // Status filter
-      if (statusFilter !== "all" && domain.status !== statusFilter) {
-        return false;
+      if (statusFilter !== "all") {
+        const filterMap: Record<string, string> = {
+          active: "Active",
+          inactive: "Suspended",
+          expired: "Deactivated",
+        };
+        if (domain.status !== (filterMap[statusFilter] || statusFilter)) {
+          return false;
+        }
       }
 
       // OPD filter
@@ -127,9 +134,9 @@ function SuperAdminDomainsContent() {
   const stats = useMemo(() => {
     return {
       total: domains.length,
-      active: domains.filter((d) => d.status === "active").length,
-      inactive: domains.filter((d) => d.status === "inactive").length,
-      expired: domains.filter((d) => d.status === "expired").length,
+      active: domains.filter((d) => d.status === "Active").length,
+      inactive: domains.filter((d) => d.status === "Suspended").length,
+      expired: domains.filter((d) => d.status === "Deactivated").length,
     };
   }, [domains]);
 
@@ -146,7 +153,7 @@ function SuperAdminDomainsContent() {
   };
 
   const handleCheckHealth = async (domain: Domain) => {
-    setIsCheckingHealth((prev) => new Set(prev).add(domain.id));
+    setIsCheckingHealth((prev) => new Set(prev).add(domain.id.toString()));
 
     try {
       const response = await fetch(`/api/domains/${domain.id}/health`);
@@ -155,7 +162,9 @@ function SuperAdminDomainsContent() {
       }
       const healthInfo: DomainHealth = await response.json();
 
-      setHealthData((prev) => new Map(prev).set(domain.id, healthInfo));
+      setHealthData((prev) =>
+        new Map(prev).set(domain.id.toString(), healthInfo)
+      );
 
       // Show result in dialog
       handleOpenDialog(domain, "health-check");
@@ -165,7 +174,7 @@ function SuperAdminDomainsContent() {
     } finally {
       setIsCheckingHealth((prev) => {
         const next = new Set(prev);
-        next.delete(domain.id);
+        next.delete(domain.id.toString());
         return next;
       });
     }
@@ -196,9 +205,9 @@ function SuperAdminDomainsContent() {
         Exclude<ActionType, "health-check">,
         Domain["status"]
       > = {
-        activate: "active",
-        suspend: "inactive",
-        deactivate: "inactive",
+        activate: "Active",
+        suspend: "Suspended",
+        deactivate: "Deactivated",
       };
 
       const newStatus =
@@ -247,7 +256,7 @@ function SuperAdminDomainsContent() {
 
   const getStatusBadge = (status: Domain["status"]) => {
     switch (status) {
-      case "active":
+      case "Active":
         return (
           <Badge
             variant="outline"
@@ -256,7 +265,7 @@ function SuperAdminDomainsContent() {
             Aktif
           </Badge>
         );
-      case "inactive":
+      case "Suspended":
         return (
           <Badge
             variant="outline"
@@ -265,22 +274,13 @@ function SuperAdminDomainsContent() {
             Tidak Aktif
           </Badge>
         );
-      case "expired":
+      case "Deactivated":
         return (
           <Badge
             variant="outline"
             className="bg-red-50 text-red-700 border-red-200"
           >
             Kadaluarsa
-          </Badge>
-        );
-      case "pending":
-        return (
-          <Badge
-            variant="outline"
-            className="bg-yellow-50 text-yellow-700 border-yellow-200"
-          >
-            Pending
           </Badge>
         );
       default:
@@ -401,7 +401,7 @@ function SuperAdminDomainsContent() {
                 <SelectContent>
                   <SelectItem value="all">Semua OPD</SelectItem>
                   {allOpds.map((opd) => (
-                    <SelectItem key={opd} value={opd}>
+                    <SelectItem key={opd || ""} value={opd || ""}>
                       {opd}
                     </SelectItem>
                   ))}
@@ -567,10 +567,12 @@ function SuperAdminDomainsContent() {
 
               {/* Health Check Results */}
               {actionType === "health-check" &&
-                healthData.has(selectedDomain.id) && (
+                healthData.has(selectedDomain.id.toString()) && (
                   <div className="space-y-3 border-t pt-4">
                     {(() => {
-                      const health = healthData.get(selectedDomain.id)!;
+                      const health = healthData.get(
+                        selectedDomain.id.toString()
+                      )!;
                       return (
                         <>
                           <h4 className="font-semibold text-sm flex items-center gap-2">
@@ -702,9 +704,11 @@ function SuperAdminDomainsContent() {
                           {/* Last Checked */}
                           <div className="text-xs text-muted-foreground text-center pt-2">
                             Terakhir diperiksa:{" "}
-                            {new Date(health.lastChecked).toLocaleString(
-                              "id-ID"
-                            )}
+                            {new Date(
+                              health.lastChecked ||
+                                health.last_checked ||
+                                new Date()
+                            ).toLocaleString("id-ID")}
                           </div>
                         </>
                       );
@@ -743,7 +747,7 @@ function SuperAdminDomainsContent() {
             {actionType === "health-check" && selectedDomain ? (
               <div className="flex items-center justify-between w-full">
                 <div className="flex gap-2">
-                  {selectedDomain.status !== "active" && (
+                  {selectedDomain.status !== "Active" && (
                     <Button
                       variant="default"
                       size="sm"
@@ -755,7 +759,7 @@ function SuperAdminDomainsContent() {
                       Aktifkan
                     </Button>
                   )}
-                  {selectedDomain.status === "active" && (
+                  {selectedDomain.status === "Active" && (
                     <Button
                       variant="secondary"
                       size="sm"
@@ -767,7 +771,7 @@ function SuperAdminDomainsContent() {
                       Suspen
                     </Button>
                   )}
-                  {selectedDomain.status !== "expired" && (
+                  {selectedDomain.status !== "Deactivated" && (
                     <Button
                       variant="destructive"
                       size="sm"

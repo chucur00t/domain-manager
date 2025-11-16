@@ -45,7 +45,7 @@ export interface ChangeUserStatusRequest {
   is_active: boolean;
 }
 
-export type DomainStatus = 'Active' | 'Suspended' | 'Deactivated';
+export type DomainStatus = 'Active' | 'Suspended' | 'Deactivated' | 'Expired';
 export type ApplicationStatus = 'Pending' | 'Approved' | 'Rejected';
 export type ApplicationType = 'domain' | 'hosting';
 
@@ -105,7 +105,7 @@ export interface Hosting {
   storage_capacity?: string;
   bandwidth?: string;
   server_type?: string;
-  status: 'Active' | 'Deactivated';
+  status: 'Active' | 'Deactivated' | 'Expired';
   activated_at: string;
   // Joined fields
   domain_name?: string;

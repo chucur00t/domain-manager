@@ -1,6 +1,12 @@
-import { query, execute, buildPagination } from '../utils';
-import type { DatabaseRow } from '../types';
-import type { SubdomainApplication, HostingApplication, ApplicationStatus } from '@/backend/models/types';
+import { query, execute, buildPagination } from "../utils";
+import type { DatabaseRow } from "../types";
+import type {
+  SubdomainApplication,
+  HostingApplication,
+  ApplicationStatus,
+  Application,
+  ApplicationType,
+} from "@/backend/models/types";
 
 export interface DocumentRow extends DatabaseRow {
   id: number;
@@ -13,7 +19,7 @@ export interface DocumentRow extends DatabaseRow {
 
 export interface ApplicationRow extends DatabaseRow {
   id: number;
-  application_type: 'domain' | 'hosting';
+  application_type: "domain" | "hosting";
   requested_domain_name?: string;
   opd_id?: number;
   submitter_id?: number;
@@ -27,7 +33,7 @@ export interface ApplicationRow extends DatabaseRow {
   updater_name?: string;
   // Domain specific fields
   domain_name?: string;
-  // Hosting specific fields  
+  // Hosting specific fields
   application_name?: string;
   framework?: string;
   storage_capacity?: string;
@@ -73,7 +79,7 @@ export interface UpdateApplicationData {
 
 export interface ApplicationFilter {
   status?: ApplicationStatus;
-  application_type?: 'domain' | 'hosting';
+  application_type?: "domain" | "hosting";
   opd_id?: number;
   submitter_id?: number;
   search?: string;
@@ -84,8 +90,8 @@ export interface ApplicationFilter {
 export class ApplicationService {
   // Get all applications with pagination and filtering
   async getApplications(
-    page: number = 1, 
-    limit: number = 10, 
+    page: number = 1,
+    limit: number = 10,
     filters: ApplicationFilter = {}
   ): Promise<{
     applications: (SubdomainApplication | HostingApplication)[];
@@ -99,41 +105,48 @@ export class ApplicationService {
       const params: any[] = [];
 
       if (filters.status) {
-        conditions.push('a.status = ?');
+        conditions.push("a.status = ?");
         params.push(filters.status);
       }
 
       if (filters.application_type) {
-        conditions.push('a.application_type = ?');
+        conditions.push("a.application_type = ?");
         params.push(filters.application_type);
       }
 
       if (filters.opd_id) {
-        conditions.push('a.opd_id = ?');
+        conditions.push("a.opd_id = ?");
         params.push(filters.opd_id);
       }
 
       if (filters.submitter_id) {
-        conditions.push('a.submitter_id = ?');
+        conditions.push("a.submitter_id = ?");
         params.push(filters.submitter_id);
       }
 
       if (filters.search) {
-        conditions.push('(o.name LIKE ? OR u.username LIKE ? OR a.reason LIKE ?)');
-        params.push(`%${filters.search}%`, `%${filters.search}%`, `%${filters.search}%`);
+        conditions.push(
+          "(o.name LIKE ? OR u.username LIKE ? OR a.reason LIKE ?)"
+        );
+        params.push(
+          `%${filters.search}%`,
+          `%${filters.search}%`,
+          `%${filters.search}%`
+        );
       }
 
       if (filters.date_from) {
-        conditions.push('a.submitted_at >= ?');
+        conditions.push("a.submitted_at >= ?");
         params.push(filters.date_from);
       }
 
       if (filters.date_to) {
-        conditions.push('a.submitted_at <= ?');
+        conditions.push("a.submitted_at <= ?");
         params.push(filters.date_to);
       }
 
-      const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : '';
+      const whereClause =
+        conditions.length > 0 ? `WHERE ${conditions.join(" AND ")}` : "";
 
       // Get total count
       const countSql = `
@@ -148,9 +161,9 @@ export class ApplicationService {
 
       // Get applications with pagination
       const { offset, limit: paginationLimit } = buildPagination(page, limit);
-      
+
       const applicationsSql = `
-        SELECT a.id, a.application_type, a.requested_domain_name, a.opd_id, a.submitter_id, a.status, a.reason,
+        SELECT a.id, a.application_type, a.opd_id, a.submitter_id, a.status, a.reason,
                a.submitted_at, a.approved_at, a.last_updated_by,
                o.name as opd_name,
                u.username as submitter_name,
@@ -164,43 +177,56 @@ export class ApplicationService {
         LIMIT ? OFFSET ?
       `;
 
-      const applications = await query<ApplicationRow>(applicationsSql, [...params, paginationLimit, offset]);
+      const applications = await query<ApplicationRow>(applicationsSql, [
+        ...params,
+        paginationLimit,
+        offset,
+      ]);
 
       // Convert to application format
-      const formattedApplications: (SubdomainApplication | HostingApplication)[] = applications.map(app => ({
-        id: app.id.toString(),
-        userId: app.submitter_id?.toString() || '',
-        domainName: app.requested_domain_name || '',
-        purpose: app.reason || '',
-        opd: app.opd_name || '',
+      const formattedApplications: Application[] = applications.map((app) => ({
+        id: app.id,
+        application_type: app.application_type as ApplicationType,
+        opd_id: app.opd_id,
+        submitter_id: app.submitter_id,
         status: app.status as ApplicationStatus,
-        submissionDate: app.submitted_at.toISOString().split('T')[0],
-        submittedDate: app.submitted_at.toISOString().split('T')[0],
-        approvalDate: app.approved_at?.toISOString().split('T')[0],
-        applicantName: app.submitter_name,
-        description: app.reason || '',
-        applicationName: app.requested_domain_name || '',
-        framework: '', // Will be filled by specific service
-        documents: [],
-        rejectionReason: app.status === 'rejected' ? app.reason : undefined
+        reason: app.reason,
+        submitted_at: app.submitted_at.toISOString(),
+        approved_at: app.approved_at?.toISOString(),
+        last_updated_by: app.last_updated_by,
+        opd: app.opd_name,
+        submitter_username: app.submitter_name,
+        domainName: app.opd_name
+          ? `${app.opd_name
+              .toLowerCase()
+              .replace(/\s+/g, "-")}.kalbarprov.go.id`
+          : "",
+        submittedDate: app.submitted_at.toISOString().split("T")[0],
+        submissionDate: app.submitted_at.toISOString().split("T")[0],
       }));
 
       return {
         applications: formattedApplications,
         total,
         page,
-        limit: paginationLimit
+        limit: paginationLimit,
       };
     } catch (error) {
-      throw new Error(`Failed to fetch applications: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      throw new Error(
+        `Failed to fetch applications: ${
+          error instanceof Error ? error.message : "Unknown error"
+        }`
+      );
     }
   }
 
   // Get application by ID
-  async getApplication(id: number): Promise<(SubdomainApplication | HostingApplication) | null> {
+  async getApplication(
+    id: number
+  ): Promise<(SubdomainApplication | HostingApplication) | null> {
     try {
-      const applicationsSql = `
-        SELECT a.id, a.application_type, a.requested_domain_name, a.opd_id, a.submitter_id, a.status, a.reason,
+      const sql = `
+        SELECT a.id, a.application_type, a.opd_id, a.submitter_id, a.status, a.reason,
                a.submitted_at, a.approved_at, a.last_updated_by,
                o.name as opd_name,
                u.username as submitter_name,
@@ -212,47 +238,56 @@ export class ApplicationService {
         WHERE a.id = ?
       `;
 
-      const applications = await query<ApplicationRow>(applicationsSql, [id]);
-      
+      const applications = await query<ApplicationRow>(sql, [id]);
+
       if (applications.length === 0) {
         return null;
       }
 
       const app = applications[0];
       return {
-        id: app.id.toString(),
-        userId: app.submitter_id?.toString() || '',
-        domainName: app.requested_domain_name || '',
-        purpose: app.reason || '',
-        opd: app.opd_name || '',
+        id: app.id,
+        application_type: app.application_type as ApplicationType,
+        opd_id: app.opd_id,
+        submitter_id: app.submitter_id,
         status: app.status as ApplicationStatus,
-        submissionDate: app.submitted_at.toISOString().split('T')[0],
-        submittedDate: app.submitted_at.toISOString().split('T')[0],
-        approvalDate: app.approved_at?.toISOString().split('T')[0],
-        applicantName: app.submitter_name,
-        description: app.reason || '',
-        applicationName: app.requested_domain_name || '',
-        framework: '',
-        documents: [],
-        rejectionReason: app.status === 'rejected' ? app.reason : undefined
+        reason: app.reason,
+        submitted_at: app.submitted_at.toISOString(),
+        approved_at: app.approved_at?.toISOString(),
+        last_updated_by: app.last_updated_by,
+        opd: app.opd_name,
+        submitter_username: app.submitter_name,
+        domainName: app.opd_name
+          ? `${app.opd_name
+              .toLowerCase()
+              .replace(/\s+/g, "-")}.kalbarprov.go.id`
+          : "",
+        submittedDate: app.submitted_at.toISOString().split("T")[0],
+        submissionDate: app.submitted_at.toISOString().split("T")[0],
       };
     } catch (error) {
-      throw new Error(`Failed to fetch application: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      throw new Error(
+        `Failed to fetch application: ${
+          error instanceof Error ? error.message : "Unknown error"
+        }`
+      );
     }
   }
 
   // Create subdomain application
-  async createSubdomainApplication(data: CreateSubdomainApplicationData): Promise<string> {
+  async createSubdomainApplication(
+    data: CreateSubdomainApplicationData
+  ): Promise<string> {
     try {
       // First, find or create OPD
       let opdId = await this.findOrCreateOpd(data.opd);
-      
+
       // Find user by ID
-      const userSql = 'SELECT id FROM users WHERE id = ?';
+      const userSql = "SELECT id FROM users WHERE id = ?";
       const userResult = await query<{ id: number }>(userSql, [data.userId]);
-      
+
       if (userResult.length === 0) {
-        throw new Error('User not found');
+        throw new Error("User not found");
       }
 
       const insertSql = `
@@ -260,16 +295,14 @@ export class ApplicationService {
         VALUES ('domain', ?, ?, 'pending', ?)
       `;
 
-      const params = [
-        opdId,
-        userResult[0].id,
-        data.purpose
-      ];
+      const params = [opdId, userResult[0].id, data.purpose];
 
       const result = await execute(insertSql, params);
-      
+
       if (!result.insertId) {
-        throw new Error('Failed to create subdomain application: No ID returned');
+        throw new Error(
+          "Failed to create subdomain application: No ID returned"
+        );
       }
 
       const applicationId = result.insertId;
@@ -281,22 +314,28 @@ export class ApplicationService {
 
       return applicationId.toString();
     } catch (error) {
-      throw new Error(`Failed to create subdomain application: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      throw new Error(
+        `Failed to create subdomain application: ${
+          error instanceof Error ? error.message : "Unknown error"
+        }`
+      );
     }
   }
 
   // Create hosting application
-  async createHostingApplication(data: CreateHostingApplicationData): Promise<string> {
+  async createHostingApplication(
+    data: CreateHostingApplicationData
+  ): Promise<string> {
     try {
       // First, find or create OPD
       let opdId = await this.findOrCreateOpd(data.opd);
-      
+
       // Find user by ID
-      const userSql = 'SELECT id FROM users WHERE id = ?';
+      const userSql = "SELECT id FROM users WHERE id = ?";
       const userResult = await query<{ id: number }>(userSql, [data.userId]);
-      
+
       if (userResult.length === 0) {
-        throw new Error('User not found');
+        throw new Error("User not found");
       }
 
       // Create hosting description combining all the fields
@@ -305,9 +344,9 @@ export class ApplicationService {
         Framework: ${data.framework}
         Tujuan: ${data.purpose}
         Deskripsi: ${data.description}
-        ${data.expectedUsers ? `Expected Users: ${data.expectedUsers}` : ''}
-        ${data.storage ? `Storage: ${data.storage}` : ''}
-        ${data.bandwidth ? `Bandwidth: ${data.bandwidth}` : ''}
+        ${data.expectedUsers ? `Expected Users: ${data.expectedUsers}` : ""}
+        ${data.storage ? `Storage: ${data.storage}` : ""}
+        ${data.bandwidth ? `Bandwidth: ${data.bandwidth}` : ""}
       `.trim();
 
       const insertSql = `
@@ -315,16 +354,12 @@ export class ApplicationService {
         VALUES ('hosting', ?, ?, 'pending', ?)
       `;
 
-      const params = [
-        opdId,
-        userResult[0].id,
-        hostingDescription
-      ];
+      const params = [opdId, userResult[0].id, hostingDescription];
 
       const result = await execute(insertSql, params);
-      
+
       if (!result.insertId) {
-        throw new Error('Failed to create hosting application: No ID returned');
+        throw new Error("Failed to create hosting application: No ID returned");
       }
 
       const applicationId = result.insertId;
@@ -336,12 +371,19 @@ export class ApplicationService {
 
       return applicationId.toString();
     } catch (error) {
-      throw new Error(`Failed to create hosting application: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      throw new Error(
+        `Failed to create hosting application: ${
+          error instanceof Error ? error.message : "Unknown error"
+        }`
+      );
     }
   }
 
   // Save documents for an application
-  private async saveDocuments(applicationId: number, documents: UploadedFile[]): Promise<void> {
+  private async saveDocuments(
+    applicationId: number,
+    documents: UploadedFile[]
+  ): Promise<void> {
     try {
       const insertSql = `
         INSERT INTO documents (application_id, file_name, file_path, file_type)
@@ -353,11 +395,15 @@ export class ApplicationService {
           applicationId,
           doc.name,
           `/uploads/${doc.name}`, // In real implementation, this would be actual file path
-          doc.type
+          doc.type,
         ]);
       }
     } catch (error) {
-      throw new Error(`Failed to save documents: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      throw new Error(
+        `Failed to save documents: ${
+          error instanceof Error ? error.message : "Unknown error"
+        }`
+      );
     }
   }
 
@@ -373,60 +419,72 @@ export class ApplicationService {
 
       const documents = await query<DocumentRow>(documentsSql, [applicationId]);
 
-      return documents.map(doc => ({
+      return documents.map((doc) => ({
         id: doc.id.toString(),
         name: doc.file_name,
         size: 0, // Size not stored in DB, would need file system access
         type: doc.file_type,
-        url: doc.file_path
+        url: doc.file_path,
       }));
     } catch (error) {
-      throw new Error(`Failed to fetch documents: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      throw new Error(
+        `Failed to fetch documents: ${
+          error instanceof Error ? error.message : "Unknown error"
+        }`
+      );
     }
   }
 
   // Update application status
-  async updateApplication(id: number, data: UpdateApplicationData, updatedBy: number): Promise<void> {
+  async updateApplication(
+    id: number,
+    data: UpdateApplicationData,
+    updatedBy: number
+  ): Promise<void> {
     try {
       const updates = [];
       const params: any[] = [];
 
       if (data.status !== undefined) {
-        updates.push('status = ?');
+        updates.push("status = ?");
         params.push(data.status);
-        
-        if (data.status === 'approved') {
-          updates.push('approved_at = CURRENT_TIMESTAMP');
+
+        if (data.status === "approved") {
+          updates.push("approved_at = CURRENT_TIMESTAMP");
         }
       }
 
       if (data.reason !== undefined) {
-        updates.push('reason = ?');
+        updates.push("reason = ?");
         params.push(data.reason);
       }
 
-      updates.push('last_updated_by = ?');
+      updates.push("last_updated_by = ?");
       params.push(updatedBy);
 
       if (updates.length === 0) {
-        throw new Error('No fields to update');
+        throw new Error("No fields to update");
       }
 
       const updateSql = `
         UPDATE applications 
-        SET ${updates.join(', ')}
+        SET ${updates.join(", ")}
         WHERE id = ?
       `;
 
       params.push(id);
 
       const result = await execute(updateSql, params);
-      
+
       if (result.affectedRows === 0) {
-        throw new Error('Application not found or no changes made');
+        throw new Error("Application not found or no changes made");
       }
     } catch (error) {
-      throw new Error(`Failed to update application: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      throw new Error(
+        `Failed to update application: ${
+          error instanceof Error ? error.message : "Unknown error"
+        }`
+      );
     }
   }
 
@@ -438,20 +496,26 @@ export class ApplicationService {
       `;
 
       const result = await execute(deleteSql, [id]);
-      
+
       if (result.affectedRows === 0) {
-        throw new Error('Application not found');
+        throw new Error("Application not found");
       }
     } catch (error) {
-      throw new Error(`Failed to delete application: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      throw new Error(
+        `Failed to delete application: ${
+          error instanceof Error ? error.message : "Unknown error"
+        }`
+      );
     }
   }
 
   // Get applications by status
-  async getApplicationsByStatus(status: ApplicationStatus): Promise<(SubdomainApplication | HostingApplication)[]> {
+  async getApplicationsByStatus(
+    status: ApplicationStatus
+  ): Promise<(SubdomainApplication | HostingApplication)[]> {
     try {
       const applicationsSql = `
-        SELECT a.id, a.application_type, a.requested_domain_name, a.opd_id, a.submitter_id, a.status, a.reason,
+        SELECT a.id, a.application_type, a.opd_id, a.submitter_id, a.status, a.reason,
                a.submitted_at, a.approved_at, a.last_updated_by,
                o.name as opd_name,
                u.username as submitter_name
@@ -462,27 +526,36 @@ export class ApplicationService {
         ORDER BY a.submitted_at DESC
       `;
 
-      const applications = await query<ApplicationRow>(applicationsSql, [status]);
+      const applications = await query<ApplicationRow>(applicationsSql, [
+        status,
+      ]);
 
-      return applications.map(app => ({
-        id: app.id.toString(),
-        userId: app.submitter_id?.toString() || '',
-        domainName: app.requested_domain_name || '',
-        purpose: app.reason || '',
-        opd: app.opd_name || '',
+      return applications.map((app) => ({
+        id: app.id,
+        application_type: app.application_type as ApplicationType,
+        opd_id: app.opd_id,
+        submitter_id: app.submitter_id,
         status: app.status as ApplicationStatus,
-        submissionDate: app.submitted_at.toISOString().split('T')[0],
-        submittedDate: app.submitted_at.toISOString().split('T')[0],
-        approvalDate: app.approved_at?.toISOString().split('T')[0],
-        applicantName: app.submitter_name,
-        description: app.reason || '',
-        applicationName: app.requested_domain_name || '',
-        framework: '',
-        documents: [],
-        rejectionReason: app.status === 'rejected' ? app.reason : undefined
+        reason: app.reason,
+        submitted_at: app.submitted_at.toISOString(),
+        approved_at: app.approved_at?.toISOString(),
+        last_updated_by: app.last_updated_by,
+        opd: app.opd_name,
+        submitter_username: app.submitter_name,
+        domainName: app.opd_name
+          ? `${app.opd_name
+              .toLowerCase()
+              .replace(/\s+/g, "-")}.kalbarprov.go.id`
+          : "",
+        submittedDate: app.submitted_at.toISOString().split("T")[0],
+        submissionDate: app.submitted_at.toISOString().split("T")[0],
       }));
     } catch (error) {
-      throw new Error(`Failed to fetch applications by status: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      throw new Error(
+        `Failed to fetch applications by status: ${
+          error instanceof Error ? error.message : "Unknown error"
+        }`
+      );
     }
   }
 
@@ -490,24 +563,29 @@ export class ApplicationService {
   private async findOrCreateOpd(opdName: string): Promise<number> {
     try {
       // Try to find existing OPD
-      const findSql = 'SELECT id FROM opds WHERE name = ?';
+      const findSql = "SELECT id FROM opds WHERE name = ?";
       const existing = await query<{ id: number }>(findSql, [opdName]);
-      
+
       if (existing.length > 0) {
         return existing[0].id;
       }
 
       // Create new OPD if not found
-      const insertSql = 'INSERT INTO opds (name, contact_person, phone_number) VALUES (?, ?, ?)';
-      const result = await execute(insertSql, [opdName, 'Unknown', 'Unknown']);
-      
+      const insertSql =
+        "INSERT INTO opds (name, contact_person, phone_number) VALUES (?, ?, ?)";
+      const result = await execute(insertSql, [opdName, "Unknown", "Unknown"]);
+
       if (!result.insertId) {
-        throw new Error('Failed to create OPD');
+        throw new Error("Failed to create OPD");
       }
 
       return result.insertId;
     } catch (error) {
-      throw new Error(`Failed to find or create OPD: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      throw new Error(
+        `Failed to find or create OPD: ${
+          error instanceof Error ? error.message : "Unknown error"
+        }`
+      );
     }
   }
 
@@ -537,7 +615,11 @@ export class ApplicationService {
 
       return result[0] || { total: 0, pending: 0, approved: 0, rejected: 0 };
     } catch (error) {
-      throw new Error(`Failed to fetch application stats: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      throw new Error(
+        `Failed to fetch application stats: ${
+          error instanceof Error ? error.message : "Unknown error"
+        }`
+      );
     }
   }
 }

@@ -113,11 +113,10 @@ export function AdminDaerahDashboard({ role, userOpd }: Props) {
   // Calculate statistics
   const stats = {
     totalDomains: opdDomains.length,
-    activeDomains: opdDomains.filter((d) => d.status === "active").length,
-    pendingApplications: opdApplications.filter(
-      (a) => a.status === "pending_review" || a.status === "pending_approval"
-    ).length,
-    approvedApplications: opdApplications.filter((a) => a.status === "approved")
+    activeDomains: opdDomains.filter((d) => d.status === "Active").length,
+    pendingApplications: opdApplications.filter((a) => a.status === "Pending")
+      .length,
+    approvedApplications: opdApplications.filter((a) => a.status === "Approved")
       .length,
   };
 
@@ -125,24 +124,22 @@ export function AdminDaerahDashboard({ role, userOpd }: Props) {
   const applicationStatusData = [
     {
       name: "approved",
-      value: opdApplications.filter((a) => a.status === "approved").length,
+      value: opdApplications.filter((a) => a.status === "Approved").length,
       fill: "var(--color-approved)",
     },
     {
       name: "pending_review",
-      value: opdApplications.filter((a) => a.status === "pending_review")
-        .length,
+      value: opdApplications.filter((a) => a.status === "Pending").length,
       fill: "var(--color-pending_review)",
     },
     {
       name: "pending_approval",
-      value: opdApplications.filter((a) => a.status === "pending_approval")
-        .length,
+      value: opdApplications.filter((a) => a.status === "Pending").length,
       fill: "var(--color-pending_approval)",
     },
     {
       name: "rejected",
-      value: opdApplications.filter((a) => a.status === "rejected").length,
+      value: opdApplications.filter((a) => a.status === "Rejected").length,
       fill: "var(--color-rejected)",
     },
   ].filter((item) => item.value > 0);
@@ -171,7 +168,7 @@ export function AdminDaerahDashboard({ role, userOpd }: Props) {
 
   // Active domains with activation dates for countdown
   const activeDomainsWithCountdown = opdDomains
-    .filter((d) => d.status === "active" && d.activationDate)
+    .filter((d) => d.status === "Active" && d.activationDate)
     .map((domain) => ({
       ...domain,
       countdown: calculateCountdown(domain.activationDate!),

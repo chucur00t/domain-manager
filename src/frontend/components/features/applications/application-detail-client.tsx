@@ -94,12 +94,18 @@ function ApplicationDetailContent({
     startTransition(async () => {
       let result;
       if (actionType === "forward") {
-        result = await forwardForApproval(application.id, currentUserRole);
+        result = await forwardForApproval(
+          application.id.toString(),
+          currentUserRole
+        );
       } else if (actionType === "approve") {
-        result = await approveApplication(application.id, currentUserRole);
+        result = await approveApplication(
+          application.id.toString(),
+          currentUserRole
+        );
       } else {
         result = await rejectApplication(
-          application.id,
+          application.id.toString(),
           rejectionReason,
           currentUserRole
         );
@@ -146,13 +152,15 @@ function ApplicationDetailContent({
 
   const { title: dialogTitle, description: dialogDescription } =
     getDialogContent();
-  
+
   // Normalize status to lowercase to match statusConfig keys
-  const normalizedStatus = application.status.toLowerCase() as keyof typeof statusConfig;
-  const currentStatusInfo = statusConfig[normalizedStatus] || statusConfig.pending;
-  
+  const normalizedStatus =
+    application.status.toLowerCase() as keyof typeof statusConfig;
+  const currentStatusInfo =
+    statusConfig[normalizedStatus] || statusConfig.pending;
+
   const isSuperAdmin = currentUserRole === "Super Admin";
-  const isAdministrator = currentUserRole === "Administrator";
+  const isAdministrator = false; // Role removed
 
   const renderActionButtons = () => {
     // Super Admin can approve/reject Pending applications
@@ -250,16 +258,16 @@ function ApplicationDetailContent({
           <CardHeader>
             <WorkflowStepper
               currentStep={currentStatusInfo.step}
-              isRejected={application.status === "rejected"}
+              isRejected={application.status === "Rejected"}
             />
           </CardHeader>
         </Card>
 
-        {application.status === "rejected" && application.rejectionReason && (
+        {application.status === "Rejected" && application.reason && (
           <Alert variant="destructive">
             <Info className="h-4 w-4" />
             <AlertTitle>Alasan Penolakan</AlertTitle>
-            <AlertDescription>{application.rejectionReason}</AlertDescription>
+            <AlertDescription>{application.reason}</AlertDescription>
           </Alert>
         )}
 
@@ -267,8 +275,8 @@ function ApplicationDetailContent({
           <CardHeader>
             <CardTitle>{application.domainName}</CardTitle>
             <CardDescription>
-              Diajukan oleh {application.applicantName} dari {application.opd}{" "}
-              pada {application.submittedDate}.
+              Diajukan oleh {application.submitter_username} dari{" "}
+              {application.opd} pada {application.submittedDate}.
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -278,7 +286,9 @@ function ApplicationDetailContent({
                 <div className="grid md:grid-cols-2 gap-4 text-sm">
                   <div>
                     <p className="text-muted-foreground">Nama Pemohon</p>
-                    <p className="font-medium">{application.applicantName}</p>
+                    <p className="font-medium">
+                      {application.submitter_username}
+                    </p>
                   </div>
                   <div>
                     <p className="text-muted-foreground">
@@ -294,7 +304,7 @@ function ApplicationDetailContent({
                   Deskripsi Permohonan
                 </h3>
                 <p className="text-sm text-muted-foreground">
-                  {application.description}
+                  {application.reason || "Tidak ada deskripsi"}
                 </p>
               </div>
               <Separator />
@@ -303,8 +313,8 @@ function ApplicationDetailContent({
                   Dokumen Pendukung
                 </h3>
                 <div className="flex flex-col gap-2">
-                  {application.documents && application.documents.length > 0 ? (
-                    application.documents.map((doc, index) => (
+                  {false ? (
+                    [].map((doc: any, index: number) => (
                       <Button
                         key={index}
                         variant="outline"

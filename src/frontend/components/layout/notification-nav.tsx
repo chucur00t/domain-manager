@@ -66,7 +66,7 @@ function NotificationNavContent() {
 
         if (role === "Super Admin") {
           const domainNotifications = domainApps
-            .filter((app) => app.status === "pending_review")
+            .filter((app) => app.status === "Pending")
             .map((app) => ({
               id: `d-${app.id}`,
               title: `Domain Baru: ${app.domainName}`,
@@ -74,7 +74,7 @@ function NotificationNavContent() {
               href: `/applications/${app.id}${roleQuery}`,
             }));
           const hostingNotifications = hostingApps
-            .filter((app) => app.status === "pending_review")
+            .filter((app) => app.status === "Deactivated")
             .map((app) => ({
               id: `h-${app.id}`,
               title: `Hosting Baru: ${app.applicationName}`,
@@ -84,7 +84,7 @@ function NotificationNavContent() {
           allNotifications = [...domainNotifications, ...hostingNotifications];
         } else if (role === "Admin Daerah") {
           const domainNotifications = domainApps
-            .filter((app) => app.status === "pending_approval")
+            .filter((app) => app.status === "Pending")
             .map((app) => ({
               id: `d-${app.id}`,
               title: `Persetujuan Domain: ${app.domainName}`,
@@ -92,7 +92,7 @@ function NotificationNavContent() {
               href: `/applications/${app.id}${roleQuery}`,
             }));
           const hostingNotifications = hostingApps
-            .filter((app) => app.status === "pending_approval")
+            .filter((app) => app.status === "Deactivated")
             .map((app) => ({
               id: `h-${app.id}`,
               title: `Persetujuan Hosting: ${app.applicationName}`,
@@ -106,13 +106,13 @@ function NotificationNavContent() {
             .filter(
               (app) =>
                 app.opd === userOpd &&
-                (app.status === "approved" || app.status === "rejected")
+                (app.status === "Approved" || app.status === "Rejected")
             )
             .map((app) => ({
               id: `d-status-${app.id}`,
               title: `Update Domain: ${app.domainName}`,
               description: `Status permohonan Anda kini: ${
-                app.status === "approved" ? "Disetujui" : "Ditolak"
+                app.status === "Approved" ? "Disetujui" : "Ditolak"
               }.`,
               href: `/applications/${app.id}${roleQuery}`,
             }));
@@ -120,13 +120,13 @@ function NotificationNavContent() {
             .filter(
               (app) =>
                 app.opd === userOpd &&
-                (app.status === "approved" || app.status === "rejected")
+                (app.status === "Active" || app.status === "Expired")
             )
             .map((app) => ({
               id: `h-status-${app.id}`,
               title: `Update Hosting: ${app.applicationName}`,
               description: `Status permohonan Anda kini: ${
-                app.status === "approved" ? "Disetujui" : "Ditolak"
+                app.status === "Active" ? "Diaktifkan" : "Kedaluwarsa"
               }.`,
               href: `/hosting/${app.id}${roleQuery}`,
             }));

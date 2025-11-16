@@ -32,12 +32,14 @@ export function addDomainAliases(domain: Domain): Domain {
 
 export function addApplicationAliases(app: Application): Application {
   // Find related domain for domain applications
-  const relatedDomain = MOCK_DOMAINS.find(d => d.application_id === app.id);
+  const relatedDomain = MOCK_DOMAINS.find((d) => d.application_id === app.id);
   return {
     ...app,
     submittedDate: app.submitted_at,
     submissionDate: app.submitted_at,
-    domainName: relatedDomain?.domain_name || `${app.opd?.toLowerCase().replace(/\s+/g, '-')}.kalbarprov.go.id`,
+    domainName:
+      relatedDomain?.domain_name ||
+      `${app.opd?.toLowerCase().replace(/\s+/g, "-")}.kalbarprov.go.id`,
   };
 }
 
@@ -45,7 +47,7 @@ export function addUserAliases(user: User): User {
   return {
     ...user,
     name: user.username,
-    status: user.is_active ? 'active' : 'inactive',
+    status: user.is_active ? "active" : "inactive",
   };
 }
 
@@ -53,165 +55,165 @@ export const MOCK_ROLES = ["Super Admin", "Admin Daerah"];
 
 // ============= OPDS DATA - KALIMANTAN BARAT =============
 export const MOCK_OPDS: OPD[] = [
-  { 
-    id: 1, 
-    name: "Dinas Komunikasi dan Informatika", 
+  {
+    id: 1,
+    name: "Dinas Komunikasi dan Informatika",
     address: "Jl. Ahmad Yani, Pontianak, Kalimantan Barat",
     contact_person: "Ir. Hartoyo, M.T.",
     phone_number: "0561-736622",
-    created_at: "2024-01-15 08:00:00"
+    created_at: "2024-01-15 08:00:00",
   },
-  { 
-    id: 2, 
-    name: "Dinas Pendidikan dan Kebudayaan", 
+  {
+    id: 2,
+    name: "Dinas Pendidikan dan Kebudayaan",
     address: "Jl. Letjen Sutoyo, Pontianak, Kalimantan Barat",
     contact_person: "Dr. Sri Wahyuni, M.Pd.",
     phone_number: "0561-735306",
-    created_at: "2024-01-15 08:00:00"
+    created_at: "2024-01-15 08:00:00",
   },
-  { 
-    id: 3, 
-    name: "Dinas Kesehatan", 
+  {
+    id: 3,
+    name: "Dinas Kesehatan",
     address: "Jl. K. H. Wahid Hasyim No. 249, Pontianak, Kalimantan Barat",
     contact_person: "dr. Harisson, M.Kes., Sp.PD.",
     phone_number: "0561-736711",
-    created_at: "2024-01-15 08:00:00"
+    created_at: "2024-01-15 08:00:00",
   },
-  { 
-    id: 4, 
-    name: "Dinas Pekerjaan Umum dan Penataan Ruang", 
+  {
+    id: 4,
+    name: "Dinas Pekerjaan Umum dan Penataan Ruang",
     address: "Jl. Alianyang, Pontianak, Kalimantan Barat",
     contact_person: "Ir. Andi Wijaya, M.T.",
     phone_number: "0561-583440",
-    created_at: "2024-01-15 08:00:00"
+    created_at: "2024-01-15 08:00:00",
   },
-  { 
-    id: 5, 
-    name: "Dinas Sosial", 
+  {
+    id: 5,
+    name: "Dinas Sosial",
     address: "Jl. Dr. Sutomo, Pontianak, Kalimantan Barat",
     contact_person: "Drs. Bambang Suryanto, M.Si.",
     phone_number: "0561-732121",
-    created_at: "2024-01-15 08:00:00"
+    created_at: "2024-01-15 08:00:00",
   },
-  { 
-    id: 6, 
-    name: "Dinas Tenaga Kerja dan Transmigrasi", 
+  {
+    id: 6,
+    name: "Dinas Tenaga Kerja dan Transmigrasi",
     address: "Jl. Sultan Abdurrahman, Pontianak, Kalimantan Barat",
     contact_person: "Dra. Siti Aminah, M.M.",
     phone_number: "0561-736449",
-    created_at: "2024-01-15 08:00:00"
+    created_at: "2024-01-15 08:00:00",
   },
-  { 
-    id: 7, 
-    name: "Dinas Perhubungan", 
+  {
+    id: 7,
+    name: "Dinas Perhubungan",
     address: "Jl. Jenderal Urip, Pontianak, Kalimantan Barat",
     contact_person: "Ir. Budiman Santoso, M.T.",
     phone_number: "0561-765521",
-    created_at: "2024-01-15 08:00:00"
+    created_at: "2024-01-15 08:00:00",
   },
-  { 
-    id: 8, 
-    name: "Dinas Pariwisata", 
+  {
+    id: 8,
+    name: "Dinas Pariwisata",
     address: "Jl. Sidas, Pontianak, Kalimantan Barat",
     contact_person: "Agustinus Teras Narang, S.Sos., M.Si.",
     phone_number: "0561-743415",
-    created_at: "2024-01-15 08:00:00"
+    created_at: "2024-01-15 08:00:00",
   },
-  { 
-    id: 9, 
-    name: "Dinas Perindustrian dan Perdagangan", 
+  {
+    id: 9,
+    name: "Dinas Perindustrian dan Perdagangan",
     address: "Jl. A. Yani II, Pontianak, Kalimantan Barat",
     contact_person: "Drs. Hermansyah, M.M.",
     phone_number: "0561-736183",
-    created_at: "2024-01-15 08:00:00"
+    created_at: "2024-01-15 08:00:00",
   },
-  { 
-    id: 10, 
-    name: "Dinas Pertanian dan Hortikultura", 
+  {
+    id: 10,
+    name: "Dinas Pertanian dan Hortikultura",
     address: "Jl. Alianyang KM 10, Pontianak, Kalimantan Barat",
     contact_person: "Ir. Suryadi, M.P.",
     phone_number: "0561-587711",
-    created_at: "2024-01-15 08:00:00"
+    created_at: "2024-01-15 08:00:00",
   },
-  { 
-    id: 11, 
-    name: "Dinas Perikanan", 
+  {
+    id: 11,
+    name: "Dinas Perikanan",
     address: "Jl. Alianyang KM 10, Pontianak, Kalimantan Barat",
     contact_person: "Ir. Muhammad Rizki, M.Si.",
     phone_number: "0561-587722",
-    created_at: "2024-01-15 08:00:00"
+    created_at: "2024-01-15 08:00:00",
   },
-  { 
-    id: 12, 
-    name: "Dinas Kehutanan", 
+  {
+    id: 12,
+    name: "Dinas Kehutanan",
     address: "Jl. Gusti Sulung Lelanang, Pontianak, Kalimantan Barat",
     contact_person: "Dr. Ir. Bambang Heryanto, M.Si.",
     phone_number: "0561-736595",
-    created_at: "2024-01-15 08:00:00"
+    created_at: "2024-01-15 08:00:00",
   },
-  { 
-    id: 13, 
-    name: "Dinas Lingkungan Hidup", 
+  {
+    id: 13,
+    name: "Dinas Lingkungan Hidup",
     address: "Jl. Sultan Hamid II, Pontianak, Kalimantan Barat",
     contact_person: "Ir. Ratna Sari Dewi, M.T.",
     phone_number: "0561-742444",
-    created_at: "2024-01-15 08:00:00"
+    created_at: "2024-01-15 08:00:00",
   },
-  { 
-    id: 14, 
-    name: "Dinas Energi dan Sumber Daya Mineral", 
+  {
+    id: 14,
+    name: "Dinas Energi dan Sumber Daya Mineral",
     address: "Jl. Achmad Yani, Pontianak, Kalimantan Barat",
     contact_person: "Ir. Hadi Purnomo, M.T.",
     phone_number: "0561-736211",
-    created_at: "2024-01-15 08:00:00"
+    created_at: "2024-01-15 08:00:00",
   },
-  { 
-    id: 15, 
-    name: "Badan Perencanaan Pembangunan Daerah", 
+  {
+    id: 15,
+    name: "Badan Perencanaan Pembangunan Daerah",
     address: "Jl. Letjen Sutoyo, Pontianak, Kalimantan Barat",
     contact_person: "Drs. H. Ahmad Fauzi, M.Si.",
     phone_number: "0561-736519",
-    created_at: "2024-01-15 08:00:00"
+    created_at: "2024-01-15 08:00:00",
   },
-  { 
-    id: 16, 
-    name: "Badan Kepegawaian Daerah", 
+  {
+    id: 16,
+    name: "Badan Kepegawaian Daerah",
     address: "Jl. Ahmad Yani, Pontianak, Kalimantan Barat",
     contact_person: "Dra. Hj. Nurlaila, M.M.",
     phone_number: "0561-736344",
-    created_at: "2024-01-15 08:00:00"
+    created_at: "2024-01-15 08:00:00",
   },
-  { 
-    id: 17, 
-    name: "Badan Pengelola Keuangan dan Aset Daerah", 
+  {
+    id: 17,
+    name: "Badan Pengelola Keuangan dan Aset Daerah",
     address: "Jl. Letjen Sutoyo, Pontianak, Kalimantan Barat",
     contact_person: "Drs. Hari Kusuma, M.M., Ak.",
     phone_number: "0561-735000",
-    created_at: "2024-01-15 08:00:00"
+    created_at: "2024-01-15 08:00:00",
   },
-  { 
-    id: 18, 
-    name: "Dinas Pemberdayaan Masyarakat dan Desa", 
+  {
+    id: 18,
+    name: "Dinas Pemberdayaan Masyarakat dan Desa",
     address: "Jl. Sultan Abdurrahman, Pontianak, Kalimantan Barat",
     contact_person: "Ir. H. Syamsul Bahri, M.Si.",
     phone_number: "0561-736566",
-    created_at: "2024-01-15 08:00:00"
+    created_at: "2024-01-15 08:00:00",
   },
-  { 
-    id: 19, 
-    name: "Dinas Kependudukan dan Pencatatan Sipil", 
+  {
+    id: 19,
+    name: "Dinas Kependudukan dan Pencatatan Sipil",
     address: "Jl. Ahmad Yani, Pontianak, Kalimantan Barat",
     contact_person: "Drs. Agus Riyanto, M.Si.",
     phone_number: "0561-742233",
-    created_at: "2024-01-15 08:00:00"
+    created_at: "2024-01-15 08:00:00",
   },
-  { 
-    id: 20, 
-    name: "Satuan Polisi Pamong Praja", 
+  {
+    id: 20,
+    name: "Satuan Polisi Pamong Praja",
     address: "Jl. Letjen Sutoyo, Pontianak, Kalimantan Barat",
     contact_person: "Drs. H. Yusuf Hidayat, M.M.",
     phone_number: "0561-736455",
-    created_at: "2024-01-15 08:00:00"
+    created_at: "2024-01-15 08:00:00",
   },
 ];
 
@@ -225,7 +227,7 @@ export const MOCK_USERS: MockUser[] = [
     status: "active",
     nip: "197805152003121001",
     whatsapp: "081511223344",
-    opd: "Dinas Komunikasi dan Informatika"
+    opd: "Dinas Komunikasi dan Informatika",
   },
   {
     id: "2",
@@ -383,7 +385,7 @@ export const MOCK_APPLICATIONS: Application[] = [
     last_updated_by: 1,
     opd: "Dinas Komunikasi dan Informatika",
     submitter_username: "admin.diskominfo",
-    submitter_email: "admin.diskominfo@kalbarprov.go.id"
+    submitter_email: "admin.diskominfo@kalbarprov.go.id",
   },
   {
     id: 2,
@@ -396,7 +398,7 @@ export const MOCK_APPLICATIONS: Application[] = [
     last_updated_by: 1,
     opd: "Dinas Pendidikan dan Kebudayaan",
     submitter_username: "admin.disdikbud",
-    submitter_email: "admin.disdikbud@kalbarprov.go.id"
+    submitter_email: "admin.disdikbud@kalbarprov.go.id",
   },
   {
     id: 3,
@@ -409,7 +411,7 @@ export const MOCK_APPLICATIONS: Application[] = [
     last_updated_by: 1,
     opd: "Dinas Kesehatan",
     submitter_username: "admin.dinkes",
-    submitter_email: "admin.dinkes@kalbarprov.go.id"
+    submitter_email: "admin.dinkes@kalbarprov.go.id",
   },
   {
     id: 4,
@@ -422,7 +424,7 @@ export const MOCK_APPLICATIONS: Application[] = [
     last_updated_by: 1,
     opd: "Dinas Pekerjaan Umum dan Penataan Ruang",
     submitter_username: "admin.dpupr",
-    submitter_email: "admin.dpupr@kalbarprov.go.id"
+    submitter_email: "admin.dpupr@kalbarprov.go.id",
   },
   {
     id: 5,
@@ -435,7 +437,7 @@ export const MOCK_APPLICATIONS: Application[] = [
     last_updated_by: 1,
     opd: "Dinas Sosial",
     submitter_username: "admin.dinsos",
-    submitter_email: "admin.dinsos@kalbarprov.go.id"
+    submitter_email: "admin.dinsos@kalbarprov.go.id",
   },
   {
     id: 6,
@@ -448,7 +450,7 @@ export const MOCK_APPLICATIONS: Application[] = [
     last_updated_by: 1,
     opd: "Dinas Pariwisata",
     submitter_username: "admin.dispar",
-    submitter_email: "admin.dispar@kalbarprov.go.id"
+    submitter_email: "admin.dispar@kalbarprov.go.id",
   },
   {
     id: 7,
@@ -461,7 +463,7 @@ export const MOCK_APPLICATIONS: Application[] = [
     last_updated_by: 1,
     opd: "Dinas Pertanian dan Hortikultura",
     submitter_username: "admin.distanhort",
-    submitter_email: "admin.distanhort@kalbarprov.go.id"
+    submitter_email: "admin.distanhort@kalbarprov.go.id",
   },
   {
     id: 8,
@@ -474,7 +476,7 @@ export const MOCK_APPLICATIONS: Application[] = [
     last_updated_by: 1,
     opd: "Dinas Perikanan",
     submitter_username: "admin.diskan",
-    submitter_email: "admin.diskan@kalbarprov.go.id"
+    submitter_email: "admin.diskan@kalbarprov.go.id",
   },
   {
     id: 9,
@@ -487,7 +489,7 @@ export const MOCK_APPLICATIONS: Application[] = [
     last_updated_by: 1,
     opd: "Dinas Lingkungan Hidup",
     submitter_username: "admin.dlh",
-    submitter_email: "admin.dlh@kalbarprov.go.id"
+    submitter_email: "admin.dlh@kalbarprov.go.id",
   },
   {
     id: 10,
@@ -500,7 +502,7 @@ export const MOCK_APPLICATIONS: Application[] = [
     last_updated_by: 1,
     opd: "Badan Perencanaan Pembangunan Daerah",
     submitter_username: "superadmin",
-    submitter_email: "superadmin@kalbarprov.go.id"
+    submitter_email: "superadmin@kalbarprov.go.id",
   },
   // === PENDING DOMAIN APPLICATIONS ===
   {
@@ -512,7 +514,7 @@ export const MOCK_APPLICATIONS: Application[] = [
     submitted_at: "2025-11-10 10:30:00",
     opd: "Dinas Perhubungan",
     submitter_username: "admin.dishub",
-    submitter_email: "admin.dishub@kalbarprov.go.id"
+    submitter_email: "admin.dishub@kalbarprov.go.id",
   },
   {
     id: 12,
@@ -523,7 +525,7 @@ export const MOCK_APPLICATIONS: Application[] = [
     submitted_at: "2025-11-12 09:15:00",
     opd: "Dinas Perindustrian dan Perdagangan",
     submitter_username: "admin.disperindag",
-    submitter_email: "admin.disperindag@kalbarprov.go.id"
+    submitter_email: "admin.disperindag@kalbarprov.go.id",
   },
   {
     id: 13,
@@ -534,7 +536,7 @@ export const MOCK_APPLICATIONS: Application[] = [
     submitted_at: "2025-11-13 14:00:00",
     opd: "Dinas Tenaga Kerja dan Transmigrasi",
     submitter_username: "admin.disnakertrans",
-    submitter_email: "admin.disnakertrans@kalbarprov.go.id"
+    submitter_email: "admin.disnakertrans@kalbarprov.go.id",
   },
   // === REJECTED DOMAIN APPLICATION ===
   {
@@ -543,13 +545,14 @@ export const MOCK_APPLICATIONS: Application[] = [
     opd_id: 12,
     submitter_id: 13,
     status: "Rejected",
-    reason: "Nama domain tidak sesuai dengan konvensi penamaan yang ditetapkan. Gunakan format: [nama-dinas].kalbarprov.go.id",
+    reason:
+      "Nama domain tidak sesuai dengan konvensi penamaan yang ditetapkan. Gunakan format: [nama-dinas].kalbarprov.go.id",
     submitted_at: "2025-10-20 11:30:00",
     approved_at: "2025-10-25 14:15:00",
     last_updated_by: 1,
     opd: "Dinas Kehutanan",
     submitter_username: "admin.dishut",
-    submitter_email: "admin.dishut@kalbarprov.go.id"
+    submitter_email: "admin.dishut@kalbarprov.go.id",
   },
   // === APPROVED HOSTING APPLICATIONS ===
   {
@@ -563,7 +566,7 @@ export const MOCK_APPLICATIONS: Application[] = [
     last_updated_by: 1,
     opd: "Dinas Komunikasi dan Informatika",
     submitter_username: "admin.diskominfo",
-    submitter_email: "admin.diskominfo@kalbarprov.go.id"
+    submitter_email: "admin.diskominfo@kalbarprov.go.id",
   },
   {
     id: 16,
@@ -576,7 +579,7 @@ export const MOCK_APPLICATIONS: Application[] = [
     last_updated_by: 1,
     opd: "Dinas Pendidikan dan Kebudayaan",
     submitter_username: "admin.disdikbud",
-    submitter_email: "admin.disdikbud@kalbarprov.go.id"
+    submitter_email: "admin.disdikbud@kalbarprov.go.id",
   },
   {
     id: 17,
@@ -589,7 +592,7 @@ export const MOCK_APPLICATIONS: Application[] = [
     last_updated_by: 1,
     opd: "Dinas Kesehatan",
     submitter_username: "admin.dinkes",
-    submitter_email: "admin.dinkes@kalbarprov.go.id"
+    submitter_email: "admin.dinkes@kalbarprov.go.id",
   },
   {
     id: 18,
@@ -602,7 +605,7 @@ export const MOCK_APPLICATIONS: Application[] = [
     last_updated_by: 1,
     opd: "Dinas Pariwisata",
     submitter_username: "admin.dispar",
-    submitter_email: "admin.dispar@kalbarprov.go.id"
+    submitter_email: "admin.dispar@kalbarprov.go.id",
   },
   {
     id: 19,
@@ -615,7 +618,7 @@ export const MOCK_APPLICATIONS: Application[] = [
     last_updated_by: 1,
     opd: "Dinas Pertanian dan Hortikultura",
     submitter_username: "admin.distanhort",
-    submitter_email: "admin.distanhort@kalbarprov.go.id"
+    submitter_email: "admin.distanhort@kalbarprov.go.id",
   },
   // === PENDING HOSTING APPLICATIONS ===
   {
@@ -627,7 +630,7 @@ export const MOCK_APPLICATIONS: Application[] = [
     submitted_at: "2025-11-11 13:20:00",
     opd: "Dinas Perikanan",
     submitter_username: "admin.diskan",
-    submitter_email: "admin.diskan@kalbarprov.go.id"
+    submitter_email: "admin.diskan@kalbarprov.go.id",
   },
   {
     id: 21,
@@ -638,7 +641,7 @@ export const MOCK_APPLICATIONS: Application[] = [
     submitted_at: "2025-11-13 10:45:00",
     opd: "Dinas Lingkungan Hidup",
     submitter_username: "admin.dlh",
-    submitter_email: "admin.dlh@kalbarprov.go.id"
+    submitter_email: "admin.dlh@kalbarprov.go.id",
   },
   // === REJECTED HOSTING APPLICATION ===
   {
@@ -647,13 +650,14 @@ export const MOCK_APPLICATIONS: Application[] = [
     opd_id: 4,
     submitter_id: 5,
     status: "Rejected",
-    reason: "Spesifikasi teknis yang diajukan tidak memenuhi standar minimum untuk aplikasi yang akan di-hosting",
+    reason:
+      "Spesifikasi teknis yang diajukan tidak memenuhi standar minimum untuk aplikasi yang akan di-hosting",
     submitted_at: "2025-10-18 09:00:00",
     approved_at: "2025-10-22 11:30:00",
     last_updated_by: 1,
     opd: "Dinas Pekerjaan Umum dan Penataan Ruang",
     submitter_username: "admin.dpupr",
-    submitter_email: "admin.dpupr@kalbarprov.go.id"
+    submitter_email: "admin.dpupr@kalbarprov.go.id",
   },
 ];
 
@@ -667,7 +671,7 @@ export const MOCK_DOMAINS: Domain[] = [
     activated_at: "2024-01-20 08:00:00",
     expires_at: "2026-01-20 08:00:00",
     opd: "Dinas Komunikasi dan Informatika",
-    opd_id: 1
+    opd_id: 1,
   },
   {
     id: 2,
@@ -677,7 +681,7 @@ export const MOCK_DOMAINS: Domain[] = [
     activated_at: "2024-02-18 09:00:00",
     expires_at: "2026-02-18 09:00:00",
     opd: "Dinas Pendidikan dan Kebudayaan",
-    opd_id: 2
+    opd_id: 2,
   },
   {
     id: 3,
@@ -687,17 +691,17 @@ export const MOCK_DOMAINS: Domain[] = [
     activated_at: "2024-03-12 10:00:00",
     expires_at: "2026-03-12 10:00:00",
     opd: "Dinas Kesehatan",
-    opd_id: 3
+    opd_id: 3,
   },
   {
     id: 4,
     application_id: 4,
     domain_name: "dpupr.kalbarprov.go.id",
-    status: "Active",
+    status: "Expired",
     activated_at: "2024-03-28 08:30:00",
-    expires_at: "2026-03-28 08:30:00",
+    expires_at: "2024-03-28 08:30:00",
     opd: "Dinas Pekerjaan Umum dan Penataan Ruang",
-    opd_id: 4
+    opd_id: 4,
   },
   {
     id: 5,
@@ -707,7 +711,7 @@ export const MOCK_DOMAINS: Domain[] = [
     activated_at: "2024-04-15 11:00:00",
     expires_at: "2026-04-15 11:00:00",
     opd: "Dinas Sosial",
-    opd_id: 5
+    opd_id: 5,
   },
   {
     id: 6,
@@ -717,7 +721,7 @@ export const MOCK_DOMAINS: Domain[] = [
     activated_at: "2024-05-22 09:30:00",
     expires_at: "2026-05-22 09:30:00",
     opd: "Dinas Pariwisata",
-    opd_id: 8
+    opd_id: 8,
   },
   {
     id: 7,
@@ -727,7 +731,7 @@ export const MOCK_DOMAINS: Domain[] = [
     activated_at: "2024-06-28 10:00:00",
     expires_at: "2026-06-28 10:00:00",
     opd: "Dinas Pertanian dan Hortikultura",
-    opd_id: 10
+    opd_id: 10,
   },
   {
     id: 8,
@@ -737,7 +741,7 @@ export const MOCK_DOMAINS: Domain[] = [
     activated_at: "2024-07-18 08:00:00",
     expires_at: "2026-07-18 08:00:00",
     opd: "Dinas Perikanan",
-    opd_id: 11
+    opd_id: 11,
   },
   {
     id: 9,
@@ -747,7 +751,7 @@ export const MOCK_DOMAINS: Domain[] = [
     activated_at: "2024-08-12 11:30:00",
     expires_at: "2026-08-12 11:30:00",
     opd: "Dinas Lingkungan Hidup",
-    opd_id: 13
+    opd_id: 13,
   },
   {
     id: 10,
@@ -757,7 +761,7 @@ export const MOCK_DOMAINS: Domain[] = [
     activated_at: "2024-09-08 09:00:00",
     expires_at: "2026-09-08 09:00:00",
     opd: "Badan Perencanaan Pembangunan Daerah",
-    opd_id: 15
+    opd_id: 15,
   },
 ];
 
@@ -780,7 +784,8 @@ export const MOCK_HOSTINGS: Hosting[] = [
     submittedDate: "2024-02-01 10:00:00",
     applicantName: "Rina Kusumawati",
     framework: "Laravel 11",
-    description: "Portal website resmi Dinas Komunikasi dan Informatika Provinsi Kalimantan Barat yang menyediakan informasi layanan publik, berita teknologi informasi, dan sistem pelaporan online untuk masyarakat Kalbar"
+    description:
+      "Portal website resmi Dinas Komunikasi dan Informatika Provinsi Kalimantan Barat yang menyediakan informasi layanan publik, berita teknologi informasi, dan sistem pelaporan online untuk masyarakat Kalbar",
   },
   {
     id: 2,
@@ -799,7 +804,8 @@ export const MOCK_HOSTINGS: Hosting[] = [
     submittedDate: "2024-03-15 11:30:00",
     applicantName: "Sri Wahyuni",
     framework: "Next.js 14",
-    description: "Sistem Penerimaan Peserta Didik Baru (PPDB) Online untuk seluruh sekolah di Kalimantan Barat, dilengkapi dengan fitur pendaftaran real-time, verifikasi dokumen digital, dan pengumuman hasil seleksi"
+    description:
+      "Sistem Penerimaan Peserta Didik Baru (PPDB) Online untuk seluruh sekolah di Kalimantan Barat, dilengkapi dengan fitur pendaftaran real-time, verifikasi dokumen digital, dan pengumuman hasil seleksi",
   },
   {
     id: 3,
@@ -818,7 +824,8 @@ export const MOCK_HOSTINGS: Hosting[] = [
     submittedDate: "2024-04-20 09:00:00",
     applicantName: "dr. Harisson",
     framework: "React + Express.js",
-    description: "Portal layanan kesehatan masyarakat Kalbar meliputi informasi rumah sakit, puskesmas, jadwal posyandu, program imunisasi, dan sistem pendaftaran online untuk layanan kesehatan di seluruh Kalimantan Barat"
+    description:
+      "Portal layanan kesehatan masyarakat Kalbar meliputi informasi rumah sakit, puskesmas, jadwal posyandu, program imunisasi, dan sistem pendaftaran online untuk layanan kesehatan di seluruh Kalimantan Barat",
   },
   {
     id: 4,
@@ -837,7 +844,8 @@ export const MOCK_HOSTINGS: Hosting[] = [
     submittedDate: "2024-06-10 10:15:00",
     applicantName: "Agustinus Teras Narang",
     framework: "WordPress + Custom Plugin",
-    description: "Portal promosi pariwisata Kalimantan Barat yang menampilkan destinasi wisata, budaya lokal, kuliner khas, event pariwisata, paket tour, dan sistem booking online untuk wisatawan domestik dan mancanegara"
+    description:
+      "Portal promosi pariwisata Kalimantan Barat yang menampilkan destinasi wisata, budaya lokal, kuliner khas, event pariwisata, paket tour, dan sistem booking online untuk wisatawan domestik dan mancanegara",
   },
   {
     id: 5,
@@ -856,7 +864,68 @@ export const MOCK_HOSTINGS: Hosting[] = [
     submittedDate: "2024-07-25 08:30:00",
     applicantName: "Ir. Suryadi",
     framework: "CodeIgniter 4",
-    description: "Sistem informasi pertanian dan hortikultura Kalbar yang menyediakan data harga komoditas, panduan budidaya, jadwal tanam, informasi hama penyakit, dan layanan konsultasi online untuk petani"
+    description:
+      "Sistem informasi pertanian dan hortikultura Kalbar yang menyediakan data harga komoditas, panduan budidaya, jadwal tanam, informasi hama penyakit, dan layanan konsultasi online untuk petani",
+  },
+  {
+    id: 6,
+    application_id: 20,
+    domain_id: 8,
+    storage_capacity: "20GB",
+    bandwidth: "200GB/month",
+    server_type: "VPS",
+    status: "Deactivated",
+    activated_at: "",
+    domain_name: "diskan.kalbarprov.go.id",
+    opd: "Dinas Perikanan",
+    // Compatibility fields for UI
+    applicationName: "Sistem Informasi Perikanan",
+    domainName: "diskan.kalbarprov.go.id",
+    submittedDate: "2025-11-11 13:20:00",
+    applicantName: "Muhammad Rizki",
+    framework: "Laravel 11",
+    description:
+      "Sistem informasi perikanan yang mengelola data nelayan, kapal, hasil tangkapan, dan statistik perikanan di Kalimantan Barat",
+  },
+  {
+    id: 7,
+    application_id: 21,
+    domain_id: 9,
+    storage_capacity: "25GB",
+    bandwidth: "250GB/month",
+    server_type: "VPS",
+    status: "Deactivated",
+    activated_at: "",
+    domain_name: "dlh.kalbarprov.go.id",
+    opd: "Dinas Lingkungan Hidup",
+    // Compatibility fields for UI
+    applicationName: "Portal Lingkungan Hidup Kalbar",
+    domainName: "dlh.kalbarprov.go.id",
+    submittedDate: "2025-11-13 10:45:00",
+    applicantName: "Ratna Sari Dewi",
+    framework: "Next.js 14",
+    description:
+      "Portal monitoring kualitas lingkungan, pengaduan sampah, dan program penghijauan di Kalimantan Barat",
+  },
+  {
+    id: 8,
+    application_id: 12,
+    domain_id: 4,
+    storage_capacity: "30GB",
+    bandwidth: "300GB/month",
+    server_type: "VPS",
+    status: "Expired",
+    activated_at: "2023-01-15 10:00:00",
+    domain_name: "dpupr.kalbarprov.go.id",
+    opd: "Dinas Pekerjaan Umum dan Penataan Ruang",
+    // Compatibility fields for UI
+    applicationName: "Sistem Manajemen Proyek DPUPR",
+    domainName: "dpupr.kalbarprov.go.id",
+    submittedDate: "2023-01-10 08:00:00",
+    applicantName: "Andi Wijaya",
+    framework: "Laravel 10",
+    description:
+      "Sistem manajemen proyek pembangunan infrastruktur Kalimantan Barat yang mencakup monitoring progres, laporan keuangan, dan dokumentasi proyek",
   },
 ];
 
@@ -869,7 +938,7 @@ export const MOCK_DOCUMENTS: Document[] = [
     file_name: "surat_permohonan_diskominfo_kalbar.pdf",
     file_path: "/uploads/documents/2024/01/surat_permohonan_diskominfo.pdf",
     file_type: "application/pdf",
-    uploaded_at: "2024-01-15 09:15:00"
+    uploaded_at: "2024-01-15 09:15:00",
   },
   {
     id: 2,
@@ -877,7 +946,7 @@ export const MOCK_DOCUMENTS: Document[] = [
     file_name: "surat_permohonan_disdikbud_kalbar.pdf",
     file_path: "/uploads/documents/2024/02/surat_permohonan_disdikbud.pdf",
     file_type: "application/pdf",
-    uploaded_at: "2024-02-10 10:30:00"
+    uploaded_at: "2024-02-10 10:30:00",
   },
   {
     id: 3,
@@ -885,7 +954,7 @@ export const MOCK_DOCUMENTS: Document[] = [
     file_name: "surat_permohonan_dinkes_kalbar.pdf",
     file_path: "/uploads/documents/2024/03/surat_permohonan_dinkes.pdf",
     file_type: "application/pdf",
-    uploaded_at: "2024-03-05 08:45:00"
+    uploaded_at: "2024-03-05 08:45:00",
   },
   {
     id: 4,
@@ -893,7 +962,7 @@ export const MOCK_DOCUMENTS: Document[] = [
     file_name: "surat_permohonan_dispar_kalbar.pdf",
     file_path: "/uploads/documents/2024/05/surat_permohonan_dispar.pdf",
     file_type: "application/pdf",
-    uploaded_at: "2024-05-15 11:15:00"
+    uploaded_at: "2024-05-15 11:15:00",
   },
   {
     id: 5,
@@ -901,7 +970,7 @@ export const MOCK_DOCUMENTS: Document[] = [
     file_name: "surat_permohonan_bappeda_kalbar.pdf",
     file_path: "/uploads/documents/2024/09/surat_permohonan_bappeda.pdf",
     file_type: "application/pdf",
-    uploaded_at: "2024-09-01 08:20:00"
+    uploaded_at: "2024-09-01 08:20:00",
   },
   // Hosting Application Documents
   {
@@ -910,7 +979,7 @@ export const MOCK_DOCUMENTS: Document[] = [
     file_name: "spesifikasi_hosting_diskominfo.pdf",
     file_path: "/uploads/documents/2024/02/spesifikasi_hosting_diskominfo.pdf",
     file_type: "application/pdf",
-    uploaded_at: "2024-02-01 10:20:00"
+    uploaded_at: "2024-02-01 10:20:00",
   },
   {
     id: 7,
@@ -918,7 +987,7 @@ export const MOCK_DOCUMENTS: Document[] = [
     file_name: "arsitektur_aplikasi_diskominfo.pdf",
     file_path: "/uploads/documents/2024/02/arsitektur_aplikasi_diskominfo.pdf",
     file_type: "application/pdf",
-    uploaded_at: "2024-02-01 10:25:00"
+    uploaded_at: "2024-02-01 10:25:00",
   },
   {
     id: 8,
@@ -926,7 +995,7 @@ export const MOCK_DOCUMENTS: Document[] = [
     file_name: "spesifikasi_ppdb_online.pdf",
     file_path: "/uploads/documents/2024/03/spesifikasi_ppdb_online.pdf",
     file_type: "application/pdf",
-    uploaded_at: "2024-03-15 11:45:00"
+    uploaded_at: "2024-03-15 11:45:00",
   },
   {
     id: 9,
@@ -934,7 +1003,7 @@ export const MOCK_DOCUMENTS: Document[] = [
     file_name: "spesifikasi_sistem_kesehatan.pdf",
     file_path: "/uploads/documents/2024/04/spesifikasi_sistem_kesehatan.pdf",
     file_type: "application/pdf",
-    uploaded_at: "2024-04-20 09:15:00"
+    uploaded_at: "2024-04-20 09:15:00",
   },
   {
     id: 10,
@@ -942,7 +1011,7 @@ export const MOCK_DOCUMENTS: Document[] = [
     file_name: "proposal_visit_kalbar.pdf",
     file_path: "/uploads/documents/2024/06/proposal_visit_kalbar.pdf",
     file_type: "application/pdf",
-    uploaded_at: "2024-06-10 10:30:00"
+    uploaded_at: "2024-06-10 10:30:00",
   },
   // Pending Application Documents
   {
@@ -951,7 +1020,7 @@ export const MOCK_DOCUMENTS: Document[] = [
     file_name: "surat_permohonan_dishub_kalbar.pdf",
     file_path: "/uploads/documents/2025/11/surat_permohonan_dishub.pdf",
     file_type: "application/pdf",
-    uploaded_at: "2025-11-10 10:45:00"
+    uploaded_at: "2025-11-10 10:45:00",
   },
   {
     id: 12,
@@ -959,7 +1028,7 @@ export const MOCK_DOCUMENTS: Document[] = [
     file_name: "surat_permohonan_disperindag_kalbar.pdf",
     file_path: "/uploads/documents/2025/11/surat_permohonan_disperindag.pdf",
     file_type: "application/pdf",
-    uploaded_at: "2025-11-12 09:30:00"
+    uploaded_at: "2025-11-12 09:30:00",
   },
   {
     id: 13,
@@ -967,7 +1036,7 @@ export const MOCK_DOCUMENTS: Document[] = [
     file_name: "spesifikasi_aplikasi_perikanan.pdf",
     file_path: "/uploads/documents/2025/11/spesifikasi_aplikasi_perikanan.pdf",
     file_type: "application/pdf",
-    uploaded_at: "2025-11-11 13:35:00"
+    uploaded_at: "2025-11-11 13:35:00",
   },
 ];
 
@@ -979,40 +1048,44 @@ export const MOCK_AUDIT_LOGS: AuditLog[] = [
     user_id: 1,
     application_id: 1,
     action: "APPROVE_APPLICATION",
-    details: "Menyetujui permohonan domain diskominfo.kalbarprov.go.id dari Dinas Komunikasi dan Informatika",
+    details:
+      "Menyetujui permohonan domain diskominfo.kalbarprov.go.id dari Dinas Komunikasi dan Informatika",
     timestamp: "2024-01-18 10:30:00",
     username: "superadmin",
-    user_role: "Super Admin"
+    user_role: "Super Admin",
   },
   {
     id: 2,
     user_id: 1,
     application_id: 2,
     action: "APPROVE_APPLICATION",
-    details: "Menyetujui permohonan domain disdikbud.kalbarprov.go.id dari Dinas Pendidikan dan Kebudayaan",
+    details:
+      "Menyetujui permohonan domain disdikbud.kalbarprov.go.id dari Dinas Pendidikan dan Kebudayaan",
     timestamp: "2024-02-15 14:00:00",
     username: "superadmin",
-    user_role: "Super Admin"
+    user_role: "Super Admin",
   },
   {
     id: 3,
     user_id: 1,
     application_id: 3,
     action: "APPROVE_APPLICATION",
-    details: "Menyetujui permohonan domain dinkes.kalbarprov.go.id dari Dinas Kesehatan",
+    details:
+      "Menyetujui permohonan domain dinkes.kalbarprov.go.id dari Dinas Kesehatan",
     timestamp: "2024-03-10 11:45:00",
     username: "superadmin",
-    user_role: "Super Admin"
+    user_role: "Super Admin",
   },
   {
     id: 4,
     user_id: 1,
     application_id: 6,
     action: "APPROVE_APPLICATION",
-    details: "Menyetujui permohonan domain dispar.kalbarprov.go.id dari Dinas Pariwisata",
+    details:
+      "Menyetujui permohonan domain dispar.kalbarprov.go.id dari Dinas Pariwisata",
     timestamp: "2024-05-20 13:15:00",
     username: "superadmin",
-    user_role: "Super Admin"
+    user_role: "Super Admin",
   },
   // Hosting Application Approvals
   {
@@ -1020,30 +1093,33 @@ export const MOCK_AUDIT_LOGS: AuditLog[] = [
     user_id: 1,
     application_id: 15,
     action: "APPROVE_APPLICATION",
-    details: "Menyetujui permohonan hosting Portal Resmi Diskominfo Kalbar dengan spesifikasi VPS 20GB",
+    details:
+      "Menyetujui permohonan hosting Portal Resmi Diskominfo Kalbar dengan spesifikasi VPS 20GB",
     timestamp: "2024-02-05 13:30:00",
     username: "superadmin",
-    user_role: "Super Admin"
+    user_role: "Super Admin",
   },
   {
     id: 6,
     user_id: 1,
     application_id: 16,
     action: "APPROVE_APPLICATION",
-    details: "Menyetujui permohonan hosting Sistem PPDB Online Kalbar dengan spesifikasi VPS 30GB",
+    details:
+      "Menyetujui permohonan hosting Sistem PPDB Online Kalbar dengan spesifikasi VPS 30GB",
     timestamp: "2024-03-20 14:00:00",
     username: "superadmin",
-    user_role: "Super Admin"
+    user_role: "Super Admin",
   },
   {
     id: 7,
     user_id: 1,
     application_id: 18,
     action: "APPROVE_APPLICATION",
-    details: "Menyetujui permohonan hosting Visit Kalimantan Barat dengan spesifikasi Dedicated Server 40GB",
+    details:
+      "Menyetujui permohonan hosting Visit Kalimantan Barat dengan spesifikasi Dedicated Server 40GB",
     timestamp: "2024-06-15 13:45:00",
     username: "superadmin",
-    user_role: "Super Admin"
+    user_role: "Super Admin",
   },
   // Application Rejections
   {
@@ -1051,20 +1127,22 @@ export const MOCK_AUDIT_LOGS: AuditLog[] = [
     user_id: 1,
     application_id: 14,
     action: "REJECT_APPLICATION",
-    details: "Menolak permohonan domain dari Dinas Kehutanan: Nama domain tidak sesuai konvensi penamaan",
+    details:
+      "Menolak permohonan domain dari Dinas Kehutanan: Nama domain tidak sesuai konvensi penamaan",
     timestamp: "2025-10-25 14:15:00",
     username: "superadmin",
-    user_role: "Super Admin"
+    user_role: "Super Admin",
   },
   {
     id: 9,
     user_id: 1,
     application_id: 22,
     action: "REJECT_APPLICATION",
-    details: "Menolak permohonan hosting dari DPUPR: Spesifikasi teknis tidak memenuhi standar minimum",
+    details:
+      "Menolak permohonan hosting dari DPUPR: Spesifikasi teknis tidak memenuhi standar minimum",
     timestamp: "2025-10-22 11:30:00",
     username: "superadmin",
-    user_role: "Super Admin"
+    user_role: "Super Admin",
   },
   // Domain Submissions
   {
@@ -1075,7 +1153,7 @@ export const MOCK_AUDIT_LOGS: AuditLog[] = [
     details: "Mengajukan permohonan domain diskominfo.kalbarprov.go.id",
     timestamp: "2024-01-15 09:00:00",
     username: "admin.diskominfo",
-    user_role: "Admin Daerah"
+    user_role: "Admin Daerah",
   },
   {
     id: 11,
@@ -1085,7 +1163,7 @@ export const MOCK_AUDIT_LOGS: AuditLog[] = [
     details: "Mengajukan permohonan domain disdikbud.kalbarprov.go.id",
     timestamp: "2024-02-10 10:15:00",
     username: "admin.disdikbud",
-    user_role: "Admin Daerah"
+    user_role: "Admin Daerah",
   },
   {
     id: 12,
@@ -1095,54 +1173,59 @@ export const MOCK_AUDIT_LOGS: AuditLog[] = [
     details: "Mengajukan permohonan domain dinkes.kalbarprov.go.id",
     timestamp: "2024-03-05 08:30:00",
     username: "admin.dinkes",
-    user_role: "Admin Daerah"
+    user_role: "Admin Daerah",
   },
   // Domain Activations
   {
     id: 13,
     user_id: 1,
     action: "ACTIVATE_DOMAIN",
-    details: "Mengaktifkan domain diskominfo.kalbarprov.go.id dengan masa aktif 2 tahun",
+    details:
+      "Mengaktifkan domain diskominfo.kalbarprov.go.id dengan masa aktif 2 tahun",
     timestamp: "2024-01-20 08:00:00",
     username: "superadmin",
-    user_role: "Super Admin"
+    user_role: "Super Admin",
   },
   {
     id: 14,
     user_id: 1,
     action: "ACTIVATE_DOMAIN",
-    details: "Mengaktifkan domain disdikbud.kalbarprov.go.id dengan masa aktif 2 tahun",
+    details:
+      "Mengaktifkan domain disdikbud.kalbarprov.go.id dengan masa aktif 2 tahun",
     timestamp: "2024-02-18 09:00:00",
     username: "superadmin",
-    user_role: "Super Admin"
+    user_role: "Super Admin",
   },
   {
     id: 15,
     user_id: 1,
     action: "ACTIVATE_DOMAIN",
-    details: "Mengaktifkan domain dispar.kalbarprov.go.id untuk portal pariwisata Visit Kalbar",
+    details:
+      "Mengaktifkan domain dispar.kalbarprov.go.id untuk portal pariwisata Visit Kalbar",
     timestamp: "2024-05-22 09:30:00",
     username: "superadmin",
-    user_role: "Super Admin"
+    user_role: "Super Admin",
   },
   // Hosting Activations
   {
     id: 16,
     user_id: 1,
     action: "ACTIVATE_HOSTING",
-    details: "Mengaktifkan hosting Portal Resmi Diskominfo Kalbar pada VPS dengan kapasitas 20GB",
+    details:
+      "Mengaktifkan hosting Portal Resmi Diskominfo Kalbar pada VPS dengan kapasitas 20GB",
     timestamp: "2024-02-06 08:30:00",
     username: "superadmin",
-    user_role: "Super Admin"
+    user_role: "Super Admin",
   },
   {
     id: 17,
     user_id: 1,
     action: "ACTIVATE_HOSTING",
-    details: "Mengaktifkan hosting Sistem PPDB Online pada VPS dengan kapasitas 30GB",
+    details:
+      "Mengaktifkan hosting Sistem PPDB Online pada VPS dengan kapasitas 30GB",
     timestamp: "2024-03-22 09:30:00",
     username: "superadmin",
-    user_role: "Super Admin"
+    user_role: "Super Admin",
   },
   // Recent Activities
   {
@@ -1153,17 +1236,18 @@ export const MOCK_AUDIT_LOGS: AuditLog[] = [
     details: "Mengajukan permohonan domain untuk Dinas Perhubungan Kalbar",
     timestamp: "2025-11-10 10:30:00",
     username: "admin.dishub",
-    user_role: "Admin Daerah"
+    user_role: "Admin Daerah",
   },
   {
     id: 19,
     user_id: 10,
     application_id: 12,
     action: "SUBMIT_APPLICATION",
-    details: "Mengajukan permohonan domain untuk Dinas Perindustrian dan Perdagangan",
+    details:
+      "Mengajukan permohonan domain untuk Dinas Perindustrian dan Perdagangan",
     timestamp: "2025-11-12 09:15:00",
     username: "admin.disperindag",
-    user_role: "Admin Daerah"
+    user_role: "Admin Daerah",
   },
   {
     id: 20,
@@ -1172,7 +1256,7 @@ export const MOCK_AUDIT_LOGS: AuditLog[] = [
     details: "Super Admin masuk ke sistem Domain Manager Kalimantan Barat",
     timestamp: "2025-11-14 08:00:00",
     username: "superadmin",
-    user_role: "Super Admin"
+    user_role: "Super Admin",
   },
 ];
 
@@ -1182,7 +1266,8 @@ export const MOCK_NOTIFICATIONS: Notification[] = [
   {
     id: 1,
     user_id: 2,
-    message: "Permohonan domain diskominfo.kalbarprov.go.id telah disetujui oleh Super Admin",
+    message:
+      "Permohonan domain diskominfo.kalbarprov.go.id telah disetujui oleh Super Admin",
     type: "domain",
     status: "read",
     related_entity_type: "application",
@@ -1191,12 +1276,13 @@ export const MOCK_NOTIFICATIONS: Notification[] = [
     created_at: "2024-01-18 10:35:00",
     read_at: "2024-01-18 11:00:00",
     expires_at: "2026-01-18 10:35:00",
-    is_email_sent: true
+    is_email_sent: true,
   },
   {
     id: 2,
     user_id: 3,
-    message: "Permohonan domain disdikbud.kalbarprov.go.id telah disetujui dan siap diaktifkan",
+    message:
+      "Permohonan domain disdikbud.kalbarprov.go.id telah disetujui dan siap diaktifkan",
     type: "domain",
     status: "read",
     related_entity_type: "application",
@@ -1205,12 +1291,13 @@ export const MOCK_NOTIFICATIONS: Notification[] = [
     created_at: "2024-02-15 14:05:00",
     read_at: "2024-02-15 15:30:00",
     expires_at: "2026-02-15 14:05:00",
-    is_email_sent: true
+    is_email_sent: true,
   },
   {
     id: 3,
     user_id: 9,
-    message: "Permohonan domain dispar.kalbarprov.go.id telah disetujui untuk portal Visit Kalimantan Barat",
+    message:
+      "Permohonan domain dispar.kalbarprov.go.id telah disetujui untuk portal Visit Kalimantan Barat",
     type: "domain",
     status: "read",
     related_entity_type: "application",
@@ -1219,13 +1306,14 @@ export const MOCK_NOTIFICATIONS: Notification[] = [
     created_at: "2024-05-20 13:20:00",
     read_at: "2024-05-20 14:00:00",
     expires_at: "2026-05-20 13:20:00",
-    is_email_sent: true
+    is_email_sent: true,
   },
   // Hosting Approval Notifications
   {
     id: 4,
     user_id: 2,
-    message: "Permohonan hosting Portal Resmi Diskominfo Kalbar telah disetujui dengan spesifikasi VPS 20GB",
+    message:
+      "Permohonan hosting Portal Resmi Diskominfo Kalbar telah disetujui dengan spesifikasi VPS 20GB",
     type: "hosting",
     status: "read",
     related_entity_type: "application",
@@ -1234,7 +1322,7 @@ export const MOCK_NOTIFICATIONS: Notification[] = [
     created_at: "2024-02-05 13:35:00",
     read_at: "2024-02-05 14:00:00",
     expires_at: "2026-02-05 13:35:00",
-    is_email_sent: true
+    is_email_sent: true,
   },
   {
     id: 5,
@@ -1248,13 +1336,14 @@ export const MOCK_NOTIFICATIONS: Notification[] = [
     created_at: "2024-03-22 09:35:00",
     read_at: "2024-03-22 10:00:00",
     expires_at: "2026-03-22 09:35:00",
-    is_email_sent: true
+    is_email_sent: true,
   },
   // Domain Expiry Warning Notifications
   {
     id: 6,
     user_id: 2,
-    message: "Domain diskominfo.kalbarprov.go.id akan kedaluwarsa dalam 90 hari. Segera lakukan perpanjangan",
+    message:
+      "Domain diskominfo.kalbarprov.go.id akan kedaluwarsa dalam 90 hari. Segera lakukan perpanjangan",
     type: "perpanjangan",
     status: "unread",
     related_entity_type: "domain",
@@ -1262,12 +1351,13 @@ export const MOCK_NOTIFICATIONS: Notification[] = [
     link: "/domains/1",
     created_at: "2025-10-22 08:00:00",
     expires_at: "2026-04-22 08:00:00",
-    is_email_sent: true
+    is_email_sent: true,
   },
   {
     id: 7,
     user_id: 3,
-    message: "Domain disdikbud.kalbarprov.go.id akan kedaluwarsa dalam 90 hari. Harap segera perpanjang domain",
+    message:
+      "Domain disdikbud.kalbarprov.go.id akan kedaluwarsa dalam 90 hari. Harap segera perpanjang domain",
     type: "perpanjangan",
     status: "unread",
     related_entity_type: "domain",
@@ -1275,13 +1365,14 @@ export const MOCK_NOTIFICATIONS: Notification[] = [
     link: "/domains/2",
     created_at: "2025-11-20 08:00:00",
     expires_at: "2026-05-20 08:00:00",
-    is_email_sent: true
+    is_email_sent: true,
   },
   // Application Rejection Notifications
   {
     id: 8,
     user_id: 13,
-    message: "Permohonan domain Dinas Kehutanan ditolak. Nama domain tidak sesuai konvensi penamaan",
+    message:
+      "Permohonan domain Dinas Kehutanan ditolak. Nama domain tidak sesuai konvensi penamaan",
     type: "domain",
     status: "read",
     related_entity_type: "application",
@@ -1290,12 +1381,13 @@ export const MOCK_NOTIFICATIONS: Notification[] = [
     created_at: "2025-10-25 14:20:00",
     read_at: "2025-10-25 15:00:00",
     expires_at: "2026-04-25 14:20:00",
-    is_email_sent: true
+    is_email_sent: true,
   },
   {
     id: 9,
     user_id: 5,
-    message: "Permohonan hosting DPUPR ditolak. Spesifikasi teknis tidak memenuhi standar minimum",
+    message:
+      "Permohonan hosting DPUPR ditolak. Spesifikasi teknis tidak memenuhi standar minimum",
     type: "hosting",
     status: "read",
     related_entity_type: "application",
@@ -1304,36 +1396,39 @@ export const MOCK_NOTIFICATIONS: Notification[] = [
     created_at: "2025-10-22 11:35:00",
     read_at: "2025-10-22 13:00:00",
     expires_at: "2026-04-22 11:35:00",
-    is_email_sent: true
+    is_email_sent: true,
   },
   // Pending Application Notifications for Super Admin
   {
     id: 10,
     user_id: 1,
-    message: "Ada 3 permohonan domain baru menunggu persetujuan dari Dishub, Disperindag, dan Disnakertrans",
+    message:
+      "Ada 3 permohonan domain baru menunggu persetujuan dari Dishub, Disperindag, dan Disnakertrans",
     type: "system",
     status: "unread",
     link: "/applications?status=Pending&type=domain",
     created_at: "2025-11-13 15:00:00",
     expires_at: "2026-05-13 15:00:00",
-    is_email_sent: false
+    is_email_sent: false,
   },
   {
     id: 11,
     user_id: 1,
-    message: "Ada 2 permohonan hosting menunggu persetujuan dari Dinas Perikanan dan Dinas Lingkungan Hidup",
+    message:
+      "Ada 2 permohonan hosting menunggu persetujuan dari Dinas Perikanan dan Dinas Lingkungan Hidup",
     type: "system",
     status: "unread",
     link: "/hosting-applications?status=Pending",
     created_at: "2025-11-13 15:05:00",
     expires_at: "2026-05-13 15:05:00",
-    is_email_sent: false
+    is_email_sent: false,
   },
   // Recent Submission Confirmations
   {
     id: 12,
     user_id: 8,
-    message: "Permohonan domain untuk Dinas Perhubungan telah diterima dan sedang dalam proses review",
+    message:
+      "Permohonan domain untuk Dinas Perhubungan telah diterima dan sedang dalam proses review",
     type: "domain",
     status: "read",
     related_entity_type: "application",
@@ -1342,12 +1437,13 @@ export const MOCK_NOTIFICATIONS: Notification[] = [
     created_at: "2025-11-10 10:35:00",
     read_at: "2025-11-10 11:00:00",
     expires_at: "2026-05-10 10:35:00",
-    is_email_sent: true
+    is_email_sent: true,
   },
   {
     id: 13,
     user_id: 12,
-    message: "Permohonan hosting aplikasi perikanan telah diterima dan sedang dalam proses evaluasi",
+    message:
+      "Permohonan hosting aplikasi perikanan telah diterima dan sedang dalam proses evaluasi",
     type: "hosting",
     status: "unread",
     related_entity_type: "application",
@@ -1355,25 +1451,28 @@ export const MOCK_NOTIFICATIONS: Notification[] = [
     link: "/hosting-applications/20",
     created_at: "2025-11-11 13:25:00",
     expires_at: "2026-05-11 13:25:00",
-    is_email_sent: true
+    is_email_sent: true,
   },
   // System Maintenance Notification
   {
     id: 14,
     user_id: 1,
-    message: "Maintenance server dijadwalkan pada 20 November 2025 pukul 01:00 - 05:00 WIB",
+    message:
+      "Maintenance server dijadwalkan pada 20 November 2025 pukul 01:00 - 05:00 WIB",
     type: "system",
     status: "unread",
     link: "/settings/maintenance",
     created_at: "2025-11-14 09:00:00",
     expires_at: "2025-11-20 05:00:00",
-    is_email_sent: false
+    is_email_sent: false,
   },
 ];
 
 // Export with compatibility aliases automatically added
 export const MOCK_DOMAINS_WITH_ALIASES = MOCK_DOMAINS.map(addDomainAliases);
-export const MOCK_APPLICATIONS_WITH_ALIASES = MOCK_APPLICATIONS.map(addApplicationAliases);
+export const MOCK_APPLICATIONS_WITH_ALIASES = MOCK_APPLICATIONS.map(
+  addApplicationAliases
+);
 
 // Export legacy compatibility
 export const MOCK_APPLICATIONS_LEGACY = MOCK_APPLICATIONS;

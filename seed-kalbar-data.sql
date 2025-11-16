@@ -125,7 +125,9 @@ INSERT INTO hostings (id, application_id, domain_id, storage_capacity, bandwidth
 (2, 16, 2, '30GB', '300GB/month', 'VPS', 'Active', '2024-03-22 09:30:00'),
 (3, 17, 3, '25GB', '250GB/month', 'VPS', 'Active', '2024-04-28 10:00:00'),
 (4, 18, 6, '40GB', '400GB/month', 'Dedicated Server', 'Active', '2024-06-18 11:00:00'),
-(5, 19, 7, '15GB', '150GB/month', 'Shared Hosting', 'Active', '2024-08-02 09:00:00');
+(5, 19, 7, '15GB', '150GB/month', 'Shared Hosting', 'Active', '2024-08-02 09:00:00'),
+(6, 20, 8, '20GB', '200GB/month', 'VPS', 'Deactivated', NULL),
+(7, 21, 9, '25GB', '250GB/month', 'VPS', 'Deactivated', NULL);
 
 -- =========================================
 -- INSERT DOCUMENTS (13 Documents)

@@ -108,62 +108,54 @@ function NotificationsPageContent() {
       const hostingApps: HostingApplication[] = await hostingResponse.json();
 
       // Filter by user's OPD and create notifications
-      const domainNotifications: Notification[] = domainApps
+      const domainNotifications: any[] = domainApps
         .filter(
           (app) =>
             app.opd === userOpd &&
-            (app.status === "approved" || app.status === "rejected")
+            (app.status === "Approved" || app.status === "Rejected")
         )
         .map((app) => ({
           id: `domain-${app.id}`,
           type: "domain" as NotificationType,
           title:
-            app.status === "approved"
+            app.status === "Approved"
               ? "✅ Permohonan Domain Disetujui"
               : "❌ Permohonan Domain Ditolak",
           message:
-            app.status === "approved"
+            app.status === "Approved"
               ? `Permohonan domain "${app.domainName}" telah disetujui dan siap digunakan.`
               : `Permohonan domain "${app.domainName}" ditolak.`,
-          status: app.status as
-            | "approved"
-            | "rejected"
-            | "pending_review"
-            | "pending_approval",
+          status: app.status,
           timestamp: app.submittedDate || new Date().toISOString(),
-          relatedId: app.id,
+          relatedId: app.id.toString(),
           isRead: false,
-          rejectionReason: app.rejectionReason,
+          rejectionReason: app.reason,
           details: {
             name: app.domainName,
             opd: app.opd,
           },
         }));
 
-      const hostingNotifications: Notification[] = hostingApps
+      const hostingNotifications: any[] = hostingApps
         .filter(
           (app) =>
             app.opd === userOpd &&
-            (app.status === "approved" || app.status === "rejected")
+            (app.status === "Active" || app.status === "Expired")
         )
         .map((app) => ({
           id: `hosting-${app.id}`,
           type: "hosting" as NotificationType,
           title:
-            app.status === "approved"
-              ? "✅ Permohonan Hosting Disetujui"
-              : "❌ Permohonan Hosting Ditolak",
+            app.status === "Active"
+              ? "✅ Permohonan Hosting Diaktifkan"
+              : "❌ Permohonan Hosting Kedaluwarsa",
           message:
-            app.status === "approved"
+            app.status === "Active"
               ? `Permohonan hosting untuk "${app.applicationName}" telah disetujui dan sumber daya telah dialokasikan.`
-              : `Permohonan hosting untuk "${app.applicationName}" ditolak.`,
-          status: app.status as
-            | "approved"
-            | "rejected"
-            | "pending_review"
-            | "pending_approval",
+              : `Permohonan hosting untuk "${app.applicationName}" telah kedaluwarsa.`,
+          status: app.status,
           timestamp: app.submittedDate || new Date().toISOString(),
-          relatedId: app.id,
+          relatedId: app.id.toString(),
           isRead: false,
           rejectionReason: app.rejectionReason,
           details: {
@@ -313,7 +305,7 @@ function NotificationsPageContent() {
   }
 
   // Check if user is Admin Daerah
-  if (role !== "Admin Daerah" && role !== "Operator") {
+  if (role !== "Admin Daerah") {
     return (
       <Card>
         <CardHeader>

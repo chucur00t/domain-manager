@@ -9,6 +9,7 @@ import {
 } from "@/backend/services";
 import type {
   HostingApplication,
+  Hosting,
   User,
   UserRole,
 } from "@/backend/models/types";
@@ -43,18 +44,23 @@ export async function submitHostingApplication(
   }
 
   try {
-    const newId = `hosting-${Date.now()}`;
-    const newApplication: HostingApplication = {
+    const newId = Date.now();
+    const newApplication: Hosting = {
       id: newId,
+      application_id: 0,
+      domain_id: 0,
+      storage_capacity: "20GB",
+      bandwidth: "200GB/month",
+      server_type: "VPS",
+      status: "Deactivated",
+      activated_at: "",
       applicationName,
       domainName,
       opd,
-      status: "pending",
       submittedDate: new Date().toISOString().split("T")[0],
       applicantName,
       description,
       framework,
-      userId: "system", // Since this is manual submission
     };
 
     const newApp = await createHostingApplication(newApplication);
@@ -63,7 +69,7 @@ export async function submitHostingApplication(
     await auditService.logAction({
       action: "SUBMIT_HOSTING_APP",
       resourceType: "hosting",
-      resourceId: typeof newApp === "string" ? newApp : newId,
+      resourceId: typeof newApp === "string" ? newApp : newId.toString(),
       description: `Mengajukan permohonan hosting untuk ${applicationName} (ID: ${
         typeof newApp === "string" ? newApp : newId
       })`,
@@ -110,7 +116,11 @@ export async function forwardHostingForApproval(
     action: "FORWARD_HOSTING_FOR_APPROVAL",
     resourceType: "hosting",
     resourceId: applicationId,
-    description: `Meneruskan permohonan hosting ${applicationId} (${application.applicationName}) untuk persetujuan final.`,
+    description: `Meneruskan permohonan hosting ${applicationId} ${
+      (application as any).applicationName
+        ? `(${(application as any).applicationName})`
+        : ""
+    } untuk persetujuan final.`,
     userId: "system", // Use system since we don't track who is forwarding
   });
 
@@ -141,7 +151,7 @@ export async function approveHostingApplication(
     return { success: false, message: "Permohonan hosting tidak ditemukan." };
   }
 
-  await updateHostingApplication(applicationId, { status: "approved" });
+  await updateHostingApplication(applicationId, { status: "Active" });
 
   // CREATE domain when hosting is approved (domain langsung active karena hosting disetujui)
   if (application.domainName) {
@@ -160,7 +170,7 @@ export async function approveHostingApplication(
       if (existingDomain) {
         // Domain sudah ada, update ke active
         await domainService.updateDomain(parseInt(existingDomain.id), {
-          status: "active",
+          status: "Active",
         });
 
         await auditService.logAction({
@@ -175,7 +185,7 @@ export async function approveHostingApplication(
         const domainData = {
           domain_name: application.domainName,
           opd_id: 1, // TODO: Get actual OPD ID from OPD name
-          status: "active" as const,
+          status: "Active" as const,
           expires_at: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000), // 1 year
         };
 
@@ -232,7 +242,9 @@ export async function approveHostingApplication(
     action: "APPROVE_HOSTING_APP",
     resourceType: "hosting",
     resourceId: applicationId,
-    description: `Menyetujui permohonan hosting ${applicationId} untuk ${application.applicationName}`,
+    description: `Menyetujui permohonan hosting ${applicationId} untuk ${
+      (application as any).applicationName || "aplikasi"
+    }`,
     userId: "system",
   });
 
@@ -245,7 +257,9 @@ export async function approveHostingApplication(
 
   return {
     success: true,
-    message: `Permohonan hosting ${applicationId} berhasil disetujui.`,
+    message: `Hosting ${
+      (application as any).applicationName || applicationId
+    } berhasil diaktifkan.`,
   };
 }
 
@@ -254,7 +268,7 @@ export async function rejectHostingApplication(
   reason: string,
   currentUserRole: User["role"]
 ): Promise<{ success: boolean; message: string }> {
-  const allowedRoles: User["role"][] = ["Administrator", "Kepala Bidang", "Super Admin"];
+  const allowedRoles: User["role"][] = ["Super Admin", "Admin Daerah"];
   if (!allowedRoles.includes(currentUserRole)) {
     return {
       success: false,
@@ -267,14 +281,18 @@ export async function rejectHostingApplication(
     return { success: false, message: "Permohonan hosting tidak ditemukan." };
   }
 
-  await updateHostingApplication(applicationId, { status: "rejected" });
+  await updateHostingApplication(applicationId, { status: "Deactivated" });
   // Note: Reason handling should be done in a separate function or through a different mechanism
 
   await auditService.logAction({
-    action: "REJECT_HOSTING_APP",
+    action: "DEACTIVATE_HOSTING",
     resourceType: "hosting",
     resourceId: applicationId,
-    description: `Menolak permohonan hosting ${applicationId} (${application.applicationName}). Alasan: ${reason}`,
+    description: `Menonaktifkan hosting ${applicationId} ${
+      (application as any).applicationName
+        ? `(${(application as any).applicationName})`
+        : ""
+    }. Alasan: ${reason}`,
     userId: "system",
   });
 
@@ -285,6 +303,8 @@ export async function rejectHostingApplication(
 
   return {
     success: true,
-    message: `Permohonan hosting ${applicationId} berhasil ditolak.`,
+    message: `Hosting ${
+      (application as any).applicationName || applicationId
+    } berhasil dinonaktifkan.`,
   };
 }

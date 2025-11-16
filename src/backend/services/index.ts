@@ -6,10 +6,11 @@ import { HostingService } from "@/backend/database/services/hosting.service";
 import { AuditLogService } from "@/backend/database/services/audit-log.service";
 import type {
   SubdomainApplication,
-  ServiceDomain,
   User,
   AuditLog,
   HostingApplication,
+  Domain,
+  Application,
 } from "@/backend/models/types";
 
 // Initialize service instances
@@ -45,35 +46,34 @@ export const getApplicationById = async (id: string) => {
   return await applicationService.getApplication(parseInt(id));
 };
 
-export const createApplication = async (application: SubdomainApplication) => {
+export const createApplication = async (application: any) => {
   // Map SubdomainApplication to CreateSubdomainApplicationData format
   const appData = {
-    userId: application.userId || "system",
-    domainName: application.domainName,
-    purpose: application.purpose || "",
-    opd: application.opd,
-    description: application.description || "",
-    documents: application.documents?.map((doc) => ({
-      id: doc,
-      name: doc,
-      size: 0,
-      type: "application/pdf",
-    })),
+    userId:
+      application.userId || application.submitter_id?.toString() || "system",
+    domainName: application.domainName || application.domain_name || "",
+    purpose: application.purpose || application.reason || "",
+    opd: application.opd || "",
+    description: application.description || application.reason || "",
+    documents:
+      application.documents?.map((doc: any) => ({
+        id: doc,
+        name: doc,
+        size: 0,
+        type: "application/pdf",
+      })) || [],
   };
 
   const id = await applicationService.createSubdomainApplication(appData);
   return id;
 };
 
-export const updateApplication = async (
-  id: string,
-  application: Partial<SubdomainApplication>
-) => {
+export const updateApplication = async (id: string, application: any) => {
   // Map partial update
   const updateData: any = {};
   if (application.status) updateData.status = application.status;
-  if (application.rejectionReason)
-    updateData.reason = application.rejectionReason;
+  if (application.rejectionReason || application.reason)
+    updateData.reason = application.rejectionReason || application.reason;
 
   await applicationService.updateApplication(parseInt(id), updateData, 1);
 };
@@ -84,12 +84,7 @@ export const deleteApplication = async (id: string) => {
 
 export const updateApplicationStatus = async (
   id: string,
-  status:
-    | "pending"
-    | "approved"
-    | "rejected"
-    | "pending_review"
-    | "pending_approval",
+  status: "Pending" | "Approved" | "Rejected",
   reason?: string
 ) => {
   await applicationService.updateApplication(
@@ -112,11 +107,8 @@ export const getDomainById = async (id: string) => {
   return await domainService.getDomain(parseInt(id));
 };
 
-export const updateDomain = async (
-  id: string,
-  domain: Partial<ServiceDomain>
-) => {
-  // Map ServiceDomain to DomainService format
+export const updateDomain = async (id: string, domain: Partial<Domain>) => {
+  // Map Domain to DomainService format
   const updateData: any = {};
   if (domain.status) updateData.status = domain.status;
   if (domain.expires_at) updateData.expires_at = new Date(domain.expires_at);
@@ -130,7 +122,7 @@ export const deleteDomain = async (id: string) => {
 
 export const updateDomainStatus = async (
   id: string,
-  status: "active" | "inactive" | "expired"
+  status: "Active" | "Suspended" | "Deactivated"
 ) => {
   await domainService.updateDomain(parseInt(id), { status });
 };
@@ -143,11 +135,11 @@ export const updateDomainStatus = async (
  * Alur baru: Application Approved → Admin pilih hosting → Hosting Approved → Domain Created (active)
  */
 export const createDomainFromApplication = async (
-  application: SubdomainApplication
-): Promise<ServiceDomain> => {
+  application: any
+): Promise<Domain> => {
   const domainData = {
-    domain_name: application.domainName,
-    status: "active" as const, // Jika fungsi ini dipanggil, langsung active
+    domain_name: application.domainName || application.domain_name || "",
+    status: "Active" as const, // Jika fungsi ini dipanggil, langsung active
     expires_at: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000), // 1 year from now
   };
 
@@ -227,15 +219,19 @@ export const getAuditLogs = async () => {
   }
 };
 
-export const createAuditLog = async (log: AuditLog) => {
+export const createAuditLog = async (log: any) => {
   const logData = {
-    user_id: parseInt(log.userId),
+    user_id:
+      typeof log.user_id === "number"
+        ? log.user_id
+        : parseInt(log.userId || log.user_id),
     action: log.action,
     application_id:
-      log.resourceId && log.resourceType === "Application"
+      log.application_id ||
+      (log.resourceId && log.resourceType === "Application"
         ? parseInt(log.resourceId)
-        : undefined,
-    details: log.description || log.details,
+        : undefined),
+    details: log.details || log.description,
   };
 
   return await auditLogService.createAuditLog(logData);
@@ -259,36 +255,79 @@ export const getHostingApplications = async () => {
 };
 
 export const getHostingApplicationById = async (id: string) => {
+  console.log("\n=== getHostingApplicationById called ===");
+  console.log("ID requested:", id);
+
+  // First try to get from hostings table (for active hostings)
+  console.log("1. Checking hostings table...");
   try {
-    // First check if it's an application (pending hosting request)
+    const hosting = await hostingService.getHosting(parseInt(id));
+    if (hosting) {
+      console.log("✓ Found in hostings table:", hosting.id);
+      return hosting;
+    }
+    console.log("✗ Not found in hostings table");
+  } catch (error) {
+    console.log("✗ Error accessing hostings table:", (error as Error).message);
+  }
+
+  // If not found in hostings, check applications table (for pending requests)
+  console.log("2. Checking applications table...");
+  try {
     const application = await applicationService.getApplication(parseInt(id));
-    if (application && (application as any).application_type === 'hosting') {
+    if (application && (application as any).application_type === "hosting") {
+      console.log("✓ Found in applications table:", application.id);
       return application;
     }
-    
-    // If not found in applications, check hostings table
-    return await hostingService.getHosting(parseInt(id));
+    console.log("✗ Not found in applications table");
   } catch (error) {
-    console.error('Error fetching hosting application:', error);
-    return null;
+    console.log(
+      "✗ Error accessing applications table:",
+      (error as Error).message
+    );
   }
+
+  // Fallback to mock data if not found in database
+  console.log("3. Checking mock data...");
+  try {
+    const { MOCK_HOSTINGS } = await import("@/backend/utils/mock-data");
+    console.log("Total mock hostings:", MOCK_HOSTINGS.length);
+    console.log(
+      "Mock hosting IDs:",
+      MOCK_HOSTINGS.map((h) => h.id)
+    );
+
+    const mockHosting = MOCK_HOSTINGS.find((h) => h.id === parseInt(id));
+    if (mockHosting) {
+      console.log("✓ Found in mock data:", mockHosting.id);
+      console.log("Mock hosting data:", JSON.stringify(mockHosting, null, 2));
+      return mockHosting as any;
+    }
+    console.log("✗ Not found in mock data");
+  } catch (error) {
+    console.log("✗ Error accessing mock data:", (error as Error).message);
+  }
+
+  console.log("=== RESULT: No hosting found with ID", id, "===\n");
+  return null;
 };
 
-export const createHostingApplication = async (
-  application: HostingApplication
-) => {
+export const createHostingApplication = async (application: any) => {
+  const desc = application.description || "";
   // Map HostingApplication to CreateHostingData format
   const hostingData = {
-    domain_id: parseInt(application.domainName) || undefined, // Assuming domainName contains domain ID
-    storage_capacity: application.description.includes("Storage:")
-      ? application.description.split("Storage:")[1].split(",")[0].trim()
-      : "10GB",
-    bandwidth: application.description.includes("Bandwidth:")
-      ? application.description.split("Bandwidth:")[1].split(",")[0].trim()
-      : "100GB",
-    server_type: application.framework,
+    domain_id:
+      application.domain_id ||
+      (application.domainName ? parseInt(application.domainName) : undefined),
+    storage_capacity: desc.includes("Storage:")
+      ? desc.split("Storage:")[1].split(",")[0].trim()
+      : application.storage_capacity || "10GB",
+    bandwidth: desc.includes("Bandwidth:")
+      ? desc.split("Bandwidth:")[1].split(",")[0].trim()
+      : application.bandwidth || "100GB",
+    server_type: application.framework || application.server_type || "VPS",
     status:
-      application.status === "approved"
+      application.status === "Active" || application.status === "Approved"
         ? ("Active" as const)
         : ("Deactivated" as const),
   };
@@ -298,17 +337,19 @@ export const createHostingApplication = async (
 
 export const updateHostingApplication = async (
   id: string,
-  application: Partial<HostingApplication>
+  application: any
 ) => {
   const updateData: any = {};
 
-  if (application.framework) {
-    updateData.server_type = application.framework;
+  if (application.framework || application.server_type) {
+    updateData.server_type = application.framework || application.server_type;
   }
 
   if (application.status) {
     updateData.status =
-      application.status === "approved" ? "Active" : "Deactivated";
+      application.status === "Active" || application.status === "Approved"
+        ? "Active"
+        : "Deactivated";
   }
 
   await hostingService.updateHosting(parseInt(id), updateData);

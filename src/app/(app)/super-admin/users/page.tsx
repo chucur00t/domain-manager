@@ -50,7 +50,7 @@ function SuperAdminUsersPageContent() {
     if (!searchTerm) return users;
     return users.filter(
       (user) =>
-        user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        user.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
         user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
         user.role.toLowerCase().includes(searchTerm.toLowerCase()) ||
         (user.opd && user.opd.toLowerCase().includes(searchTerm.toLowerCase()))

@@ -238,7 +238,10 @@ function HostingApplicationFormContent() {
                     </FormControl>
                     <SelectContent>
                       {usersInOpd.map((user) => (
-                        <SelectItem key={user.id} value={user.username || user.name}>
+                        <SelectItem
+                          key={user.id}
+                          value={user.username || user.name || ""}
+                        >
                           {user.username || user.name}
                         </SelectItem>
                       ))}
