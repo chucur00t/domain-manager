@@ -67,79 +67,90 @@ function NotificationNavContent() {
     const fetchNotifications = async () => {
       setIsLoading(true);
       try {
-        // Fetch data from API routes instead of direct backend services
+        // Fetch data from API routes with individual error handling
         const [usersRes, domainAppsRes, hostingAppsRes, domainsRes] = await Promise.all([
-          fetch("/api/users"),
-          fetch("/api/applications"),
-          fetch("/api/hosting-applications"),
-          fetch("/api/domains"),
+          fetch("/api/users").catch(err => {
+            console.error("Failed to fetch users:", err);
+            return { ok: false, json: async () => [] };
+          }),
+          fetch("/api/applications").catch(err => {
+            console.error("Failed to fetch applications:", err);
+            return { ok: false, json: async () => [] };
+          }),
+          fetch("/api/hosting-applications").catch(err => {
+            console.error("Failed to fetch hosting applications:", err);
+            return { ok: false, json: async () => [] };
+          }),
+          fetch("/api/domains").catch(err => {
+            console.error("Failed to fetch domains:", err);
+            return { ok: false, json: async () => [] };
+          }),
         ]);
 
-        if (!usersRes.ok || !domainAppsRes.ok || !hostingAppsRes.ok || !domainsRes.ok) {
-          throw new Error("Failed to fetch data");
-        }
-
-        const users: User[] = await usersRes.json();
-        const domainApps: SubdomainApplication[] = await domainAppsRes.json();
-        const hostingApps: HostingApplication[] = await hostingAppsRes.json();
-        const domains = await domainsRes.json();
+        const users: User[] = usersRes.ok ? await usersRes.json() : [];
+        const domainApps: SubdomainApplication[] = domainAppsRes.ok ? await domainAppsRes.json() : [];
+        const hostingApps: HostingApplication[] = hostingAppsRes.ok ? await hostingAppsRes.json() : [];
+        const domains = domainsRes.ok ? await domainsRes.json() : [];
 
         const currentUser = users.find((user) => user.role === role);
         let allNotifications: NotificationItem[] = [];
 
         // Calculate countdown for Admin Daerah
-        if (role === "Admin Daerah" && currentUser?.opd) {
+        if (role === "Admin Daerah" && currentUser?.opd && Array.isArray(domains)) {
           const userOpd = currentUser.opd;
           const activeDomains = domains.filter(
-            (d: any) => d.opd === userOpd && d.status === "Active" && d.activated_at
+            (d: any) => d.opd === userOpd && d.status === "Active" && (d.activated_at || d.activationDate)
           );
           
           if (activeDomains.length > 0) {
-            const countdowns = activeDomains.map((d: any) => calculateCountdown(d.activated_at));
+            const countdowns = activeDomains.map((d: any) => {
+              const activationDate = d.activated_at || d.activationDate;
+              return calculateCountdown(activationDate);
+            });
             const nearestExpiry = Math.min(...countdowns.map(c => c.days).filter(d => d > 0));
             setCountdownInfo({ nearestExpiry: nearestExpiry !== Infinity ? nearestExpiry : null, totalActive: activeDomains.length });
           }
         }
 
         if (role === "Super Admin") {
-          const domainNotifications = domainApps
+          const domainNotifications = Array.isArray(domainApps) ? domainApps
             .filter((app) => app.status === "Pending")
             .map((app) => ({
               id: `d-${app.id}`,
-              title: `Domain Baru: ${app.domainName}`,
-              description: `Dari: ${app.opd}`,
+              title: `Domain Baru: ${app.domainName || app.requested_domain_name || 'Domain'}`,
+              description: `Dari: ${app.opd || 'N/A'}`,
               href: `/applications/${app.id}${roleQuery}`,
-            }));
-          const hostingNotifications = hostingApps
+            })) : [];
+          const hostingNotifications = Array.isArray(hostingApps) ? hostingApps
             .filter((app) => app.status === "Deactivated")
             .map((app) => ({
               id: `h-${app.id}`,
-              title: `Hosting Baru: ${app.applicationName}`,
-              description: `Dari: ${app.opd}`,
+              title: `Hosting Baru: ${app.applicationName || 'Hosting'}`,
+              description: `Dari: ${app.opd || 'N/A'}`,
               href: `/hosting/${app.id}${roleQuery}`,
-            }));
+            })) : [];
           allNotifications = [...domainNotifications, ...hostingNotifications];
         } else if (role === "Admin Daerah") {
-          const domainNotifications = domainApps
+          const domainNotifications = Array.isArray(domainApps) ? domainApps
             .filter((app) => app.status === "Pending")
             .map((app) => ({
               id: `d-${app.id}`,
-              title: `Persetujuan Domain: ${app.domainName}`,
-              description: `Dari: ${app.opd}`,
+              title: `Persetujuan Domain: ${app.domainName || app.requested_domain_name || 'Domain'}`,
+              description: `Dari: ${app.opd || 'N/A'}`,
               href: `/applications/${app.id}${roleQuery}`,
-            }));
-          const hostingNotifications = hostingApps
+            })) : [];
+          const hostingNotifications = Array.isArray(hostingApps) ? hostingApps
             .filter((app) => app.status === "Deactivated")
             .map((app) => ({
               id: `h-${app.id}`,
-              title: `Persetujuan Hosting: ${app.applicationName}`,
-              description: `Dari: ${app.opd}`,
+              title: `Persetujuan Hosting: ${app.applicationName || 'Hosting'}`,
+              description: `Dari: ${app.opd || 'N/A'}`,
               href: `/hosting/${app.id}${roleQuery}`,
-            }));
+            })) : [];
           allNotifications = [...domainNotifications, ...hostingNotifications];
         } else if (role === "Operator" && currentUser?.opd) {
           const userOpd = currentUser.opd;
-          const domainNotifications = domainApps
+          const domainNotifications = Array.isArray(domainApps) ? domainApps
             .filter(
               (app) =>
                 app.opd === userOpd &&
@@ -147,13 +158,13 @@ function NotificationNavContent() {
             )
             .map((app) => ({
               id: `d-status-${app.id}`,
-              title: `Update Domain: ${app.domainName}`,
+              title: `Update Domain: ${app.domainName || app.requested_domain_name || 'Domain'}`,
               description: `Status permohonan Anda kini: ${
                 app.status === "Approved" ? "Disetujui" : "Ditolak"
               }.`,
               href: `/applications/${app.id}${roleQuery}`,
-            }));
-          const hostingNotifications = hostingApps
+            })) : [];
+          const hostingNotifications = Array.isArray(hostingApps) ? hostingApps
             .filter(
               (app) =>
                 app.opd === userOpd &&
@@ -161,12 +172,12 @@ function NotificationNavContent() {
             )
             .map((app) => ({
               id: `h-status-${app.id}`,
-              title: `Update Hosting: ${app.applicationName}`,
+              title: `Update Hosting: ${app.applicationName || 'Hosting'}`,
               description: `Status permohonan Anda kini: ${
                 app.status === "Active" ? "Diaktifkan" : "Kedaluwarsa"
               }.`,
               href: `/hosting/${app.id}${roleQuery}`,
-            }));
+            })) : [];
           allNotifications = [...domainNotifications, ...hostingNotifications];
         }
         setNotifications(allNotifications);

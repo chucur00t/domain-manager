@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter, useSearchParams } from "next/navigation";
-import React, { useState, useTransition } from "react";
+import React, { useState, useTransition, useEffect } from "react";
 import {
   Card,
   CardContent,
@@ -50,11 +50,11 @@ import { BackButton } from "@/components/shared/back-button";
 
 // Simplified status config - only 3 main statuses
 const statusConfig = {
-  pending: { text: "Pending", variant: "default" as const, step: 0 },
-  pending_review: { text: "Pending", variant: "default" as const, step: 1 },
-  pending_approval: { text: "Pending", variant: "default" as const, step: 2 },
-  approved: { text: "Disetujui", variant: "secondary" as const, step: 3 },
-  rejected: { text: "Ditolak", variant: "destructive" as const, step: 0 },
+  pending: { text: "Pending", variant: "secondary" as const, step: 0, className: "!bg-gray-500 !text-white border-transparent" },
+  pending_review: { text: "Pending", variant: "secondary" as const, step: 1, className: "!bg-gray-500 !text-white border-transparent" },
+  pending_approval: { text: "Pending", variant: "secondary" as const, step: 2, className: "!bg-gray-500 !text-white border-transparent" },
+  approved: { text: "Disetujui", variant: "secondary" as const, step: 3, className: "!bg-green-500 !text-white border-transparent" },
+  rejected: { text: "Ditolak", variant: "destructive" as const, step: 0, className: "!bg-red-500 !text-white border-transparent" },
 };
 
 function ApplicationDetailContent({
@@ -72,6 +72,38 @@ function ApplicationDetailContent({
     "forward" | "approve" | "reject" | null
   >(null);
   const [rejectionReason, setRejectionReason] = useState("");
+  const [documents, setDocuments] = useState<any[]>([]);
+  const [loadingDocuments, setLoadingDocuments] = useState(true);
+
+  // Fetch documents
+  useEffect(() => {
+    const fetchDocuments = async () => {
+      try {
+        setLoadingDocuments(true);
+        const response = await fetch(`/api/applications/${application.id}/documents`);
+        if (response.ok) {
+          const contentType = response.headers.get("content-type");
+          if (contentType && contentType.includes("application/json")) {
+            const docs = await response.json();
+            setDocuments(docs);
+          } else {
+            console.warn("Documents API returned non-JSON response");
+            setDocuments([]);
+          }
+        } else {
+          console.warn("Documents API returned status:", response.status);
+          setDocuments([]);
+        }
+      } catch (error) {
+        console.error("Error fetching documents:", error);
+        setDocuments([]);
+      } finally {
+        setLoadingDocuments(false);
+      }
+    };
+
+    fetchDocuments();
+  }, [application.id]);
 
   const handleActionClick = (action: "forward" | "approve" | "reject") => {
     setActionType(action);
@@ -245,7 +277,7 @@ function ApplicationDetailContent({
           </h1>
           <Badge
             variant={currentStatusInfo.variant}
-            className="ml-auto sm:ml-0"
+            className={cn("ml-auto sm:ml-0", currentStatusInfo.className)}
           >
             {currentStatusInfo.text}
           </Badge>
@@ -273,7 +305,10 @@ function ApplicationDetailContent({
 
         <Card>
           <CardHeader>
-            <CardTitle>{application.domainName}</CardTitle>
+            <CardTitle>
+              {application.requested_domain_name || application.domainName}
+              {application.requested_domain_name && !application.requested_domain_name.includes('.') && '.kalbarprov.go.id'}
+            </CardTitle>
             <CardDescription>
               Diajukan oleh {application.submitter_username} dari{" "}
               {application.opd} pada {application.submittedDate}.
@@ -296,15 +331,41 @@ function ApplicationDetailContent({
                     </p>
                     <p className="font-medium">{application.opd}</p>
                   </div>
+                  <div>
+                    <p className="text-muted-foreground">Domain yang Diminta</p>
+                    <p className="font-medium">
+                      {application.requested_domain_name || application.domainName || "-"}
+                      {(application.requested_domain_name && !application.requested_domain_name.includes('.')) && '.kalbarprov.go.id'}
+                    </p>
+                  </div>
                 </div>
+              </div>
+              <Separator />
+              <div>
+                <h3 className="font-semibold text-lg mb-2">
+                  Tujuan Penggunaan
+                </h3>
+                <p className="text-sm text-muted-foreground">
+                  {(() => {
+                    const reason = application.reason || "";
+                    const colonIndex = reason.indexOf(":");
+                    if (colonIndex === -1) return reason || "Tidak ada tujuan";
+                    return reason.substring(0, colonIndex).trim() || "Tidak ada tujuan";
+                  })()}
+                </p>
               </div>
               <Separator />
               <div>
                 <h3 className="font-semibold text-lg mb-2">
                   Deskripsi Permohonan
                 </h3>
-                <p className="text-sm text-muted-foreground">
-                  {application.reason || "Tidak ada deskripsi"}
+                <p className="text-sm text-muted-foreground whitespace-pre-wrap">
+                  {(() => {
+                    const reason = application.reason || "";
+                    const colonIndex = reason.indexOf(":");
+                    if (colonIndex === -1) return "Tidak ada deskripsi";
+                    return reason.substring(colonIndex + 1).trim() || "Tidak ada deskripsi";
+                  })()}
                 </p>
               </div>
               <Separator />
@@ -313,15 +374,21 @@ function ApplicationDetailContent({
                   Dokumen Pendukung
                 </h3>
                 <div className="flex flex-col gap-2">
-                  {false ? (
-                    [].map((doc: any, index: number) => (
+                  {loadingDocuments ? (
+                    <p className="text-sm text-muted-foreground flex items-center gap-2">
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                      Memuat dokumen...
+                    </p>
+                  ) : documents && documents.length > 0 ? (
+                    documents.map((doc: any) => (
                       <Button
-                        key={index}
+                        key={doc.id}
                         variant="outline"
                         className="justify-start max-w-xs gap-2"
+                        onClick={() => window.open(doc.url, '_blank')}
                       >
                         <FileText className="h-4 w-4" />
-                        <span>{doc}</span>
+                        <span className="truncate">{doc.name}</span>
                         <Download className="h-4 w-4 ml-auto" />
                       </Button>
                     ))

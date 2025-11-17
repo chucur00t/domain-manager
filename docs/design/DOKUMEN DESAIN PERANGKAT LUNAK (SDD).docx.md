@@ -8,7 +8,7 @@
 
 1. **PENDAHULUAN**
 
-Tujuan dokumen ini adalah memberikan cetak biru teknis untuk pembangunan aplikasi SPDPD Web Manager, berdasarkan dokumen SRS yang telah disepakati. Aplikasi ini dibangun menggunakan React.js dengan arsitektur Next.js (Node.js) untuk mengotomatisasi proses pengajuan, verifikasi, aktivasi, dan pemantauan domain serta hosting bagi Organisasi Perangkat Daerah (OPD) di bawah pengawasan Dinas Komunikasi dan Informatika (Diskominfo). Sistem ini menggunakan MySQL sebagai sistem database utama dan mendukung integrasi dengan layanan DNS, SSO, dan API Hosting.
+Tujuan dokumen ini adalah memberikan cetak biru teknis untuk pembangunan aplikasi SPDPD Web Manager, berdasarkan dokumen SRS yang telah disepakati. Aplikasi ini dibangun menggunakan React.js dengan arsitektur Next.js (Node.js) untuk mengotomatisasi proses pengajuan, verifikasi, aktivasi, dan pemantauan domain serta hosting bagi Organisasi Perangkat Daerah (OPD) di bawah pengawasan Dinas Komunikasi dan Informatika (Diskominfo). Sistem ini menggunakan MySQL sebagai sistem database utama dan mendukung integrasi dengan layanan DNS, dan API Hosting.
 
 **2\. DESAIN ARSITEKTUR (HIGH-LEVEL)**
 
@@ -23,7 +23,7 @@ Aplikasi akan menggunakan pola Client-Server dengan pendekatan Monolith Modular.
 | **Frontend** | **React.js (Next.js Client Components)** | Membangun UI yang responsive dan type-safe. Memanfaatkan Client Components untuk interaksi pengguna dan Server Components untuk fetching data. |
 | **Backend** | **Node.js via Next.js (Server Actions/API Routes)** | Node.js menangani semua logika bisnis, workflow, dan integrasi eksternal. TypeScript memastikan kode server-side yang robust. |
 | **Database** | **MySQL**  | Sistem database yang kuat dan stabil. Koneksi dikelola melalui ORM (misalnya Prisma, Sequelize) yang mendukung Node.js. |
-| **Integrasi Eksternal** | **API Provider (DNS, SSO, dan Hosting Usage API)** | Integrasi dilakukan melalui *Server Actions* atau *API Routes* yang berjalan di lingkungan Node.js. |
+| **Integrasi Eksternal** | **API Provider (DNS, dan Hosting Usage API)** | Integrasi dilakukan melalui *Server Actions* atau *API Routes* yang berjalan di lingkungan Node.js. |
 
 **3\. DESAIN DATABASE**
 
@@ -157,9 +157,9 @@ Aplikasi memiliki dua mode utama: Admin Daerah dan Super Admin.
 
 **Kelas:** AuthRoute.ts
 
-**Metode:** ssoRedirect(): Bertanggung jawab untuk mengalihkan pengguna ke penyedia layanan SSO eksternal. Diimplementasikan sebagai *API Route* (e.g., app/api/auth/sso/route.ts).
+**Metode:** loginWithCredentials(username, password): Bertanggung jawab untuk menerima kredensial (Username dan Password). Melakukan validasi, verifikasi password (menggunakan *hashing* bcrypt sesuai KNF), dan membuat sesi autentikasi Next.js.
 
-**Metode:** ssoCallback(request: Request): Memproses *callback* dari SSO. Memvalidasi token, mencocokkan email pengguna di tabel users **(via ORM MySQL)**, dan membuat sesi autentikasi Next.js/NextAuth.
+**Metode:** validateSession(request: Request): Memproses dan memvalidasi token sesi pengguna saat ini untuk memastikan pengguna terautentikasi dan berwenang.
 
 **Metode:** authorizeUserRole(userId): Menentukan hak akses berdasarkan peran (Admin Daerah atau Super Admin).
 

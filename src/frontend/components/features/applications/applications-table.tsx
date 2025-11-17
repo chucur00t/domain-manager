@@ -40,39 +40,39 @@ const statusConfig = {
   },
   pending_review: {
     text: "Pending",
-    variant: "default" as const,
-    className: "bg-amber-500 hover:bg-amber-600",
+    variant: "secondary" as const,
+    className: "!bg-gray-500 !hover:bg-gray-600 !text-white border-transparent",
   },
   pending_approval: {
     text: "Pending",
-    variant: "default" as const,
-    className: "bg-amber-500 hover:bg-amber-600",
+    variant: "secondary" as const,
+    className: "!bg-gray-500 !hover:bg-gray-600 !text-white border-transparent",
   },
   approved: {
     text: "Disetujui",
     variant: "secondary" as const,
-    className: "bg-green-500 hover:bg-green-600 text-white",
+    className: "!bg-green-500 !hover:bg-green-600 !text-white border-transparent",
   },
   rejected: {
     text: "Ditolak",
     variant: "destructive" as const,
-    className: "bg-red-500 hover:bg-red-600",
+    className: "!bg-red-500 !hover:bg-red-600 !text-white border-transparent",
   },
   // Database might use different case
   Pending: {
     text: "Pending",
-    variant: "default" as const,
-    className: "bg-amber-500 hover:bg-amber-600",
+    variant: "secondary" as const,
+    className: "!bg-gray-500 !hover:bg-gray-600 !text-white border-transparent",
   },
   Approved: {
     text: "Disetujui",
     variant: "secondary" as const,
-    className: "bg-green-500 hover:bg-green-600 text-white",
+    className: "!bg-green-500 !hover:bg-green-600 !text-white border-transparent",
   },
   Rejected: {
     text: "Ditolak",
     variant: "destructive" as const,
-    className: "bg-red-500 hover:bg-red-600",
+    className: "!bg-red-500 !hover:bg-red-600 !text-white border-transparent",
   },
 };
 
@@ -81,8 +81,8 @@ const getStatusConfig = (status: string) => {
   return (
     statusConfig[status as keyof typeof statusConfig] || {
       text: "Pending",
-      variant: "default" as const,
-      className: "bg-amber-500 hover:bg-amber-600",
+      variant: "secondary" as const,
+      className: "!bg-gray-500 !hover:bg-gray-600 !text-white border-transparent",
     }
   );
 };
@@ -209,7 +209,7 @@ function ApplicationsTableContent({ applications }: ApplicationsTableProps) {
                 currentApplications.map((app) => (
                   <TableRow key={app.id}>
                     <TableCell className="font-medium">
-                      {app.domainName}
+                      {app.requested_domain_name || app.domainName || "-"}
                     </TableCell>
                     <TableCell>{app.submittedDate}</TableCell>
                     <TableCell>

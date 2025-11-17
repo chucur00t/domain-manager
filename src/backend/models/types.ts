@@ -80,6 +80,7 @@ export interface Domain {
 export interface Application {
   id: number;
   application_type: ApplicationType;
+  requested_domain_name?: string; // Domain name requested in application
   opd_id: number;
   submitter_id: number;
   status: ApplicationStatus;
@@ -92,7 +93,7 @@ export interface Application {
   submitter_username?: string;
   submitter_email?: string;
   // Compatibility fields
-  domainName?: string; // For display
+  domainName?: string; // For display (alias for requested_domain_name)
   submittedDate?: string; // Alias for submitted_at
   submissionDate?: string; // Alias for submitted_at
 }

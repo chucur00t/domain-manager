@@ -146,39 +146,56 @@ export async function approveApplication(
   }
 
   try {
+    console.log(`[approveApplication] Starting approval for application ${applicationId}`);
+    
     const application = await getApplicationById(applicationId);
     if (!application) {
+      console.error(`[approveApplication] Application ${applicationId} not found`);
       throw new Error("Application not found");
     }
+    console.log(`[approveApplication] Application found:`, application.id);
 
+    console.log(`[approveApplication] Updating status to Approved...`);
     await updateApplicationStatus(applicationId, "Approved");
+    console.log(`[approveApplication] Status updated successfully`);
 
     // NOTE: Domain TIDAK langsung dibuat saat application disetujui
     // Domain baru dibuat saat Admin Daerah mengajukan hosting dan hosting disetujui
     // Alur: Application Approved → Admin Daerah pilih hosting → Hosting Approved → Domain dibuat (active)
 
-    await logActivity(
-      "APPROVE_APPLICATION",
-      `Menyetujui permohonan ${applicationId}`,
-      currentUserRole
-    );
+    console.log(`[approveApplication] Logging activity...`);
+    try {
+      await logActivity(
+        "APPROVE_APPLICATION",
+        `Menyetujui permohonan ${applicationId}`,
+        currentUserRole
+      );
+      console.log(`[approveApplication] Activity logged successfully`);
+    } catch (logError) {
+      console.error(`[approveApplication] Failed to log activity:`, logError);
+      // Don't fail the whole operation if logging fails
+    }
 
+    console.log(`[approveApplication] Revalidating paths...`);
     revalidatePath("/applications");
     revalidatePath(`/applications/${applicationId}`);
     revalidatePath("/domains");
     revalidatePath("/dashboard");
     revalidatePath("/super-admin/dashboard");
     revalidatePath("/audit-trail");
+    console.log(`[approveApplication] Paths revalidated`);
 
     return {
       success: true,
       message: `Permohonan ${applicationId} berhasil disetujui.`,
     };
   } catch (error) {
-    console.error("Error approving application:", error);
+    console.error("[approveApplication] Error approving application:", error);
+    const errorMessage = error instanceof Error ? error.message : "Unknown error";
+    console.error("[approveApplication] Error details:", errorMessage);
     return {
       success: false,
-      message: "Terjadi kesalahan saat menyetujui permohonan.",
+      message: `Terjadi kesalahan saat menyetujui permohonan: ${errorMessage}`,
     };
   }
 }

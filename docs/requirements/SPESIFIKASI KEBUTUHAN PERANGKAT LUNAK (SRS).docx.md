@@ -23,18 +23,15 @@ Dokumen ini bertujuan untuk mendefinisikan semua kebutuhan fungsional dan non-fu
 
 **1.3 Deskripsi Umum** 
 
-SPDPD Web Manager adalah aplikasi web berbasis React.js dengan arsitektur Next.js (Node.js) yang dirancang untuk mengotomatisasi dan mendigitalkan proses pengajuan, verifikasi, aktivasi, dan monitoring domain serta hosting untuk Organisasi Perangkat Daerah (OPD) dengan pengawasan dari Dinas Komunikasi dan Informatika (Diskominfo).
+SPDPD Web Manager adalah aplikasi web berbasis React.js dengan arsitektur Next.js (Node.js) yang dirancang untuk mengotomatisasi dan mendigitalkan proses pengajuan, verifikasi, aktivasi, dan monitoring domain serta hosting untuk Organisasi Perangkat Daerah (OPD) dengan pengawasan dari Dinas Komunikasi dan Informatika (Diskominfo). 
 
-Sistem ini menerapkan pendekatan Client–Server berbasis RESTful API, di mana frontend dibangun menggunakan React.js untuk antarmuka yang responsif dan interaktif, sementara backend menggunakan Node.js via Next.js untuk menangani logika bisnis, workflow, serta integrasi eksternal seperti DNS, SSO, dan API hosting.
-
-Dengan desain modular dan integrasi otomatis, SPDPD Web Manager menggantikan proses manual menjadi workflow digital yang transparan, efisien, dan mudah diaudit.
+Sistem ini menerapkan pendekatan Client-Server berbasis RESTful API, di mana frontend dibangun menggunakan React.js untuk antarmuka yang responsif dan interaktif, sementara backend menggunakan Node.js via Next.js untuk menangani logika bisnis, workflow, serta integrasi eksternal seperti DNS dan API hosting
 
 **1.4 Definisi dan Singkatan**
 
 * **SPDPD:** Sistem Pengelolaan Domain Pemerintah Daerah  
 * **OPD:** Organisasi Perangkat Daerah  
 * **Diskominfo:** Dinas Komunikasi dan Informatika  
-* **SSO:** *Single Sign-On*  
 * **API:** *Application Programming Interface*  
 * **DNS:** Domain Name System
 
@@ -156,13 +153,13 @@ Dengan desain modular dan integrasi otomatis, SPDPD Web Manager menggantikan pro
 
 **2.3 Modul Manajemen Pengguna dan Hak Akses**
 
-**ID: KF-012 Nama Fitur: Autentikasi dan Otorisasi (SSO)**
+**ID: KF-012 Nama Fitur: Autentikasi Pengguna (Username/Password)**
 
-**Deskripsi:** Pengguna harus dapat *login* menggunakan mekanisme **SSO (Single Sign-On)**. Hak akses (Admin Daerah vs Super Admin) akan ditentukan setelah otentikasi awal berhasil.
+**Deskripsi:** Pengguna harus dapat login menggunakan mekanisme autentikasi standar (Username dan Password). Hak akses (Admin Daerah vs Super Admin) akan ditentukan setelah otentikasi awal berhasil.
 
 **Prioritas:** Tinggi
 
-**Input:** Kredensial SSO.
+**Input:** Kredensial Pengguna (Username dan Password).
 
 **Output:** Dasbor sesuai dengan peran pengguna.
 
@@ -270,7 +267,7 @@ Dengan desain modular dan integrasi otomatis, SPDPD Web Manager menggantikan pro
 
 **Admin Daerah Use Cases:**
 
-* Login/Logout (melalui SSO)  
+* Login/Logout   
 * Mengajukan Permohonan Domain/Hosting  
 * Mengajukan Perpanjangan Domain  
 * Melacak Status Permohonan  
@@ -278,7 +275,7 @@ Dengan desain modular dan integrasi otomatis, SPDPD Web Manager menggantikan pro
 
 **Super Admin Use Cases:**
 
-* Login/Logout (melalui SSO)  
+* Login/Logout   
 * Meninjau & Memproses Permohonan Domain/Hosting  
 * Mengaktifkan & Menonaktifkan/Mensuspensi Domain  
 * Mengelola Akun Pengguna  

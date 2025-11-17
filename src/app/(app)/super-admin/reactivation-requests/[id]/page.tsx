@@ -58,9 +58,10 @@ interface ReactivationRequest {
 export default function ReactivationRequestDetailPage({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
   const router = useRouter();
+  const [requestId, setRequestId] = useState<string | null>(null);
   const [request, setRequest] = useState<ReactivationRequest | null>(null);
   const [loading, setLoading] = useState(true);
   const [processing, setProcessing] = useState(false);
@@ -69,14 +70,22 @@ export default function ReactivationRequestDetailPage({
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
+  // Unwrap params Promise
   useEffect(() => {
-    fetchRequestDetail();
-  }, [params.id]);
+    params.then(({ id }) => setRequestId(id));
+  }, [params]);
+
+  useEffect(() => {
+    if (requestId) {
+      fetchRequestDetail();
+    }
+  }, [requestId]);
 
   const fetchRequestDetail = async () => {
+    if (!requestId) return;
     setLoading(true);
     try {
-      const response = await fetch(`/api/reactivation-requests/${params.id}`);
+      const response = await fetch(`/api/reactivation-requests/${requestId}`);
       if (response.ok) {
         const data = await response.json();
         setRequest(data);
@@ -105,13 +114,13 @@ export default function ReactivationRequestDetailPage({
       // TODO: Get actual logged-in Super Admin ID from session
       const decidedBy = 1; // Placeholder
 
-      const response = await fetch(`/api/reactivation-requests/${params.id}`, {
+      const response = await fetch(`/api/reactivation-requests/${requestId}`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          action: decision,
+          decision: decision,
           decided_by: decidedBy,
           comment: comment.trim() || undefined,
         }),

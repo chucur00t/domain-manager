@@ -163,7 +163,7 @@ export class ApplicationService {
       const { offset, limit: paginationLimit } = buildPagination(page, limit);
 
       const applicationsSql = `
-        SELECT a.id, a.application_type, a.opd_id, a.submitter_id, a.status, a.reason,
+        SELECT a.id, a.application_type, a.requested_domain_name, a.opd_id, a.submitter_id, a.status, a.reason,
                a.submitted_at, a.approved_at, a.last_updated_by,
                o.name as opd_name,
                u.username as submitter_name,
@@ -187,6 +187,7 @@ export class ApplicationService {
       const formattedApplications: Application[] = applications.map((app) => ({
         id: app.id,
         application_type: app.application_type as ApplicationType,
+        requested_domain_name: app.requested_domain_name,
         opd_id: app.opd_id,
         submitter_id: app.submitter_id,
         status: app.status as ApplicationStatus,
@@ -226,7 +227,7 @@ export class ApplicationService {
   ): Promise<(SubdomainApplication | HostingApplication) | null> {
     try {
       const sql = `
-        SELECT a.id, a.application_type, a.opd_id, a.submitter_id, a.status, a.reason,
+        SELECT a.id, a.application_type, a.requested_domain_name, a.opd_id, a.submitter_id, a.status, a.reason,
                a.submitted_at, a.approved_at, a.last_updated_by,
                o.name as opd_name,
                u.username as submitter_name,
@@ -248,6 +249,7 @@ export class ApplicationService {
       return {
         id: app.id,
         application_type: app.application_type as ApplicationType,
+        requested_domain_name: app.requested_domain_name,
         opd_id: app.opd_id,
         submitter_id: app.submitter_id,
         status: app.status as ApplicationStatus,
@@ -257,11 +259,11 @@ export class ApplicationService {
         last_updated_by: app.last_updated_by,
         opd: app.opd_name,
         submitter_username: app.submitter_name,
-        domainName: app.opd_name
+        domainName: app.requested_domain_name || (app.opd_name
           ? `${app.opd_name
               .toLowerCase()
               .replace(/\s+/g, "-")}.kalbarprov.go.id`
-          : "",
+          : ""),
         submittedDate: app.submitted_at.toISOString().split("T")[0],
         submissionDate: app.submitted_at.toISOString().split("T")[0],
       };
@@ -291,21 +293,25 @@ export class ApplicationService {
       }
 
       const insertSql = `
-        INSERT INTO applications (application_type, opd_id, submitter_id, status, reason)
-        VALUES ('domain', ?, ?, 'pending', ?)
+        INSERT INTO applications (application_type, requested_domain_name, opd_id, submitter_id, status, reason)
+        VALUES ('domain', ?, ?, ?, 'pending', ?)
       `;
 
-      const params = [opdId, userResult[0].id, data.purpose];
+      const params = [data.domainName, opdId, userResult[0].id, data.purpose];
 
       const result = await execute(insertSql, params);
 
-      if (!result.insertId) {
+      if (!result.success || !result.data) {
+        throw new Error(result.error || "Failed to create subdomain application: Database error");
+      }
+
+      if (!result.data.insertId) {
         throw new Error(
           "Failed to create subdomain application: No ID returned"
         );
       }
 
-      const applicationId = result.insertId;
+      const applicationId = result.data.insertId;
 
       // Save documents if provided
       if (data.documents && data.documents.length > 0) {
@@ -358,11 +364,15 @@ export class ApplicationService {
 
       const result = await execute(insertSql, params);
 
-      if (!result.insertId) {
+      if (!result.success || !result.data) {
+        throw new Error(result.error || "Failed to create hosting application: Database error");
+      }
+
+      if (!result.data.insertId) {
         throw new Error("Failed to create hosting application: No ID returned");
       }
 
-      const applicationId = result.insertId;
+      const applicationId = result.data.insertId;
 
       // Save documents if provided
       if (data.documents && data.documents.length > 0) {
@@ -435,6 +445,11 @@ export class ApplicationService {
     }
   }
 
+  // Alias for getDocuments for API consistency
+  async getDocumentsByApplicationId(applicationId: number): Promise<UploadedFile[]> {
+    return this.getDocuments(applicationId);
+  }
+
   // Update application status
   async updateApplication(
     id: number,
@@ -442,21 +457,26 @@ export class ApplicationService {
     updatedBy: number
   ): Promise<void> {
     try {
+      console.log(`[updateApplication] Starting update for application ${id}`, { data, updatedBy });
+      
       const updates = [];
       const params: any[] = [];
 
       if (data.status !== undefined) {
         updates.push("status = ?");
         params.push(data.status);
+        console.log(`[updateApplication] Setting status to: ${data.status}`);
 
-        if (data.status === "approved") {
+        if (data.status === "Approved" || data.status === "approved") {
           updates.push("approved_at = CURRENT_TIMESTAMP");
+          console.log(`[updateApplication] Setting approved_at to CURRENT_TIMESTAMP`);
         }
       }
 
       if (data.reason !== undefined) {
         updates.push("reason = ?");
         params.push(data.reason);
+        console.log(`[updateApplication] Setting reason to: ${data.reason}`);
       }
 
       updates.push("last_updated_by = ?");
@@ -473,13 +493,25 @@ export class ApplicationService {
       `;
 
       params.push(id);
+      
+      console.log(`[updateApplication] Executing SQL:`, updateSql);
+      console.log(`[updateApplication] With params:`, params);
 
       const result = await execute(updateSql, params);
+      
+      console.log(`[updateApplication] Update result:`, result);
 
-      if (result.affectedRows === 0) {
+      if (!result.success) {
+        throw new Error(result.error || "Database update failed");
+      }
+
+      if (!result.data || result.data.affectedRows === 0) {
         throw new Error("Application not found or no changes made");
       }
+      
+      console.log(`[updateApplication] Update successful, affected rows: ${result.data.affectedRows}`);
     } catch (error) {
+      console.error(`[updateApplication] Error:`, error);
       throw new Error(
         `Failed to update application: ${
           error instanceof Error ? error.message : "Unknown error"
@@ -497,7 +529,11 @@ export class ApplicationService {
 
       const result = await execute(deleteSql, [id]);
 
-      if (result.affectedRows === 0) {
+      if (!result.success) {
+        throw new Error(result.error || "Database delete failed");
+      }
+
+      if (!result.data || result.data.affectedRows === 0) {
         throw new Error("Application not found");
       }
     } catch (error) {
@@ -515,7 +551,7 @@ export class ApplicationService {
   ): Promise<(SubdomainApplication | HostingApplication)[]> {
     try {
       const applicationsSql = `
-        SELECT a.id, a.application_type, a.opd_id, a.submitter_id, a.status, a.reason,
+        SELECT a.id, a.application_type, a.requested_domain_name, a.opd_id, a.submitter_id, a.status, a.reason,
                a.submitted_at, a.approved_at, a.last_updated_by,
                o.name as opd_name,
                u.username as submitter_name
@@ -533,6 +569,7 @@ export class ApplicationService {
       return applications.map((app) => ({
         id: app.id,
         application_type: app.application_type as ApplicationType,
+        requested_domain_name: app.requested_domain_name,
         opd_id: app.opd_id,
         submitter_id: app.submitter_id,
         status: app.status as ApplicationStatus,
@@ -575,11 +612,15 @@ export class ApplicationService {
         "INSERT INTO opds (name, contact_person, phone_number) VALUES (?, ?, ?)";
       const result = await execute(insertSql, [opdName, "Unknown", "Unknown"]);
 
-      if (!result.insertId) {
-        throw new Error("Failed to create OPD");
+      if (!result.success || !result.data) {
+        throw new Error(result.error || "Failed to create OPD: Database error");
       }
 
-      return result.insertId;
+      if (!result.data.insertId) {
+        throw new Error("Failed to create OPD: No ID returned");
+      }
+
+      return result.data.insertId;
     } catch (error) {
       throw new Error(
         `Failed to find or create OPD: ${

@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import { ApplicationDetailClient } from "@/components/features/applications/application-detail-client";
-import { getApplication } from "@/lib/firebase/services";
+import { getApplicationById } from "@/backend/services";
 
 // This is now a Server Component
 export default async function ApplicationDetailPage({
@@ -9,14 +9,20 @@ export default async function ApplicationDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const application = await getApplication(id);
+  
+  try {
+    const application = await getApplicationById(id);
 
-  if (!application) {
+    if (!application) {
+      notFound();
+    }
+
+    // We pass the fetched application data to the Client Component
+    return <ApplicationDetailClient application={application} />;
+  } catch (error) {
+    console.error("Error fetching application:", error);
     notFound();
   }
-
-  // We pass the fetched application data to the Client Component
-  return <ApplicationDetailClient application={application} />;
 }
 
 // Add a suspense boundary for the page

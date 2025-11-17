@@ -46,17 +46,17 @@ const statusConfig: Record<
   Active: {
     text: "Aktif",
     variant: "secondary",
-    className: "bg-green-100 text-green-800 border-green-300",
+    className: "!bg-green-500 !hover:bg-green-600 !text-white border-transparent",
   },
   Suspended: {
-    text: "Ditangguhkan",
-    variant: "outline",
-    className: "bg-yellow-100 text-yellow-800 border-yellow-300",
+    text: "Disuspensi",
+    variant: "secondary",
+    className: "!bg-yellow-500 !hover:bg-yellow-600 !text-white border-transparent",
   },
   Deactivated: {
-    text: "Dinonaktifkan",
-    variant: "destructive",
-    className: "bg-red-100 text-red-800 border-red-300",
+    text: "Tidak Aktif",
+    variant: "secondary",
+    className: "!bg-black !hover:bg-gray-900 !text-white border-transparent",
   },
   Expired: {
     text: "Kedaluwarsa",
@@ -98,15 +98,9 @@ const getStatusConfig = (status: string) => {
 const ITEMS_PER_PAGE = 10;
 
 // Helper function to calculate countdown days for domains
-const calculateCountdown = (activatedAt: string): { days: number; isExpired: boolean } => {
-  const activation = new Date(activatedAt);
+const calculateCountdown = (expiresAt: string): { days: number; isExpired: boolean } => {
+  const expiryDate = new Date(expiresAt);
   const now = new Date();
-  const year = activation.getFullYear();
-  const isLeapYear = (year % 4 === 0 && year % 100 !== 0) || year % 400 === 0;
-  const daysInYear = isLeapYear ? 366 : 365;
-
-  const expiryDate = new Date(activation);
-  expiryDate.setDate(expiryDate.getDate() + daysInYear);
 
   const diffTime = expiryDate.getTime() - now.getTime();
   const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
@@ -152,14 +146,19 @@ function DomainsTableContent({ domains, currentUser }: DomainsTableProps) {
             <TableBody>
               {currentDomains.length > 0 ? (
                 currentDomains.map((domain) => {
-                  const countdown = domain.status === "Active" && domain.activated_at 
-                    ? calculateCountdown(domain.activated_at)
+                  // Handle both new (hostname/activationDate) and old (domain_name/activated_at) formats
+                  const domainName = domain.domain_name || domain.hostname || '-';
+                  const activatedDate = domain.activated_at || domain.activationDate || null;
+                  const expiresDate = domain.expires_at || domain.expiryDate || null;
+                  
+                  const countdown = domain.status === "Active" && expiresDate
+                    ? calculateCountdown(expiresDate)
                     : null;
                   
                   return (
                     <TableRow key={domain.id}>
                       <TableCell className="font-medium">
-                        {domain.domain_name}
+                        {domainName}
                       </TableCell>
                       <TableCell>
                         <Badge
@@ -169,7 +168,7 @@ function DomainsTableContent({ domains, currentUser }: DomainsTableProps) {
                           {getStatusConfig(domain.status).text}
                         </Badge>
                       </TableCell>
-                      <TableCell>{domain.activated_at}</TableCell>
+                      <TableCell>{activatedDate || '-'}</TableCell>
                       {isAdminDaerah && (
                         <TableCell>
                           {countdown ? (
