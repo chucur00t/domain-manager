@@ -129,3 +129,69 @@ CREATE TABLE notifications (
     INDEX idx_related_entity (related_entity_type, related_entity_id),
     INDEX idx_type (type)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE deactivation_requests (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    domain_id INT NOT NULL,
+    requester_id INT NOT NULL,
+    reason TEXT NOT NULL,
+    status VARCHAR(20) NOT NULL DEFAULT 'Pending' COMMENT 'Pending, Approved, Rejected',
+    decision_comment TEXT,
+    decided_by INT,
+    requested_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    decided_at TIMESTAMP NULL,
+    
+    FOREIGN KEY (domain_id) REFERENCES domains(id) ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY (requester_id) REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY (decided_by) REFERENCES users(id) ON DELETE SET NULL ON UPDATE CASCADE,
+    INDEX idx_domain_id (domain_id),
+    INDEX idx_requester_id (requester_id),
+    INDEX idx_status (status),
+    INDEX idx_requested_at (requested_at)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE deactivation_documents (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    deactivation_request_id INT NOT NULL,
+    file_name VARCHAR(255) NOT NULL,
+    file_path VARCHAR(512) NOT NULL,
+    file_type VARCHAR(50),
+    uploaded_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    
+    FOREIGN KEY (deactivation_request_id) REFERENCES deactivation_requests(id) ON DELETE CASCADE ON UPDATE CASCADE,
+    INDEX idx_deactivation_request_id (deactivation_request_id),
+    INDEX idx_uploaded_at (uploaded_at)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE reactivation_requests (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    domain_id INT NOT NULL,
+    requester_id INT NOT NULL,
+    reason TEXT NOT NULL,
+    status VARCHAR(20) NOT NULL DEFAULT 'Pending' COMMENT 'Pending, Approved, Rejected',
+    decision_comment TEXT,
+    decided_by INT,
+    requested_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    decided_at TIMESTAMP NULL,
+    
+    FOREIGN KEY (domain_id) REFERENCES domains(id) ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY (requester_id) REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY (decided_by) REFERENCES users(id) ON DELETE SET NULL ON UPDATE CASCADE,
+    INDEX idx_domain_id (domain_id),
+    INDEX idx_requester_id (requester_id),
+    INDEX idx_status (status),
+    INDEX idx_requested_at (requested_at)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE reactivation_documents (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    reactivation_request_id INT NOT NULL,
+    file_name VARCHAR(255) NOT NULL,
+    file_path VARCHAR(512) NOT NULL,
+    file_type VARCHAR(50),
+    uploaded_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    
+    FOREIGN KEY (reactivation_request_id) REFERENCES reactivation_requests(id) ON DELETE CASCADE ON UPDATE CASCADE,
+    INDEX idx_reactivation_request_id (reactivation_request_id),
+    INDEX idx_uploaded_at (uploaded_at)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

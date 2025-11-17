@@ -149,6 +149,75 @@ export interface Notification {
   is_email_sent: boolean;
 }
 
+// Deactivation Request Status
+export type DeactivationRequestStatus = 'Pending' | 'Approved' | 'Rejected';
+
+// Deactivation Request interface - matches deactivation_requests table
+export interface DeactivationRequest {
+  id: number;
+  domain_id: number;
+  requester_id: number;
+  reason: string;
+  status: DeactivationRequestStatus;
+  decision_comment?: string;
+  decided_by?: number;
+  requested_at: string;
+  decided_at?: string;
+  // Joined fields
+  domain_name?: string;
+  requester_name?: string;
+  requester_email?: string;
+  requester_opd?: string;
+  decider_name?: string;
+  opd_id?: number;
+  domain_status?: DomainStatus;
+}
+
+// Deactivation Document interface - matches deactivation_documents table
+export interface DeactivationDocument {
+  id: number;
+  deactivation_request_id: number;
+  file_name: string;
+  file_path: string;
+  file_type: string;
+  uploaded_at: string;
+}
+
+// Reactivation Request Status
+export type ReactivationRequestStatus = 'Pending' | 'Approved' | 'Rejected';
+
+// Reactivation Request interface - matches reactivation_requests table
+export interface ReactivationRequest {
+  id: number;
+  domain_id: number;
+  requester_id: number;
+  reason: string;
+  status: ReactivationRequestStatus;
+  decision_comment?: string;
+  decided_by?: number;
+  requested_at: string;
+  decided_at?: string;
+  // Joined fields from query
+  domain_name?: string;
+  requester_name?: string;
+  requester_email?: string;
+  requester_opd?: string;
+  decider_name?: string;
+  opd_id?: number;
+  domain_status?: DomainStatus;
+  domain_expires_at?: string;
+}
+
+// Reactivation Document interface - matches reactivation_documents table
+export interface ReactivationDocument {
+  id: number;
+  reactivation_request_id: number;
+  file_name: string;
+  file_path: string;
+  file_type: string;
+  uploaded_at: string;
+}
+
 // Domain Health Monitoring interface
 export interface DomainHealth {
   id: number;
