@@ -77,12 +77,6 @@ export const navItems: NavItem[] = [
         roles: ["Admin Daerah"],
       },
       {
-        href: (role) => `/hosting/deactivate?role=${encodeURIComponent(role)}`,
-        label: "Deaktivasi Hosting",
-        icon: Server,
-        roles: ["Admin Daerah"],
-      },
-      {
         href: (role) => `/domains/reactivate?role=${encodeURIComponent(role)}`,
         label: "Reaktivasi",
         icon: Globe,
@@ -109,6 +103,20 @@ export const navItems: NavItem[] = [
           `/super-admin/hosting-applications?role=${encodeURIComponent(role)}`,
         label: "Permohonan Hosting",
         icon: Server,
+        roles: ["Super Admin"],
+      },
+      {
+        href: (role) =>
+          `/super-admin/deactivation-requests?role=${encodeURIComponent(role)}`,
+        label: "Permohonan Deaktivasi",
+        icon: ShieldAlert,
+        roles: ["Super Admin"],
+      },
+      {
+        href: (role) =>
+          `/super-admin/reactivation-requests?role=${encodeURIComponent(role)}`,
+        label: "Permohonan Reaktivasi",
+        icon: Globe,
         roles: ["Super Admin"],
       },
     ],
