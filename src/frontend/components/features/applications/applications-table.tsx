@@ -36,43 +36,43 @@ const statusConfig = {
   pending: {
     text: "Pending",
     variant: "default" as const,
-    className: "inline-flex items-center justify-center min-w-[100px] !bg-gray-500 !hover:bg-gray-600 !text-white border-transparent",
+    className: "inline-flex items-center justify-center min-w-[100px] bg-gray-500 hover:bg-gray-600 text-white border-transparent",
   },
   pending_review: {
     text: "Pending",
     variant: "secondary" as const,
-    className: "inline-flex items-center justify-center min-w-[100px] !bg-gray-500 !hover:bg-gray-600 !text-white border-transparent",
+    className: "inline-flex items-center justify-center min-w-[100px] bg-gray-500 hover:bg-gray-600 text-white border-transparent",
   },
   pending_approval: {
     text: "Pending",
     variant: "secondary" as const,
-    className: "inline-flex items-center justify-center min-w-[100px] !bg-gray-500 !hover:bg-gray-600 !text-white border-transparent",
+    className: "inline-flex items-center justify-center min-w-[100px] bg-gray-500 hover:bg-gray-600 text-white border-transparent",
   },
   approved: {
     text: "Disetujui",
     variant: "secondary" as const,
-    className: "inline-flex items-center justify-center min-w-[100px] !bg-green-500 !hover:bg-green-600 !text-white border-transparent",
+    className: "inline-flex items-center justify-center min-w-[100px] bg-green-500 hover:bg-green-600 text-white border-transparent",
   },
   rejected: {
     text: "Ditolak",
     variant: "destructive" as const,
-    className: "inline-flex items-center justify-center min-w-[100px] !bg-red-500 !hover:bg-red-600 !text-white border-transparent",
+    className: "inline-flex items-center justify-center min-w-[100px] bg-red-500 hover:bg-red-600 text-white border-transparent",
   },
   // Database might use different case
   Pending: {
     text: "Pending",
     variant: "secondary" as const,
-    className: "inline-flex items-center justify-center min-w-[100px] !bg-gray-500 !hover:bg-gray-600 !text-white border-transparent",
+    className: "inline-flex items-center justify-center min-w-[100px] bg-gray-500 hover:bg-gray-600 text-white border-transparent",
   },
   Approved: {
     text: "Disetujui",
     variant: "secondary" as const,
-    className: "inline-flex items-center justify-center min-w-[100px] !bg-green-500 !hover:bg-green-600 !text-white border-transparent",
+    className: "inline-flex items-center justify-center min-w-[100px] bg-green-500 hover:bg-green-600 text-white border-transparent",
   },
   Rejected: {
     text: "Ditolak",
     variant: "destructive" as const,
-    className: "inline-flex items-center justify-center min-w-[100px] !bg-red-500 !hover:bg-red-600 !text-white border-transparent",
+    className: "inline-flex items-center justify-center min-w-[100px] bg-red-500 hover:bg-red-600 text-white border-transparent",
   },
 };
 

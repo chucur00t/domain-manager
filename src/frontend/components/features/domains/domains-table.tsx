@@ -46,22 +46,22 @@ const statusConfig: Record<
   Active: {
     text: "Aktif",
     variant: "secondary",
-    className: "inline-flex items-center justify-center min-w-[110px] !bg-green-500 !hover:bg-green-600 !text-white border-transparent",
+    className: "inline-flex items-center justify-center min-w-[110px] bg-green-500 hover:bg-green-600 text-white border-transparent",
   },
   Suspended: {
     text: "Disuspensi",
     variant: "secondary",
-    className: "inline-flex items-center justify-center min-w-[110px] !bg-yellow-500 !hover:bg-yellow-600 !text-white border-transparent",
+    className: "inline-flex items-center justify-center min-w-[110px] bg-yellow-500 hover:bg-yellow-600 text-white border-transparent",
   },
   Deactivated: {
     text: "Tidak Aktif",
     variant: "secondary",
-    className: "inline-flex items-center justify-center min-w-[110px] !bg-black !hover:bg-gray-900 !text-white border-transparent",
+    className: "inline-flex items-center justify-center min-w-[110px] bg-black hover:bg-gray-900 text-white border-transparent",
   },
   Expired: {
     text: "Kedaluwarsa",
     variant: "outline",
-    className: "inline-flex items-center justify-center min-w-[110px] !bg-orange-500 !hover:bg-orange-600 !text-white border-transparent",
+    className: "inline-flex items-center justify-center min-w-[110px] bg-orange-500 hover:bg-orange-600 text-white border-transparent",
   },
 };
 
