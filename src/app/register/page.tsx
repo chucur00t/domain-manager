@@ -48,20 +48,26 @@ export default function RegisterPage() {
   });
 
   useEffect(() => {
-    fetchOPDs();
+    // Static OPD list (no database required)
+    const staticOPDs = [
+      { id: 1, name: "Diskominfo Provinsi Kalimantan Barat" },
+      { id: 2, name: "Dinas Pendidikan dan Kebudayaan" },
+      { id: 3, name: "Dinas Kesehatan" },
+      { id: 4, name: "Dinas Pekerjaan Umum dan Penataan Ruang" },
+      { id: 5, name: "Dinas Sosial" },
+      { id: 6, name: "Dinas Perhubungan" },
+      { id: 7, name: "Dinas Kependudukan dan Pencatatan Sipil" },
+      { id: 8, name: "Dinas Pemberdayaan Masyarakat dan Desa" },
+      { id: 9, name: "Dinas Lingkungan Hidup" },
+      { id: 10, name: "Badan Perencanaan Pembangunan Daerah" },
+      { id: 11, name: "Badan Keuangan Daerah" },
+      { id: 12, name: "Badan Kepegawaian Daerah" },
+      { id: 13, name: "Satuan Polisi Pamong Praja" },
+      { id: 14, name: "Sekretariat Daerah" },
+      { id: 15, name: "Sekretariat DPRD" },
+    ];
+    setOpds(staticOPDs);
   }, []);
-
-  const fetchOPDs = async () => {
-    try {
-      const response = await fetch("/api/opds");
-      if (response.ok) {
-        const data = await response.json();
-        setOpds(data);
-      }
-    } catch (error) {
-      console.error("Error fetching OPDs:", error);
-    }
-  };
 
   const handleChange = (field: string, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -130,39 +136,15 @@ export default function RegisterPage() {
     setError("");
     setSuccess("");
 
-    try {
-      const response = await fetch("/api/auth/register", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          full_name: formData.full_name,
-          email: formData.email,
-          username: formData.username,
-          password: formData.password,
-          opd_id: parseInt(formData.opd_id),
-          opd_address: formData.opd_address,
-          contact: formData.contact,
-        }),
-      });
-
-      const data = await response.json();
-
-      if (data.success) {
-        setSuccess(data.message);
-        setTimeout(() => {
-          router.push("/login");
-        }, 2000);
-      } else {
-        setError(data.message);
-      }
-    } catch (error) {
-      console.error("Error during registration:", error);
-      setError("Terjadi kesalahan. Silakan coba lagi.");
-    } finally {
-      setLoading(false);
-    }
+    // Simple registration without database
+    setTimeout(() => {
+      setSuccess(
+        "Registrasi berhasil! Anda akan diarahkan ke halaman login..."
+      );
+      setTimeout(() => {
+        router.push("/login");
+      }, 2000);
+    }, 500);
   };
 
   return (

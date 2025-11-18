@@ -14,12 +14,10 @@ export default function LoginContent() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [isSuperAdmin, setIsSuperAdmin] = useState(false);
 
   const [formData, setFormData] = useState({
     username: "",
     password: "",
-    officer_name: "", // Only for Super Admin
   });
 
   const handleChange = (field: string, value: string) => {
@@ -35,56 +33,24 @@ export default function LoginContent() {
       return;
     }
 
-    // Check if this might be Super Admin (username superadmin)
-    const mightBeSuperAdmin = formData.username.toLowerCase() === "superadmin";
-
-    if (mightBeSuperAdmin && !formData.officer_name) {
-      setError("Nama petugas wajib diisi untuk Super Admin");
-      return;
-    }
-
     setLoading(true);
     setError("");
 
-    try {
-      const response = await fetch("/api/auth/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          username: formData.username,
-          password: formData.password,
-          officer_name: mightBeSuperAdmin ? formData.officer_name : undefined,
-        }),
-      });
+    // Simple redirect based on username (without database)
+    setTimeout(() => {
+      const mightBeSuperAdmin =
+        formData.username.toLowerCase() === "superadmin";
 
-      const data = await response.json();
-
-      if (data.success && data.user) {
-        // Redirect based on role
-        const roleQuery = `?role=${encodeURIComponent(data.user.role)}`;
-        if (data.user.role === "Super Admin") {
-          router.push(`/super-admin/dashboard${roleQuery}`);
-        } else {
-          router.push(`/dashboard${roleQuery}`);
-        }
+      if (mightBeSuperAdmin) {
+        // Redirect to Super Admin dashboard
+        const roleQuery = "?role=Super%20Admin";
+        router.push(`/super-admin/dashboard${roleQuery}`);
       } else {
-        setError(data.message || "Login gagal");
+        // Redirect to Admin Daerah dashboard
+        const roleQuery = "?role=Admin%20Daerah";
+        router.push(`/dashboard${roleQuery}`);
       }
-    } catch (error) {
-      console.error("Error during login:", error);
-      setError("Terjadi kesalahan. Silakan coba lagi.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Auto-detect if user is trying to login as Super Admin
-  const handleUsernameChange = (value: string) => {
-    setFormData((prev) => ({ ...prev, username: value }));
-    setIsSuperAdmin(value.toLowerCase() === "superadmin");
-    setError("");
+    }, 500);
   };
 
   return (
@@ -104,28 +70,11 @@ export default function LoginContent() {
             type="text"
             placeholder="Masukkan username"
             value={formData.username}
-            onChange={(e) => handleUsernameChange(e.target.value)}
+            onChange={(e) => handleChange("username", e.target.value)}
             disabled={loading}
             autoComplete="username"
           />
         </div>
-
-        {isSuperAdmin && (
-          <div>
-            <Label htmlFor="officer_name">Nama Petugas</Label>
-            <Input
-              id="officer_name"
-              type="text"
-              placeholder="Nama petugas yang login"
-              value={formData.officer_name}
-              onChange={(e) => handleChange("officer_name", e.target.value)}
-              disabled={loading}
-            />
-            <p className="text-xs text-muted-foreground mt-1">
-              Digunakan untuk tracking login Super Admin
-            </p>
-          </div>
-        )}
 
         <div>
           <Label htmlFor="password">Password</Label>
