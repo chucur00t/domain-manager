@@ -6,8 +6,12 @@ export interface User {
   id: number;
   username: string;
   email: string;
+  password_hash: string;
+  full_name: string;
   role: UserRole;
   opd_id?: number;
+  opd_address?: string;
+  contact?: string;
   is_active: boolean;
   created_at: string;
   updated_at: string;
@@ -16,6 +20,50 @@ export interface User {
   // Computed/compatibility fields
   name?: string; // For display purposes, usually same as username
   status?: UserStatus; // Computed from is_active
+}
+
+// Registration interface
+export interface RegistrationData {
+  full_name: string;
+  email: string;
+  username: string;
+  password: string;
+  opd_id: number;
+  opd_address: string;
+  contact: string;
+}
+
+// Login interfaces
+export interface LoginData {
+  username: string;
+  password: string;
+  officer_name?: string; // Required for Super Admin
+}
+
+export interface LoginResponse {
+  success: boolean;
+  user?: {
+    id: number;
+    username: string;
+    email: string;
+    full_name: string;
+    role: UserRole;
+    opd_id?: number;
+    opd?: string;
+  };
+  session_id?: number; // For Super Admin sessions
+  message?: string;
+}
+
+// Super Admin Session interface
+export interface SuperAdminSession {
+  id: number;
+  user_id: number;
+  officer_name: string;
+  login_at: string;
+  logout_at?: string;
+  ip_address?: string;
+  user_agent?: string;
 }
 
 // OPD interface - matches opds table
