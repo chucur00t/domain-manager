@@ -17,22 +17,6 @@ type ActionResponse = {
   message: string;
 };
 
-// Helper function for logging activity
-const logActivity = async (
-  action: string,
-  description: string,
-  userRole: string
-) => {
-  await auditService.logAction({
-    action,
-    resourceType: "application",
-    resourceId: "system",
-    description,
-    userId: "system",
-    userRole,
-  });
-};
-
 export async function submitApplication(
   applicationData: Omit<
     SubdomainApplication,
@@ -109,11 +93,14 @@ export async function forwardForApproval(
 
     await updateApplicationStatus(applicationId, "Pending");
 
-    logActivity(
-      "FORWARD_FOR_APPROVAL",
-      `Meneruskan permohonan ${applicationId} (${application.domainName}) untuk persetujuan final.`,
-      currentUserRole
-    );
+    await auditService.logAction({
+      action: "FORWARD_FOR_APPROVAL",
+      resourceType: "application",
+      resourceId: applicationId,
+      description: `Meneruskan permohonan ${applicationId} (${application.domainName}) untuk persetujuan final.`,
+      userId: "system",
+      userRole: currentUserRole,
+    });
 
     revalidatePath("/applications");
     revalidatePath(`/applications/${applicationId}`);
@@ -165,11 +152,14 @@ export async function approveApplication(
 
     console.log(`[approveApplication] Logging activity...`);
     try {
-      await logActivity(
-        "APPROVE_APPLICATION",
-        `Menyetujui permohonan ${applicationId}`,
-        currentUserRole
-      );
+      await auditService.logAction({
+        action: "APPROVE_APPLICATION",
+        resourceType: "application",
+        resourceId: applicationId,
+        description: `Menyetujui permohonan ${applicationId}`,
+        userId: "system",
+        userRole: currentUserRole,
+      });
       console.log(`[approveApplication] Activity logged successfully`);
     } catch (logError) {
       console.error(`[approveApplication] Failed to log activity:`, logError);
@@ -221,11 +211,14 @@ export async function rejectApplication(
 
     await updateApplicationStatus(applicationId, "Rejected", reason);
 
-    logActivity(
-      "REJECT_APPLICATION",
-      `Menolak permohonan ${applicationId} (${application.domainName}). Alasan: ${reason}`,
-      currentUserRole
-    );
+    await auditService.logAction({
+      action: "REJECT_APPLICATION",
+      resourceType: "application",
+      resourceId: applicationId,
+      description: `Menolak permohonan ${applicationId} (${application.domainName}). Alasan: ${reason}`,
+      userId: "system",
+      userRole: currentUserRole,
+    });
 
     revalidatePath("/applications");
     revalidatePath(`/applications/${applicationId}`);

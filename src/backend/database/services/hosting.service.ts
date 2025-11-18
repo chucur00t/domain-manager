@@ -19,8 +19,11 @@ export interface HostingRow extends DatabaseRow {
   server_type?: string;
   status: string;
   activated_at: Date;
+  submitted_at?: Date;
+  reason?: string;
   // Related data from JOINs
   application_type?: string;
+  application_status?: string;
   opd_name?: string;
   submitter_name?: string;
   domain_name?: string;
@@ -122,22 +125,28 @@ export class HostingService {
 
       // Convert to application format
       const formattedHostings: HostingApplication[] = hostings.map(
-        (hosting) => ({
-          id: hosting.id.toString(),
-          userId: hosting.application_id?.toString() || "",
-          applicationName: hosting.domain_name || "Unknown",
-          description: `Storage: ${
-            hosting.storage_capacity || "N/A"
-          }, Bandwidth: ${hosting.bandwidth || "N/A"}, Server: ${
-            hosting.server_type || "N/A"
-          }`,
-          framework: hosting.server_type || "Unknown",
-          domainName: hosting.domain_name || "",
-          opd: hosting.opd_name || "Unknown",
-          applicantName: hosting.submitter_name || "Unknown",
-          status: hosting.status === "Active" ? "approved" : "pending",
-          submittedDate: hosting.activated_at.toISOString().split("T")[0],
-        })
+        (hosting) => {
+          const activatedDate = hosting.activated_at && hosting.activated_at instanceof Date && !isNaN(hosting.activated_at.getTime())
+            ? hosting.activated_at.toISOString().split("T")[0]
+            : new Date().toISOString().split("T")[0];
+          
+          return {
+            id: hosting.id.toString(),
+            userId: hosting.application_id?.toString() || "",
+            applicationName: hosting.domain_name || "Unknown",
+            description: `Storage: ${
+              hosting.storage_capacity || "N/A"
+            }, Bandwidth: ${hosting.bandwidth || "N/A"}, Server: ${
+              hosting.server_type || "N/A"
+            }`,
+            framework: hosting.server_type || "Unknown",
+            domainName: hosting.domain_name || "",
+            opd: hosting.opd_name || "Unknown",
+            applicantName: hosting.submitter_name || "Unknown",
+            status: hosting.application_status || hosting.status || "Pending",
+            submittedDate: activatedDate,
+          };
+        }
       );
 
       return {
@@ -197,7 +206,7 @@ export class HostingService {
       const sql = `
         SELECT h.id, h.application_id, h.domain_id, h.storage_capacity, h.bandwidth,
                h.server_type, h.status, h.activated_at,
-               a.application_type,
+               a.application_type, a.status as application_status, a.submitted_at, a.reason,
                o.name as opd_name,
                u.username as submitter_name,
                d.domain_name
@@ -224,9 +233,15 @@ export class HostingService {
       }
 
       const hosting = result.data[0];
+      const activatedDate = hosting.activated_at && hosting.activated_at instanceof Date && !isNaN(hosting.activated_at.getTime())
+        ? hosting.activated_at.toISOString().split("T")[0]
+        : new Date().toISOString().split("T")[0];
+      
+      const submittedDate = hosting.submitted_at && hosting.submitted_at instanceof Date && !isNaN(hosting.submitted_at.getTime())
+        ? hosting.submitted_at.toISOString().split("T")[0]
+        : activatedDate;
 
       return {
-        id: hosting.id.toString(),
         userId: hosting.application_id?.toString() || "",
         applicationName: hosting.domain_name || "Unknown",
         description: `Storage: ${
@@ -238,12 +253,13 @@ export class HostingService {
         domainName: hosting.domain_name || "",
         opd: hosting.opd_name || "Unknown",
         applicantName: hosting.submitter_name || "Unknown",
-        status: hosting.status || "Active",
-        submittedDate: hosting.activated_at.toISOString().split("T")[0],
+        status: hosting.application_status || hosting.status || "Pending",
+        submittedDate: submittedDate,
+        rejectionReason: hosting.reason || "",
         storage_capacity: hosting.storage_capacity,
         bandwidth: hosting.bandwidth,
         server_type: hosting.server_type,
-        activated_at: hosting.activated_at.toISOString().split("T")[0],
+        activated_at: activatedDate,
       } as any;
     } catch (error) {
       console.error("Error getting hosting, using mock data:", error);
@@ -433,10 +449,12 @@ export class HostingService {
       const sql = `SELECT COUNT(*) as total FROM hostings ${whereClause}`;
       const result = await query<{ total: number }>(sql, params);
 
-      return result[0]?.total || 0;
+      return result.success && result.data && result.data.length > 0 ? result.data[0].total : 0;
     } catch (error) {
       console.error("Error counting hostings:", error);
       throw error;
     }
   }
 }
+
+export const hostingService = new HostingService();

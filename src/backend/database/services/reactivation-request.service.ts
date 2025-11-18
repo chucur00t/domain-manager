@@ -1,4 +1,4 @@
-import { query, execute } from "../utils";
+import { query, execute } from "../helpers";
 import type {
   ReactivationRequest,
   ReactivationDocument,
@@ -39,17 +39,18 @@ export class ReactivationRequestService {
       VALUES (?, ?, ?, 'Pending')
     `;
 
-    try {
-      const result = await execute(sql, [
-        data.domain_id,
-        data.requester_id,
-        data.reason,
-      ]);
-      return result.insertId || 0;
-    } catch (error) {
-      console.error("Failed to create reactivation request:", error);
-      throw error;
+    const result = await execute(sql, [
+      data.domain_id,
+      data.requester_id,
+      data.reason,
+    ]);
+    
+    if (!result.success) {
+      console.error("Failed to create reactivation request:", result.error);
+      throw new Error(`Failed to create reactivation request: ${result.error}`);
     }
+    
+    return result.data?.insertId || 0;
   }
 
   /**
@@ -116,31 +117,33 @@ export class ReactivationRequestService {
 
     sql += " ORDER BY rr.requested_at DESC";
 
-    try {
-      const rows = await query<ReactivationRequestRow>(sql, params);
-      return rows.map((row) => ({
-        id: row.id,
-        domain_id: row.domain_id,
-        requester_id: row.requester_id,
-        reason: row.reason,
-        status: row.status,
-        decision_comment: row.decision_comment || undefined,
-        decided_by: row.decided_by || undefined,
-        requested_at: row.requested_at,
-        decided_at: row.decided_at || undefined,
-        domain_name: row.domain_name,
-        requester_name: row.requester_name,
-        requester_email: row.requester_email,
-        requester_opd: row.requester_opd,
-        decider_name: row.decider_name,
-        opd_id: row.opd_id,
-        domain_status: row.domain_status as any,
-        domain_expires_at: row.domain_expires_at,
-      }));
-    } catch (error) {
-      console.error("Failed to fetch reactivation requests:", error);
-      throw error;
+    const result = await query<ReactivationRequestRow>(sql, params);
+    
+    if (!result.success) {
+      console.error("Failed to fetch reactivation requests:", result.error);
+      throw new Error(`Failed to fetch reactivation requests: ${result.error}`);
     }
+    
+    const rows = result.data || [];
+    return rows.map((row) => ({
+      id: row.id,
+      domain_id: row.domain_id,
+      requester_id: row.requester_id,
+      reason: row.reason,
+      status: row.status,
+      decision_comment: row.decision_comment || undefined,
+      decided_by: row.decided_by || undefined,
+      requested_at: row.requested_at,
+      decided_at: row.decided_at || undefined,
+      domain_name: row.domain_name,
+      requester_name: row.requester_name,
+      requester_email: row.requester_email,
+      requester_opd: row.requester_opd,
+      decider_name: row.decider_name,
+      opd_id: row.opd_id,
+      domain_status: row.domain_status as any,
+      domain_expires_at: row.domain_expires_at,
+    }));
   }
 
   /**
@@ -176,34 +179,36 @@ export class ReactivationRequestService {
       WHERE rr.id = ?
     `;
 
-    try {
-      const rows = await query<ReactivationRequestRow>(sql, [id]);
-      if (rows.length === 0) return null;
-
-      const row = rows[0];
-      return {
-        id: row.id,
-        domain_id: row.domain_id,
-        requester_id: row.requester_id,
-        reason: row.reason,
-        status: row.status,
-        decision_comment: row.decision_comment || undefined,
-        decided_by: row.decided_by || undefined,
-        requested_at: row.requested_at,
-        decided_at: row.decided_at || undefined,
-        domain_name: row.domain_name,
-        requester_name: row.requester_name,
-        requester_email: row.requester_email,
-        requester_opd: row.requester_opd,
-        decider_name: row.decider_name,
-        opd_id: row.opd_id,
-        domain_status: row.domain_status as any,
-        domain_expires_at: row.domain_expires_at,
-      };
-    } catch (error) {
-      console.error("Failed to fetch reactivation request:", error);
-      throw error;
+    const result = await query<ReactivationRequestRow>(sql, [id]);
+    
+    if (!result.success) {
+      console.error("Failed to fetch reactivation request:", result.error);
+      throw new Error(`Failed to fetch reactivation request: ${result.error}`);
     }
+    
+    const rows = result.data || [];
+    if (rows.length === 0) return null;
+
+    const row = rows[0];
+    return {
+      id: row.id,
+      domain_id: row.domain_id,
+      requester_id: row.requester_id,
+      reason: row.reason,
+      status: row.status,
+      decision_comment: row.decision_comment || undefined,
+      decided_by: row.decided_by || undefined,
+      requested_at: row.requested_at,
+      decided_at: row.decided_at || undefined,
+      domain_name: row.domain_name,
+      requester_name: row.requester_name,
+      requester_email: row.requester_email,
+      requester_opd: row.requester_opd,
+      decider_name: row.decider_name,
+      opd_id: row.opd_id,
+      domain_status: row.domain_status as any,
+      domain_expires_at: row.domain_expires_at,
+    };
   }
 
   /**
@@ -223,11 +228,15 @@ export class ReactivationRequestService {
       WHERE id = ?
     `;
 
-    try {
-      await query(sql, [decided_by, comment || null, id]);
-    } catch (error) {
-      console.error("Failed to approve reactivation request:", error);
-      throw error;
+    const result = await execute(sql, [decided_by, comment || null, id]);
+    
+    if (!result.success) {
+      console.error("Failed to approve reactivation request:", result.error);
+      throw new Error(`Failed to approve reactivation request: ${result.error}`);
+    }
+    
+    if (result.data && result.data.affectedRows === 0) {
+      throw new Error("Reactivation request not found or already processed");
     }
   }
 
@@ -248,11 +257,15 @@ export class ReactivationRequestService {
       WHERE id = ?
     `;
 
-    try {
-      await query(sql, [decided_by, comment, id]);
-    } catch (error) {
-      console.error("Failed to reject reactivation request:", error);
-      throw error;
+    const result = await execute(sql, [decided_by, comment, id]);
+    
+    if (!result.success) {
+      console.error("Failed to reject reactivation request:", result.error);
+      throw new Error(`Failed to reject reactivation request: ${result.error}`);
+    }
+    
+    if (result.data && result.data.affectedRows === 0) {
+      throw new Error("Reactivation request not found or already processed");
     }
   }
 
@@ -271,18 +284,19 @@ export class ReactivationRequestService {
       VALUES (?, ?, ?, ?)
     `;
 
-    try {
-      const result = await execute(sql, [
-        data.reactivation_request_id,
-        data.file_name,
-        data.file_path,
-        data.file_type,
-      ]);
-      return result.insertId || 0;
-    } catch (error) {
-      console.error("Failed to add document:", error);
-      throw error;
+    const result = await execute(sql, [
+      data.reactivation_request_id,
+      data.file_name,
+      data.file_path,
+      data.file_type,
+    ]);
+    
+    if (!result.success) {
+      console.error("Failed to add document:", result.error);
+      throw new Error(`Failed to add document: ${result.error}`);
     }
+    
+    return result.data?.insertId || 0;
   }
 
   /**
@@ -298,12 +312,14 @@ export class ReactivationRequestService {
       ORDER BY uploaded_at DESC
     `;
 
-    try {
-      return await query<ReactivationDocument>(sql, [reactivation_request_id]);
-    } catch (error) {
-      console.error("Failed to fetch documents:", error);
-      throw error;
+    const result = await query<ReactivationDocument>(sql, [reactivation_request_id]);
+    
+    if (!result.success) {
+      console.error("Failed to fetch documents:", result.error);
+      throw new Error(`Failed to fetch documents: ${result.error}`);
     }
+    
+    return result.data || [];
   }
 
   /**
@@ -315,11 +331,15 @@ export class ReactivationRequestService {
       WHERE id = ? AND status = 'Pending'
     `;
 
-    try {
-      await query(sql, [id]);
-    } catch (error) {
-      console.error("Failed to delete reactivation request:", error);
-      throw error;
+    const result = await execute(sql, [id]);
+    
+    if (!result.success) {
+      console.error("Failed to delete reactivation request:", result.error);
+      throw new Error(`Failed to delete reactivation request: ${result.error}`);
+    }
+    
+    if (result.data && result.data.affectedRows === 0) {
+      throw new Error("Reactivation request not found or cannot be deleted (not pending)");
     }
   }
 }

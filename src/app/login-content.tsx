@@ -38,15 +38,18 @@ export default function LoginContent() {
 
     // Simple redirect based on username (without database)
     setTimeout(() => {
-      const mightBeSuperAdmin =
-        formData.username.toLowerCase() === "superadmin";
+      const username = formData.username.trim().toLowerCase();
+      console.log("Username:", username); // Debug
+      console.log("Is Super Admin:", username === "superadmin"); // Debug
 
-      if (mightBeSuperAdmin) {
+      if (username === "superadmin") {
         // Redirect to Super Admin dashboard
+        console.log("Redirecting to Super Admin dashboard");
         const roleQuery = "?role=Super%20Admin";
         router.push(`/super-admin/dashboard${roleQuery}`);
       } else {
         // Redirect to Admin Daerah dashboard
+        console.log("Redirecting to Admin Daerah dashboard");
         const roleQuery = "?role=Admin%20Daerah";
         router.push(`/dashboard${roleQuery}`);
       }
@@ -54,7 +57,7 @@ export default function LoginContent() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6" suppressHydrationWarning>
       <form onSubmit={handleSubmit} className="space-y-4">
         {error && (
           <Alert variant="destructive">
@@ -63,7 +66,7 @@ export default function LoginContent() {
           </Alert>
         )}
 
-        <div>
+        <div suppressHydrationWarning>
           <Label htmlFor="username">Username</Label>
           <Input
             id="username"
@@ -73,10 +76,11 @@ export default function LoginContent() {
             onChange={(e) => handleChange("username", e.target.value)}
             disabled={loading}
             autoComplete="username"
+            suppressHydrationWarning
           />
         </div>
 
-        <div>
+        <div suppressHydrationWarning>
           <Label htmlFor="password">Password</Label>
           <div className="relative">
             <Input
@@ -87,6 +91,7 @@ export default function LoginContent() {
               onChange={(e) => handleChange("password", e.target.value)}
               disabled={loading}
               autoComplete="current-password"
+              suppressHydrationWarning
             />
             <button
               type="button"
@@ -103,7 +108,7 @@ export default function LoginContent() {
           </div>
         </div>
 
-        <Button type="submit" className="w-full" disabled={loading}>
+        <Button type="submit" className="w-full" disabled={loading} suppressHydrationWarning>
           {loading ? "Memproses..." : "Masuk"}
         </Button>
 

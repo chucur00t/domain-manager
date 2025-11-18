@@ -4,12 +4,27 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Server, Code } from "lucide-react";
+import { ArrowLeft, Server, Code, CheckCircle, XCircle } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { BackButton } from "@/frontend/components/shared/back-button";
+import { useState, useTransition } from "react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { useToast } from "@/hooks/use-toast";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
 
 interface HostingApplication {
   id: string | number;
+  userId?: string; // This contains application_id
   status: string;
   applicationName?: string;
   domainName?: string;
@@ -35,10 +50,104 @@ export function HostingApplicationDetailClient({
   const router = useRouter();
   const searchParams = useSearchParams();
   const currentUserRole = searchParams.get("role");
+  const { toast } = useToast();
+  const [isPending, startTransition] = useTransition();
+  const [isAlertOpen, setIsAlertOpen] = useState(false);
+  const [actionType, setActionType] = useState<"approve" | "reject" | null>(null);
+  const [rejectionReason, setRejectionReason] = useState("");
 
   const domainName = application.domainName || application.domain_name || "-";
   const submittedDate =
     application.submittedDate || application.submitted_at || "-";
+
+  const handleActionClick = (action: "approve" | "reject") => {
+    setActionType(action);
+    setRejectionReason("");
+    setIsAlertOpen(true);
+  };
+
+  const handleConfirmAction = async () => {
+    if (!actionType || !currentUserRole) return;
+
+    if (actionType === "reject" && !rejectionReason.trim()) {
+      toast({
+        title: "Validasi Gagal",
+        description: "Alasan penolakan harus diisi.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    startTransition(async () => {
+      try {
+        // Use application.userId which contains the application_id, not hosting id
+        const applicationId = application.userId || application.id;
+        const endpoint = actionType === "approve" 
+          ? `/api/hosting-applications/${applicationId}/approve`
+          : `/api/hosting-applications/${applicationId}/reject`;
+        
+        const response = await fetch(endpoint, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            role: currentUserRole,
+            reason: actionType === "reject" ? rejectionReason : undefined,
+          }),
+        });
+
+        const result = await response.json();
+
+        if (response.ok) {
+          toast({
+            title: "Sukses",
+            description: result.message || `Permohonan hosting berhasil ${actionType === "approve" ? "disetujui" : "ditolak"}.`,
+          });
+          router.refresh();
+        } else {
+          toast({
+            title: "Error",
+            description: result.message || "Terjadi kesalahan.",
+            variant: "destructive",
+          });
+        }
+      } catch (error) {
+        toast({
+          title: "Error",
+          description: "Terjadi kesalahan saat memproses permohonan.",
+          variant: "destructive",
+        });
+      }
+      setIsAlertOpen(false);
+    });
+  };
+
+  const getDialogContent = () => {
+    if (actionType === "approve") {
+      return {
+        title: "Konfirmasi Persetujuan",
+        description: `Apakah Anda yakin ingin menyetujui permohonan hosting "${application.applicationName || domainName}"? Hosting akan segera diaktifkan setelah disetujui.`,
+      };
+    } else {
+      return {
+        title: "Konfirmasi Penolakan",
+        description: `Apakah Anda yakin ingin menolak permohonan hosting "${application.applicationName || domainName}"? Harap berikan alasan penolakan yang jelas.`,
+      };
+    }
+  };
+
+  const { title: dialogTitle, description: dialogDescription } = getDialogContent();
+  const isSuperAdmin = currentUserRole === "Super Admin";
+  const isPendingApplication = application.status === "Pending" || application.status === "pending";
+
+  // Debug logging
+  console.log("=== HOSTING DETAIL CLIENT ===");
+  console.log("Current Role:", currentUserRole);
+  console.log("Is Super Admin:", isSuperAdmin);
+  console.log("Application Status:", application.status);
+  console.log("Is Pending:", isPendingApplication);
+  console.log("Should show buttons:", isSuperAdmin && isPendingApplication);
 
   // Map status to Indonesian with styling
   const getStatusConfig = (status: string) => {
@@ -210,34 +319,82 @@ export function HostingApplicationDetailClient({
           Tutup
         </Button>
         <div className="flex gap-2">
-          {/* Edit button - jika diperlukan di masa depan */}
+          {/* Super Admin - Approve/Reject for Pending applications */}
+          {isSuperAdmin && isPendingApplication && (
+            <>
+              <Button
+                variant="destructive"
+                onClick={() => handleActionClick("reject")}
+                disabled={isPending}
+                className="gap-2"
+              >
+                <XCircle className="h-4 w-4" />
+                Tolak Permohonan
+              </Button>
+              <Button
+                onClick={() => handleActionClick("approve")}
+                disabled={isPending}
+                className="gap-2"
+              >
+                <CheckCircle className="h-4 w-4" />
+                Setujui Permohonan
+              </Button>
+            </>
+          )}
+          {/* Admin Daerah - Edit/Ajukan buttons */}
           {currentUserRole === "Admin Daerah" &&
             application.status === "Deactivated" && (
-              <Button
-                variant="outline"
-                onClick={() =>
-                  router.push(
-                    `/hosting/${application.id}/edit?role=${currentUserRole}`
-                  )
-                }
-              >
-                Edit
-              </Button>
-            )}
-          {/* Ajukan Hosting - jika diperlukan di masa depan */}
-          {currentUserRole === "Admin Daerah" &&
-            application.status === "Deactivated" && (
-              <Button
-                onClick={() => {
-                  // Logic untuk ajukan hosting akan ditambahkan nanti
-                  console.log("Ajukan hosting:", application.id);
-                }}
-              >
-                Ajukan Hosting
-              </Button>
+              <>
+                <Button
+                  variant="outline"
+                  onClick={() =>
+                    router.push(
+                      `/hosting/${application.id}/edit?role=${currentUserRole}`
+                    )
+                  }
+                >
+                  Edit
+                </Button>
+                <Button
+                  onClick={() => {
+                    console.log("Ajukan hosting:", application.id);
+                  }}
+                >
+                  Ajukan Hosting
+                </Button>
+              </>
             )}
         </div>
       </div>
+
+      {/* Alert Dialog for Approve/Reject */}
+      <AlertDialog open={isAlertOpen} onOpenChange={setIsAlertOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{dialogTitle}</AlertDialogTitle>
+            <AlertDialogDescription>{dialogDescription}</AlertDialogDescription>
+          </AlertDialogHeader>
+          {actionType === "reject" && (
+            <div className="space-y-2 py-4">
+              <Label htmlFor="rejection-reason">Alasan Penolakan *</Label>
+              <Textarea
+                id="rejection-reason"
+                placeholder="Masukkan alasan penolakan..."
+                value={rejectionReason}
+                onChange={(e) => setRejectionReason(e.target.value)}
+                rows={4}
+                className="resize-none"
+              />
+            </div>
+          )}
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isPending}>Batal</AlertDialogCancel>
+            <AlertDialogAction onClick={handleConfirmAction} disabled={isPending}>
+              {isPending ? "Memproses..." : "Konfirmasi"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

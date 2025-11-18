@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { use, useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import {
   Card,
@@ -54,9 +54,10 @@ interface DeactivationRequest {
 export default function DeactivationRequestDetailPage({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
   const router = useRouter();
+  const resolvedParams = use(params);
   const [request, setRequest] = useState<DeactivationRequest | null>(null);
   const [loading, setLoading] = useState(true);
   const [processing, setProcessing] = useState(false);
@@ -67,12 +68,12 @@ export default function DeactivationRequestDetailPage({
 
   useEffect(() => {
     fetchRequest();
-  }, [params.id]);
+  }, [resolvedParams.id]);
 
   const fetchRequest = async () => {
     setLoading(true);
     try {
-      const response = await fetch(`/api/deactivation-requests/${params.id}`);
+      const response = await fetch(`/api/deactivation-requests/${resolvedParams.id}`);
       if (response.ok) {
         const data = await response.json();
         setRequest(data);
@@ -101,7 +102,7 @@ export default function DeactivationRequestDetailPage({
       // TODO: Get current user ID from session
       const currentUserId = 1; // Placeholder
 
-      const response = await fetch(`/api/deactivation-requests/${params.id}`, {
+      const response = await fetch(`/api/deactivation-requests/${resolvedParams.id}`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",

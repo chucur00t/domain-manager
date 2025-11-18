@@ -5,13 +5,15 @@ import { applicationService } from "@/backend/database/services/application.serv
 export async function GET(request: NextRequest) {
   try {
     const applications = await getApplications();
+    // Filter only domain applications (exclude hosting)
+    const domainApplications = applications.filter(app => app.application_type === 'domain');
     // Sort by most recent, handle undefined dates
-    applications.sort((a, b) => {
+    domainApplications.sort((a, b) => {
       const dateA = a.submittedDate ? new Date(a.submittedDate).getTime() : 0;
       const dateB = b.submittedDate ? new Date(b.submittedDate).getTime() : 0;
       return dateB - dateA;
     });
-    return NextResponse.json(applications);
+    return NextResponse.json(domainApplications);
   } catch (error) {
     console.error("Error fetching applications:", error);
     return NextResponse.json(

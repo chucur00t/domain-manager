@@ -75,7 +75,7 @@ export const updateApplication = async (id: string, application: any) => {
   if (application.rejectionReason || application.reason)
     updateData.reason = application.rejectionReason || application.reason;
 
-  await applicationService.updateApplication(parseInt(id), updateData, 1);
+  await applicationService.updateApplication(parseInt(id), updateData);
 };
 
 export const deleteApplication = async (id: string) => {
@@ -89,9 +89,9 @@ export const updateApplicationStatus = async (
 ) => {
   await applicationService.updateApplication(
     parseInt(id),
-    { status, reason },
-    1
-  ); // updatedBy: system user
+    { status, reason }
+    // updatedBy omitted - will not update last_updated_by field
+  );
 };
 
 // ===========================================

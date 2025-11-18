@@ -117,14 +117,30 @@ export async function PATCH(
         comment
       );
 
-      // Update domain status to Active and extend expires_at by 1 year
+      // Check if domain still exists
+      const existingDomain = await domainService.getDomain(reactivationRequest.domain_id);
+      
       const newExpiryDate = new Date();
       newExpiryDate.setFullYear(newExpiryDate.getFullYear() + 1);
 
-      await domainService.updateDomain(reactivationRequest.domain_id, {
-        status: "Active",
-        expires_at: newExpiryDate,
-      });
+      if (existingDomain) {
+        // Domain exists, just update status and expiry date
+        await domainService.updateDomain(reactivationRequest.domain_id, {
+          status: "Active",
+          expires_at: newExpiryDate,
+        });
+      } else {
+        // Domain was deleted during deactivation, recreate it
+        // Note: domain_name should be fetched from the original application or stored in reactivation_requests
+        // For now, we'll just log a warning as we need the domain_name
+        console.warn(`Domain ID ${reactivationRequest.domain_id} not found. Cannot recreate without domain_name.`);
+        
+        // Return error as we cannot proceed without domain data
+        return NextResponse.json(
+          { error: "Domain tidak ditemukan. Domain mungkin telah dihapus secara permanen." },
+          { status: 400 }
+        );
+      }
 
       // TODO: Send notification to Admin Daerah (approved)
       // TODO: Create audit log (APPROVE_REACTIVATION_REQUEST)

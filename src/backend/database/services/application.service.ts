@@ -1,4 +1,5 @@
-import { query, execute, buildPagination } from "../utils";
+import { query, buildPagination } from "../utils";
+import { execute } from "../helpers";
 import type { DatabaseRow } from "../types";
 import type {
   SubdomainApplication,
@@ -226,7 +227,8 @@ export class ApplicationService {
     id: number
   ): Promise<(SubdomainApplication | HostingApplication) | null> {
     try {
-      const sql = `
+      // First, get basic application data
+      const basicSql = `
         SELECT a.id, a.application_type, a.requested_domain_name, a.opd_id, a.submitter_id, a.status, a.reason,
                a.submitted_at, a.approved_at, a.last_updated_by,
                o.name as opd_name,
@@ -239,14 +241,16 @@ export class ApplicationService {
         WHERE a.id = ?
       `;
 
-      const applications = await query<ApplicationRow>(sql, [id]);
+      const applications = await query<ApplicationRow>(basicSql, [id]);
 
       if (applications.length === 0) {
         return null;
       }
 
       const app = applications[0];
-      return {
+      
+      // Base data for all applications
+      const baseData = {
         id: app.id,
         application_type: app.application_type as ApplicationType,
         requested_domain_name: app.requested_domain_name,
@@ -259,14 +263,64 @@ export class ApplicationService {
         last_updated_by: app.last_updated_by,
         opd: app.opd_name,
         submitter_username: app.submitter_name,
+        submittedDate: app.submitted_at.toISOString().split("T")[0],
+        submissionDate: app.submitted_at.toISOString().split("T")[0],
+      };
+
+      // If it's a hosting application, try to get hosting-specific data
+      if (app.application_type === "hosting") {
+        try {
+          const hostingSql = `
+            SELECT application_name, framework, storage_capacity, bandwidth, expected_users
+            FROM hosting_applications
+            WHERE application_id = ?
+          `;
+          const hostingData = await query<{
+            application_name?: string;
+            framework?: string;
+            storage_capacity?: string;
+            bandwidth?: string;
+            expected_users?: string;
+          }>(hostingSql, [id]);
+
+          if (hostingData.length > 0) {
+            const hosting = hostingData[0];
+            return {
+              ...baseData,
+              applicationName: hosting.application_name,
+              framework: hosting.framework,
+              storage: hosting.storage_capacity,
+              bandwidth: hosting.bandwidth,
+              expectedUsers: hosting.expected_users,
+              domainName: app.requested_domain_name || "",
+            } as HostingApplication;
+          }
+        } catch (hostingError) {
+          // If hosting_applications table doesn't exist or error, return basic data
+          console.warn("Could not fetch hosting-specific data:", hostingError);
+        }
+
+        // Return hosting application with basic data if specific data not available
+        return {
+          ...baseData,
+          applicationName: app.requested_domain_name || "",
+          framework: "",
+          storage: "",
+          bandwidth: "",
+          expectedUsers: "",
+          domainName: app.requested_domain_name || "",
+        } as HostingApplication;
+      }
+
+      // For domain applications
+      return {
+        ...baseData,
         domainName: app.requested_domain_name || (app.opd_name
           ? `${app.opd_name
               .toLowerCase()
               .replace(/\s+/g, "-")}.kalbarprov.go.id`
           : ""),
-        submittedDate: app.submitted_at.toISOString().split("T")[0],
-        submissionDate: app.submitted_at.toISOString().split("T")[0],
-      };
+      } as SubdomainApplication;
     } catch (error) {
       throw new Error(
         `Failed to fetch application: ${
@@ -454,7 +508,7 @@ export class ApplicationService {
   async updateApplication(
     id: number,
     data: UpdateApplicationData,
-    updatedBy: number
+    updatedBy?: number
   ): Promise<void> {
     try {
       console.log(`[updateApplication] Starting update for application ${id}`, { data, updatedBy });
@@ -479,8 +533,11 @@ export class ApplicationService {
         console.log(`[updateApplication] Setting reason to: ${data.reason}`);
       }
 
-      updates.push("last_updated_by = ?");
-      params.push(updatedBy);
+      if (updatedBy !== undefined) {
+        updates.push("last_updated_by = ?");
+        params.push(updatedBy);
+        console.log(`[updateApplication] Setting last_updated_by to: ${updatedBy}`);
+      }
 
       if (updates.length === 0) {
         throw new Error("No fields to update");
@@ -502,6 +559,8 @@ export class ApplicationService {
       console.log(`[updateApplication] Update result:`, result);
 
       if (!result.success) {
+        console.error(`[updateApplication] Database error:`, result.error);
+        console.error(`[updateApplication] Full result:`, JSON.stringify(result, null, 2));
         throw new Error(result.error || "Database update failed");
       }
 

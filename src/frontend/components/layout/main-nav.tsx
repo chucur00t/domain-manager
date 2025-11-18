@@ -142,14 +142,6 @@ export const navItems: NavItem[] = [
         roles: ["Super Admin"],
         exact: true,
       },
-      {
-        href: (role) =>
-          `/super-admin/session-logs?role=${encodeURIComponent(role)}`,
-        label: "Log Login Super Admin",
-        icon: ShieldAlert,
-        roles: ["Super Admin"],
-        exact: true,
-      },
     ],
   },
   // Admin Daerah: Domain Saya (hanya domain OPD mereka)

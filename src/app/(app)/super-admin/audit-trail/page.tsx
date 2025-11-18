@@ -2,6 +2,8 @@
 
 import { useState, useMemo, useTransition, Suspense, useEffect } from "react";
 import type { DateRange } from "react-day-picker";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
 import {
   Card,
   CardContent,
@@ -28,6 +30,7 @@ import {
 import {
   Calendar as CalendarIcon,
   Download,
+  FileDown,
   ListFilter,
   Loader2,
   Search,
@@ -184,20 +187,54 @@ function SuperAdminAuditTrailContent() {
   };
 
   const handleExport = () => {
-    const headers = ["ID", "Waktu", "Pengguna", "Peran", "Aksi", "Detail"];
-    const csvContent = [
-      headers.join(","),
-      ...filteredLogs.map((log) =>
-        [
-          log.id,
-          `"${log.timestamp}"`,
-          `"${log.username}"`,
-          `"${log.user_role}"`,
-          `"${log.action}"`,
-          `"${log.details?.replace(/"/g, '""') || ""}"`,
-        ].join(",")
-      ),
-    ].join("\n");
+    const dateStr = format(new Date(), "yyyy-MM-dd");
+    const timeStr = format(new Date(), "HH:mm:ss");
+    const dateRangeStr = date?.from && date?.to 
+      ? `${format(date.from, "dd/MM/yyyy")} - ${format(date.to, "dd/MM/yyyy")}`
+      : "Semua Periode";
+    
+    // BOM untuk UTF-8
+    let csvContent = "\uFEFF";
+    
+    // Header dengan informasi laporan
+    csvContent += `========================================\n`;
+    csvContent += `AUDIT TRAIL - LOG AKTIVITAS SISTEM\n`;
+    csvContent += `DOMAIN MANAGER\n`;
+    csvContent += `Pemerintah Provinsi Kalimantan Barat\n`;
+    csvContent += `========================================\n\n`;
+    csvContent += `Tanggal Export:,${dateStr}\n`;
+    csvContent += `Waktu Export:,${timeStr}\n`;
+    csvContent += `Periode Data:,${dateRangeStr}\n`;
+    csvContent += `Total Log:,${filteredLogs.length}\n`;
+    csvContent += `Dicetak oleh:,Super Admin\n\n`;
+    csvContent += `========================================\n`;
+    csvContent += `DATA LOG AKTIVITAS\n`;
+    csvContent += `========================================\n\n`;
+    
+    // Header tabel
+    const headers = ["No", "ID", "Tanggal/Waktu", "Pengguna", "Peran", "Aksi", "Detail"];
+    csvContent += headers.join(",") + "\n";
+    csvContent += `----------------------------------------\n`;
+    
+    // Data rows
+    csvContent += filteredLogs.map((log, index) =>
+      [
+        index + 1,
+        log.id,
+        `"${log.timestamp}"`,
+        `"${log.username}"`,
+        `"${log.user_role}"`,
+        `"${log.action}"`,
+        `"${log.details?.replace(/"/g, '""') || ""}"`,
+      ].join(",")
+    ).join("\n");
+    
+    csvContent += `\n----------------------------------------\n`;
+    csvContent += `\nTotal Aktivitas:,${filteredLogs.length}\n\n`;
+    csvContent += `========================================\n`;
+    csvContent += `Dokumen ini dicetak dari Domain Manager\n`;
+    csvContent += `Diskominfo Provinsi Kalimantan Barat\n`;
+    csvContent += `========================================\n`;
 
     const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
     const link = document.createElement("a");
@@ -208,11 +245,182 @@ function SuperAdminAuditTrailContent() {
     link.href = url;
     link.setAttribute(
       "download",
-      `audit_trail_${format(new Date(), "yyyy-MM-dd")}.csv`
+      `audit_trail_${dateStr}.csv`
     );
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
+
+  const handleExportPDF = () => {
+    const doc = new jsPDF({ orientation: "landscape" }); // Landscape untuk tabel yang lebih lebar
+    const dateStr = format(new Date(), "yyyy-MM-dd");
+    const timeStr = format(new Date(), "HH:mm:ss");
+    const dateRangeStr = date?.from && date?.to 
+      ? `${format(date.from, "dd/MM/yyyy")} - ${format(date.to, "dd/MM/yyyy")}`
+      : "Semua Periode";
+    
+    // Set font
+    doc.setFont("helvetica");
+
+    // Header dengan border profesional
+    doc.setDrawColor(41, 128, 185);
+    doc.setLineWidth(0.5);
+    doc.rect(10, 8, 277, 32); // Lebar disesuaikan untuk landscape
+    
+    // Logo placeholder
+    doc.setDrawColor(41, 128, 185);
+    doc.setFillColor(240, 248, 255);
+    doc.rect(14, 12, 20, 24, 'FD');
+    doc.setFontSize(8);
+    doc.setTextColor(41, 128, 185);
+    doc.text("LOGO", 24, 24, { align: "center" });
+    
+    // Header text
+    doc.setTextColor(0, 0, 0);
+    doc.setFontSize(18);
+    doc.setFont("helvetica", "bold");
+    doc.text("AUDIT TRAIL - LOG AKTIVITAS SISTEM", 148.5, 18, { align: "center" });
+    doc.setFontSize(12);
+    doc.text("Pemerintah Provinsi Kalimantan Barat", 148.5, 25, { align: "center" });
+    doc.setFontSize(10);
+    doc.setFont("helvetica", "normal");
+    doc.text("Dinas Komunikasi dan Informatika", 148.5, 31, { align: "center" });
+
+    // Info box
+    doc.setFillColor(245, 245, 245);
+    doc.rect(10, 44, 277, 16, 'F');
+    doc.setFontSize(9);
+    doc.setFont("helvetica", "bold");
+    doc.text("Tanggal Export:", 14, 50);
+    doc.text("Waktu Export:", 14, 55);
+    doc.setFont("helvetica", "normal");
+    doc.text(dateStr, 50, 50);
+    doc.text(timeStr, 50, 55);
+    doc.setFont("helvetica", "bold");
+    doc.text("Periode Data:", 110, 50);
+    doc.text("Total Log:", 110, 55);
+    doc.setFont("helvetica", "normal");
+    doc.text(dateRangeStr, 145, 50);
+    doc.text(filteredLogs.length.toString(), 145, 55);
+    doc.setFont("helvetica", "bold");
+    doc.text("Dicetak oleh:", 210, 50);
+    doc.setFont("helvetica", "normal");
+    doc.text("Super Admin", 245, 50);
+
+    doc.setDrawColor(41, 128, 185);
+    doc.setLineWidth(0.3);
+    doc.line(10, 63, 287, 63);
+
+    // Title
+    doc.setFontSize(14);
+    doc.setFont("helvetica", "bold");
+    doc.setTextColor(41, 128, 185);
+    doc.text("Data Log Aktivitas", 14, 72);
+    doc.setTextColor(0, 0, 0);
+
+    // Prepare table data - limit detail length for PDF
+    const tableData = filteredLogs.map((log, index) => [
+      (index + 1).toString(),
+      log.id.toString(),
+      format(new Date(log.timestamp), "dd/MM/yyyy HH:mm"),
+      log.username || "-",
+      log.user_role || "-",
+      log.action || "-",
+      (log.details || "-").substring(0, 100) + (log.details && log.details.length > 100 ? "..." : ""),
+    ]);
+
+    // Create table
+    autoTable(doc, {
+      startY: 77,
+      head: [["No", "ID", "Tanggal/Waktu", "Pengguna", "Peran", "Aksi", "Detail"]],
+      body: tableData,
+      theme: "striped",
+      headStyles: { 
+        fillColor: [41, 128, 185], 
+        fontStyle: "bold",
+        fontSize: 9,
+        halign: "center"
+      },
+      styles: { 
+        fontSize: 7, 
+        cellPadding: 2,
+        lineColor: [220, 220, 220],
+        lineWidth: 0.1,
+        overflow: 'linebreak'
+      },
+      alternateRowStyles: {
+        fillColor: [245, 248, 250]
+      },
+      columnStyles: {
+        0: { cellWidth: 12, halign: "center", fontStyle: "bold" },
+        1: { cellWidth: 15, halign: "center" },
+        2: { cellWidth: 35, halign: "center" },
+        3: { cellWidth: 35 },
+        4: { cellWidth: 30, halign: "center" },
+        5: { cellWidth: 50 },
+        6: { cellWidth: 90 },
+      },
+    });
+
+    // Footer dengan border dan informasi lengkap
+    const pageCount = doc.getNumberOfPages();
+    for (let i = 1; i <= pageCount; i++) {
+      doc.setPage(i);
+      
+      // Footer border
+      const pageHeight = doc.internal.pageSize.height;
+      doc.setDrawColor(41, 128, 185);
+      doc.setLineWidth(0.3);
+      doc.line(10, pageHeight - 20, 287, pageHeight - 20);
+      
+      // Footer content
+      doc.setFontSize(8);
+      doc.setFont("helvetica", "normal");
+      doc.setTextColor(100, 100, 100);
+      
+      // Left side
+      doc.text(
+        `Dokumen: audit_trail_${dateStr}.pdf`,
+        14,
+        pageHeight - 15
+      );
+      doc.text(
+        `Dicetak: ${dateStr} ${timeStr}`,
+        14,
+        pageHeight - 11
+      );
+      
+      // Center - Page number
+      doc.setFont("helvetica", "bold");
+      doc.setTextColor(41, 128, 185);
+      doc.text(
+        `Halaman ${i} dari ${pageCount}`,
+        148.5,
+        pageHeight - 13,
+        { align: "center" }
+      );
+      
+      // Right side
+      doc.setFont("helvetica", "normal");
+      doc.setTextColor(100, 100, 100);
+      doc.text(
+        "Domain Manager System",
+        283,
+        pageHeight - 15,
+        { align: "right" }
+      );
+      doc.text(
+        "Diskominfo Prov. Kalbar",
+        283,
+        pageHeight - 11,
+        { align: "right" }
+      );
+    }
+
+    // Save PDF
+    doc.save(`audit_trail_${dateStr}.pdf`);
   };
 
   // Check if user is Super Admin
@@ -325,12 +533,23 @@ function SuperAdminAuditTrailContent() {
               <Button
                 size="sm"
                 variant="outline"
-                className="h-10 gap-1 w-full"
+                className="h-10 gap-1"
                 onClick={handleExport}
               >
                 <Download className="h-3.5 w-3.5" />
                 <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
-                  Ekspor CSV
+                  CSV
+                </span>
+              </Button>
+              <Button
+                size="sm"
+                variant="outline"
+                className="h-10 gap-1"
+                onClick={handleExportPDF}
+              >
+                <FileDown className="h-3.5 w-3.5" />
+                <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
+                  PDF
                 </span>
               </Button>
             </div>

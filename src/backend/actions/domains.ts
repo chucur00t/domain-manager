@@ -9,18 +9,6 @@ import { DomainService } from '@/backend/database/services/domain.service';
 // Initialize MySQL Domain Service
 const domainService = new DomainService();
 
-// Helper function for logging activity
-const logActivity = async (action: string, description: string, userRole: string) => {
-  await auditService.logAction({
-    action,
-    resourceType: 'domain',
-    resourceId: 'system',
-    description,
-    userId: 'system',
-    userRole
-  });
-};
-
 export async function getDomainById(domainId: string) {
   try {
     const domain = await domainService.getDomain(parseInt(domainId));
@@ -43,7 +31,7 @@ export async function activateDomain(domainId: string, currentUserRole: User['ro
       throw new Error('Domain not found');
     }
     
-    await domainService.updateDomain(parseInt(domainId), { status: 'active' });
+    await domainService.updateDomain(parseInt(domainId), { status: 'Active' });
     
     // Update DNS records status if provider is configured
     try {
@@ -59,7 +47,14 @@ export async function activateDomain(domainId: string, currentUserRole: User['ro
       // Don't fail activation, just log warning
     }
     
-    logActivity('ACTIVATE_DOMAIN', `Mengaktifkan domain ${domain.hostname} (ID: ${domainId})`, currentUserRole);
+    await auditService.logAction({
+      action: 'ACTIVATE_DOMAIN',
+      resourceType: 'domain',
+      resourceId: domainId,
+      description: `Mengaktifkan domain ${domain.hostname} (ID: ${domainId})`,
+      userId: 'system',
+      userRole: currentUserRole,
+    });
     
     revalidatePath('/domains');
     revalidatePath(`/domains/${domainId}`);
@@ -86,7 +81,7 @@ export async function deactivateDomain(domainId: string, currentUserRole: User['
       throw new Error('Domain not found');
     }
     
-    await domainService.updateDomain(parseInt(domainId), { status: 'inactive' });
+    await domainService.updateDomain(parseInt(domainId), { status: 'Deactivated' });
 
     // Update DNS records status if provider is configured
     try {
@@ -102,7 +97,14 @@ export async function deactivateDomain(domainId: string, currentUserRole: User['
       // Don't fail deactivation, just log warning
     }
 
-    logActivity('DEACTIVATE_DOMAIN', `Menonaktifkan domain ${domain.hostname} (ID: ${domainId})`, currentUserRole);
+    await auditService.logAction({
+      action: 'DEACTIVATE_DOMAIN',
+      resourceType: 'domain',
+      resourceId: domainId,
+      description: `Menonaktifkan domain ${domain.hostname} (ID: ${domainId})`,
+      userId: 'system',
+      userRole: currentUserRole,
+    });
     
     revalidatePath('/domains');
     revalidatePath(`/domains/${domainId}`);
@@ -117,7 +119,7 @@ export async function deactivateDomain(domainId: string, currentUserRole: User['
   }
 }
 
-export async function updateDomainStatus(domainId: string, status: 'active' | 'inactive' | 'expired') {
+export async function updateDomainStatus(domainId: string, status: 'Active' | 'Deactivated' | 'Expired' | 'Suspended') {
   try {
     await domainService.updateDomain(parseInt(domainId), { status });
   } catch (error) {
@@ -162,7 +164,14 @@ export async function updateDomainInfo(
       // DNS records would need a separate table
     });
 
-    logActivity('UPDATE_DOMAIN_INFO', `Memperbarui info teknis untuk domain ${hostname} (ID: ${domainId})`, currentUserRole);
+    await auditService.logAction({
+      action: 'UPDATE_DOMAIN_INFO',
+      resourceType: 'domain',
+      resourceId: domainId,
+      description: `Memperbarui info teknis untuk domain ${hostname} (ID: ${domainId})`,
+      userId: 'system',
+      userRole: currentUserRole,
+    });
     
     revalidatePath(`/domains/${domainId}`);
     revalidatePath('/domains');
