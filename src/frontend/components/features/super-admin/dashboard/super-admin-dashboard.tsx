@@ -39,9 +39,9 @@ export function SuperAdminDashboard({ role }: Props) {
   const [isLoading, setIsLoading] = useState(true);
   const [stats, setStats] = useState({
     activeDomainsCount: 0,
+    inactiveDomainsCount: 0,
+    approvedApplicationsCount: 0,
     pendingApplicationsCount: 0,
-    totalUsersCount: 0,
-    totalOpdCount: 0,
   });
 
   console.log("SuperAdminDashboard rendered with stats:", stats);
@@ -65,7 +65,11 @@ export function SuperAdminDashboard({ role }: Props) {
         const domainsData = await domainsRes.json();
         const domains: Domain[] = Array.isArray(domainsData) ? domainsData : [];
         const applicationsData = await appsRes.json();
-        const applications: SubdomainApplication[] = Array.isArray(applicationsData) ? applicationsData : [];
+        const applications: SubdomainApplication[] = Array.isArray(
+          applicationsData
+        )
+          ? applicationsData
+          : [];
         const usersData = await usersRes.json();
         const users: User[] = Array.isArray(usersData) ? usersData : [];
 
@@ -87,11 +91,14 @@ export function SuperAdminDashboard({ role }: Props) {
         const calculatedStats = {
           activeDomainsCount: domains.filter((d) => d.status === "Active")
             .length,
+          inactiveDomainsCount: domains.filter((d) => d.status !== "Active")
+            .length,
+          approvedApplicationsCount: applications.filter(
+            (a) => a.status === "Approved"
+          ).length,
           pendingApplicationsCount: applications.filter(
             (a) => a.status === "Pending"
           ).length,
-          totalUsersCount: users.length,
-          totalOpdCount: opdList.length,
         };
 
         console.log("Calculated stats:", calculatedStats);
@@ -162,22 +169,22 @@ export function SuperAdminDashboard({ role }: Props) {
           description="Jumlah seluruh domain yang aktif."
         />
         <StatCard
-          title="Permohonan Belum Disetujui"
+          title="Total Domain Tidak Aktif"
+          value={stats.inactiveDomainsCount}
+          icon={<FileText className="h-4 w-4 text-muted-foreground" />}
+          description="Domain yang suspended, deactivated, atau expired."
+        />
+        <StatCard
+          title="Total Permohonan Disetujui"
+          value={stats.approvedApplicationsCount}
+          icon={<Users className="h-4 w-4 text-green-500" />}
+          description="Permohonan yang telah disetujui."
+        />
+        <StatCard
+          title="Total Permohonan Belum Disetujui"
           value={stats.pendingApplicationsCount}
-          icon={<FileText className="h-4 w-4 text-amber-500" />}
+          icon={<Building className="h-4 w-4 text-amber-500" />}
           description="Permohonan yang menunggu review teknis."
-        />
-        <StatCard
-          title="Total Pengguna"
-          value={stats.totalUsersCount}
-          icon={<Users className="h-4 w-4 text-muted-foreground" />}
-          description="Jumlah pengguna terdaftar di sistem."
-        />
-        <StatCard
-          title="Total OPD Terdaftar"
-          value={stats.totalOpdCount}
-          icon={<Building className="h-4 w-4 text-muted-foreground" />}
-          description="Jumlah OPD yang telah mengajukan."
         />
       </div>
 
