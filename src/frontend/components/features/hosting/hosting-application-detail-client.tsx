@@ -40,32 +40,36 @@ export function HostingApplicationDetailClient({
   const submittedDate =
     application.submittedDate || application.submitted_at || "-";
 
-  // Map status to Indonesian
-  const getStatusText = (status: string) => {
+  // Map status to Indonesian with styling
+  const getStatusConfig = (status: string) => {
     switch (status) {
       case "Active":
-        return "Aktif";
+      case "active":
+        return {
+          text: "Aktif",
+          variant: "secondary" as const,
+          className: "inline-flex items-center justify-center min-w-[110px] bg-green-500 hover:bg-green-600 text-white"
+        };
       case "Deactivated":
-        return "Belum Aktif";
+      case "deactivated":
+        return {
+          text: "Belum Aktif",
+          variant: "default" as const,
+          className: "inline-flex items-center justify-center min-w-[110px] bg-gray-500 hover:bg-gray-600 text-white"
+        };
       case "Expired":
-        return "Kedaluwarsa";
+      case "expired":
+        return {
+          text: "Kedaluwarsa",
+          variant: "destructive" as const,
+          className: "inline-flex items-center justify-center min-w-[110px] bg-amber-500 hover:bg-amber-600 text-white"
+        };
       default:
-        return status;
-    }
-  };
-
-  const getStatusVariant = (
-    status: string
-  ): "default" | "secondary" | "destructive" => {
-    switch (status) {
-      case "Active":
-        return "secondary";
-      case "Deactivated":
-        return "default";
-      case "Expired":
-        return "destructive";
-      default:
-        return "default";
+        return {
+          text: status,
+          variant: "default" as const,
+          className: "inline-flex items-center justify-center min-w-[110px] bg-gray-500 hover:bg-gray-600 text-white"
+        };
     }
   };
 
@@ -77,10 +81,10 @@ export function HostingApplicationDetailClient({
           Detail Hosting
         </h1>
         <Badge
-          variant={getStatusVariant(application.status)}
-          className="ml-auto sm:ml-0"
+          variant={getStatusConfig(application.status).variant}
+          className={getStatusConfig(application.status).className}
         >
-          {getStatusText(application.status)}
+          {getStatusConfig(application.status).text}
         </Badge>
       </div>
 
@@ -143,8 +147,11 @@ export function HostingApplicationDetailClient({
               </div>
               <div>
                 <p className="text-muted-foreground">Status Hosting</p>
-                <Badge variant={getStatusVariant(application.status)}>
-                  {getStatusText(application.status)}
+                <Badge 
+                  variant={getStatusConfig(application.status).variant}
+                  className={getStatusConfig(application.status).className}
+                >
+                  {getStatusConfig(application.status).text}
                 </Badge>
               </div>
               <div>

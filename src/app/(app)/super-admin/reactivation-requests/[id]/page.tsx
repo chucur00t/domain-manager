@@ -150,13 +150,13 @@ export default function ReactivationRequestDetailPage({
   const getStatusBadge = (status: string) => {
     switch (status) {
       case "Pending":
-        return <Badge className="bg-orange-500 text-white">Menunggu</Badge>;
+        return <Badge className="inline-flex items-center justify-center min-w-[100px] bg-orange-500 text-white">Menunggu</Badge>;
       case "Approved":
-        return <Badge className="bg-green-500 text-white">Disetujui</Badge>;
+        return <Badge className="inline-flex items-center justify-center min-w-[100px] bg-green-500 text-white">Disetujui</Badge>;
       case "Rejected":
-        return <Badge variant="destructive">Ditolak</Badge>;
+        return <Badge className="inline-flex items-center justify-center min-w-[100px] bg-red-500 text-white">Ditolak</Badge>;
       default:
-        return <Badge variant="secondary">{status}</Badge>;
+        return <Badge className="inline-flex items-center justify-center min-w-[100px] bg-gray-500 text-white">{status}</Badge>;
     }
   };
 

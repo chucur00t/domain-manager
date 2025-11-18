@@ -36,15 +36,15 @@ interface DomainStatusEntry {
 function getStatusColor(status: Domain['status']): string {
   switch (status) {
     case 'active':
-      return 'bg-green-500 hover:bg-green-600';
+      return 'inline-flex items-center justify-center min-w-[110px] bg-green-500 hover:bg-green-600 text-white';
     case 'expired':
-      return 'bg-red-500 hover:bg-red-600';
+      return 'inline-flex items-center justify-center min-w-[110px] bg-red-500 hover:bg-red-600 text-white';
     case 'inactive':
-      return 'bg-gray-500 hover:bg-gray-600';
+      return 'inline-flex items-center justify-center min-w-[110px] bg-gray-500 hover:bg-gray-600 text-white';
     case 'pending':
-      return 'bg-amber-500 hover:bg-amber-600';
+      return 'inline-flex items-center justify-center min-w-[110px] bg-amber-500 hover:bg-amber-600 text-white';
     default:
-      return 'bg-gray-500 hover:bg-gray-600';
+      return 'inline-flex items-center justify-center min-w-[110px] bg-gray-500 hover:bg-gray-600 text-white';
   }
 }
 

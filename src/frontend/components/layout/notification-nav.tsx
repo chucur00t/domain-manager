@@ -67,30 +67,46 @@ function NotificationNavContent() {
     const fetchNotifications = async () => {
       setIsLoading(true);
       try {
+        // Helper to safely parse JSON
+        const safeJsonParse = async (response: Response) => {
+          if (!response.ok) return [];
+          const contentType = response.headers.get("content-type");
+          if (!contentType || !contentType.includes("application/json")) {
+            console.warn("Non-JSON response received:", contentType);
+            return [];
+          }
+          try {
+            return await response.json();
+          } catch (e) {
+            console.error("Failed to parse JSON:", e);
+            return [];
+          }
+        };
+
         // Fetch data from API routes with individual error handling
         const [usersRes, domainAppsRes, hostingAppsRes, domainsRes] = await Promise.all([
           fetch("/api/users").catch(err => {
             console.error("Failed to fetch users:", err);
-            return { ok: false, json: async () => [] };
+            return { ok: false, headers: new Headers(), json: async () => [] } as Response;
           }),
           fetch("/api/applications").catch(err => {
             console.error("Failed to fetch applications:", err);
-            return { ok: false, json: async () => [] };
+            return { ok: false, headers: new Headers(), json: async () => [] } as Response;
           }),
           fetch("/api/hosting-applications").catch(err => {
             console.error("Failed to fetch hosting applications:", err);
-            return { ok: false, json: async () => [] };
+            return { ok: false, headers: new Headers(), json: async () => [] } as Response;
           }),
           fetch("/api/domains").catch(err => {
             console.error("Failed to fetch domains:", err);
-            return { ok: false, json: async () => [] };
+            return { ok: false, headers: new Headers(), json: async () => [] } as Response;
           }),
         ]);
 
-        const users: User[] = usersRes.ok ? await usersRes.json() : [];
-        const domainApps: SubdomainApplication[] = domainAppsRes.ok ? await domainAppsRes.json() : [];
-        const hostingApps: HostingApplication[] = hostingAppsRes.ok ? await hostingAppsRes.json() : [];
-        const domains = domainsRes.ok ? await domainsRes.json() : [];
+        const users: User[] = await safeJsonParse(usersRes);
+        const domainApps: SubdomainApplication[] = await safeJsonParse(domainAppsRes);
+        const hostingApps: HostingApplication[] = await safeJsonParse(hostingAppsRes);
+        const domains = await safeJsonParse(domainsRes);
 
         const currentUser = users.find((user) => user.role === role);
         let allNotifications: NotificationItem[] = [];
