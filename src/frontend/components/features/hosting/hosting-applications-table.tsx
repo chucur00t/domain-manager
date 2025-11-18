@@ -60,32 +60,32 @@ const statusConfig = {
   Active: {
     text: "Aktif",
     variant: "secondary" as const,
-    className: "bg-green-500 hover:bg-green-600 text-secondary-foreground",
+    className: "inline-flex items-center justify-center min-w-[110px] bg-green-500 hover:bg-green-600 text-white",
   },
   active: {
     text: "Aktif",
     variant: "secondary" as const,
-    className: "bg-green-500 hover:bg-green-600 text-secondary-foreground",
+    className: "inline-flex items-center justify-center min-w-[110px] bg-green-500 hover:bg-green-600 text-white",
   },
   Deactivated: {
     text: "Belum Aktif",
     variant: "default" as const,
-    className: "bg-gray-500 hover:bg-gray-600",
+    className: "inline-flex items-center justify-center min-w-[110px] bg-gray-500 hover:bg-gray-600 text-white",
   },
   deactivated: {
     text: "Belum Aktif",
     variant: "default" as const,
-    className: "bg-gray-500 hover:bg-gray-600",
+    className: "inline-flex items-center justify-center min-w-[110px] bg-gray-500 hover:bg-gray-600 text-white",
   },
   Expired: {
     text: "Kedaluwarsa",
     variant: "destructive" as const,
-    className: "bg-amber-500 hover:bg-amber-600",
+    className: "inline-flex items-center justify-center min-w-[110px] bg-amber-500 hover:bg-amber-600 text-white",
   },
   expired: {
     text: "Kedaluwarsa",
     variant: "destructive" as const,
-    className: "bg-amber-500 hover:bg-amber-600",
+    className: "inline-flex items-center justify-center min-w-[110px] bg-amber-500 hover:bg-amber-600 text-white",
   },
 };
 

@@ -54,27 +54,27 @@ const statusConfig: Record<
   active: {
     text: "Aktif",
     variant: "default",
-    className: "bg-green-500 hover:bg-green-600",
+    className: "inline-flex items-center justify-center min-w-[110px] bg-green-500 hover:bg-green-600 text-white",
   },
   expired: {
     text: "Kedaluwarsa",
     variant: "secondary",
-    className: "bg-orange-500 hover:bg-orange-600 text-white",
+    className: "inline-flex items-center justify-center min-w-[110px] bg-orange-500 hover:bg-orange-600 text-white",
   },
   suspended: {
     text: "Ditangguhkan",
     variant: "secondary",
-    className: "bg-red-500 hover:bg-red-600 text-white",
+    className: "inline-flex items-center justify-center min-w-[110px] bg-red-500 hover:bg-red-600 text-white",
   },
   pending: {
     text: "Pending",
     variant: "secondary",
-    className: "bg-yellow-500 hover:bg-yellow-600 text-white",
+    className: "inline-flex items-center justify-center min-w-[110px] bg-yellow-500 hover:bg-yellow-600 text-white",
   },
   rejected: {
     text: "Ditolak",
     variant: "destructive",
-    className: "",
+    className: "inline-flex items-center justify-center min-w-[110px] bg-red-500 hover:bg-red-600 text-white",
   },
 };
 
