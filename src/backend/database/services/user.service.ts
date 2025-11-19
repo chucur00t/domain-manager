@@ -33,9 +33,32 @@ export interface UpdateUserData {
 
 export interface UserFilter {
   role?: UserRole;
-  is_active?: boolean;
+  is_active?: boolean | null; // null = no filter, undefined = default (true only)
   opd_id?: number;
   search?: string;
+}
+
+// Helper function to normalize role format
+// Database may store: 'AdminDaerah', 'SuperAdmin' (no space)
+// Application uses: 'Admin Daerah', 'Super Admin' (with space)
+function normalizeRoleForDB(role: UserRole): string {
+  const roleMap: Record<string, string> = {
+    'Super Admin': 'SuperAdmin',
+    'Admin Daerah': 'AdminDaerah',
+    'SuperAdmin': 'SuperAdmin',
+    'AdminDaerah': 'AdminDaerah'
+  };
+  return roleMap[role] || role;
+}
+
+function normalizeRoleFromDB(role: string): UserRole {
+  const roleMap: Record<string, UserRole> = {
+    'SuperAdmin': 'Super Admin',
+    'AdminDaerah': 'Admin Daerah',
+    'Super Admin': 'Super Admin',
+    'Admin Daerah': 'Admin Daerah'
+  };
+  return roleMap[role] || (role as UserRole);
 }
 
 export class UserService {
@@ -51,14 +74,23 @@ export class UserService {
       const conditions = [];
       const params: any[] = [];
 
+      // Handle is_active filter:
+      // - null: no filter (show all users)
+      // - true/false: filter by that value
+      // - undefined: default to active users only
+      if (filters.is_active === null) {
+        // No filter, show all users including inactive
+      } else if (filters.is_active !== undefined) {
+        conditions.push('u.is_active = ?');
+        params.push(filters.is_active);
+      } else {
+        // Default: only show active users (exclude soft-deleted)
+        conditions.push('u.is_active = TRUE');
+      }
+
       if (filters.role) {
         conditions.push('u.role = ?');
         params.push(filters.role);
-      }
-
-      if (filters.is_active !== undefined) {
-        conditions.push('u.is_active = ?');
-        params.push(filters.is_active);
       }
 
       if (filters.opd_id) {
@@ -96,18 +128,22 @@ export class UserService {
       `;
 
       const users = await query<UserRow>(usersSql, [...params, paginationLimit, offset]);
+      
+      console.log('First user from DB:', users.length > 0 ? JSON.stringify(users[0], null, 2) : 'No users');
 
       // Convert to application format - sesuai dengan interface User
       const formattedUsers: User[] = users.map(user => ({
         id: user.id.toString(),
         name: user.username,
         email: user.email,
-        role: user.role as UserRole,
+        role: normalizeRoleFromDB(user.role), // Convert 'SuperAdmin' -> 'Super Admin'
         status: (user.is_active ? 'active' : 'inactive') as UserStatus,
         opd: user.opd_name,
         nip: `NIP${user.id.toString().padStart(6, '0')}`, // Generate placeholder NIP
         whatsapp: '08xxxxxxxxxx' // Generate placeholder WhatsApp
       }));
+      
+      console.log('First formatted user:', formattedUsers.length > 0 ? JSON.stringify(formattedUsers[0], null, 2) : 'No users');
 
       return {
         users: formattedUsers,
@@ -142,7 +178,7 @@ export class UserService {
         id: user.id.toString(),
         name: user.username,
         email: user.email,
-        role: user.role as UserRole,
+        role: normalizeRoleFromDB(user.role), // Convert 'SuperAdmin' -> 'Super Admin'
         status: (user.is_active ? 'active' : 'inactive') as UserStatus,
         opd: user.opd_name,
         nip: `NIP${user.id.toString().padStart(6, '0')}`,
@@ -164,12 +200,17 @@ export class UserService {
       const params = [
         data.username,
         data.email,
-        data.role,
+        normalizeRoleForDB(data.role), // Convert 'Super Admin' -> 'SuperAdmin'
         data.opd_id || null,
         data.is_active !== undefined ? data.is_active : true
       ];
+      
+      console.log('SQL:', insertSql.trim());
+      console.log('Params:', JSON.stringify(params, null, 2));
 
       const result = await execute(insertSql, params);
+      
+      console.log('Insert result:', result);
       
       if (!result.insertId) {
         throw new Error('Failed to create user: No ID returned');
@@ -177,6 +218,17 @@ export class UserService {
 
       return result.insertId.toString();
     } catch (error) {
+      // Check for duplicate entry errors
+      if (error instanceof Error && error.message.includes('Duplicate entry')) {
+        if (error.message.includes('username')) {
+          throw new Error('Username sudah digunakan');
+        } else if (error.message.includes('email')) {
+          throw new Error('Email sudah digunakan');
+        }
+        throw new Error('Data sudah ada di database');
+      }
+      
+      console.error('CreateUser error:', error);
       throw new Error(`Failed to create user: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   }
@@ -199,7 +251,7 @@ export class UserService {
 
       if (data.role !== undefined) {
         updates.push('role = ?');
-        params.push(data.role);
+        params.push(normalizeRoleForDB(data.role)); // Convert 'Super Admin' -> 'SuperAdmin'
       }
 
       if (data.opd_id !== undefined) {
@@ -237,13 +289,19 @@ export class UserService {
   // Delete user (soft delete by setting is_active to false)
   async deleteUser(id: number): Promise<void> {
     try {
+      // Append timestamp to username and email to free them up for reuse
+      const timestamp = Date.now();
       const updateSql = `
         UPDATE users 
-        SET is_active = FALSE, updated_at = CURRENT_TIMESTAMP
+        SET 
+          is_active = FALSE,
+          username = CONCAT(username, '_deleted_', ?),
+          email = CONCAT(email, '_deleted_', ?),
+          updated_at = CURRENT_TIMESTAMP
         WHERE id = ?
       `;
 
-      const result = await execute(updateSql, [id]);
+      const result = await execute(updateSql, [timestamp, timestamp, id]);
       
       if (result.affectedRows === 0) {
         throw new Error('User not found');

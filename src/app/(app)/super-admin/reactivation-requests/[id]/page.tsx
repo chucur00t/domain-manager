@@ -133,7 +133,7 @@ export default function ReactivationRequestDetailPage({
             : "Permohonan reaktivasi telah ditolak.";
         setSuccess(message);
         setTimeout(() => {
-          router.push("/super-admin/reactivation-requests");
+          router.push("/super-admin/reactivation-requests?role=Super Admin");
         }, 3000);
       } else {
         const data = await response.json();
@@ -194,7 +194,7 @@ export default function ReactivationRequestDetailPage({
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <Link href="/super-admin/reactivation-requests">
+          <Link href="/super-admin/reactivation-requests?role=Super Admin">
             <Button variant="ghost" className="mb-2">
               <ArrowLeft className="h-4 w-4 mr-2" />
               Kembali ke Daftar
@@ -430,7 +430,7 @@ export default function ReactivationRequestDetailPage({
                   {processing ? "Memproses..." : "Tolak Reaktivasi"}
                 </Button>
               )}
-              <Link href="/super-admin/reactivation-requests">
+              <Link href="/super-admin/reactivation-requests?role=Super Admin">
                 <Button variant="outline" disabled={processing}>
                   Batal
                 </Button>

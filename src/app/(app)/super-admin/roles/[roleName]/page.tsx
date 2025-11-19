@@ -24,7 +24,7 @@ import { MOCK_ROLES } from '@/backend/utils/mock-data';
 import type { UserRole, RolePermissions } from '@/backend/models/types';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
-import { useState, useEffect } from 'react';
+import { use, useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { Loader2 } from 'lucide-react';
@@ -63,12 +63,13 @@ function PermissionRow({ module, permissions, onPermissionChange }: { module: st
     )
 }
 
-export default function RoleDetailPage({ params }: { params: { roleName: string } }) {
+export default function RoleDetailPage({ params }: { params: Promise<{ roleName: string }> }) {
   const { toast } = useToast();
   const [isSaving, setIsSaving] = useState(false);
   const router = useRouter();
+  const resolvedParams = use(params);
 
-  const roleName = decodeURIComponent(params.roleName) as UserRole;
+  const roleName = decodeURIComponent(resolvedParams.roleName) as UserRole;
   
   // In a real app, permissions would be fetched from a database.
   // We use a deep copy of mock data to simulate state changes.

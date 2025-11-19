@@ -279,22 +279,45 @@ function SuperAdminReportsContent() {
     let csvContent = "\uFEFF"; // BOM untuk UTF-8
     let filename = "";
     const dateStr = new Date().toISOString().split("T")[0];
+    const timeStr = new Date().toLocaleTimeString("id-ID");
 
-    // Header dengan informasi laporan
-    csvContent += `Laporan Domain Manager - Pemerintah Provinsi Kalimantan Barat\n`;
-    csvContent += `Tanggal Export: ${getFormattedDate()}\n`;
-    csvContent += `Periode: ${getPeriodLabel()}\n\n`;
+    // Header dengan informasi laporan yang lebih profesional
+    csvContent += `========================================\n`;
+    csvContent += `LAPORAN DOMAIN MANAGER\n`;
+    csvContent += `PEMERINTAH PROVINSI KALIMANTAN BARAT\n`;
+    csvContent += `Dinas Komunikasi dan Informatika\n`;
+    csvContent += `========================================\n\n`;
+    csvContent += `Tanggal Export:,${dateStr}\n`;
+    csvContent += `Waktu Export:,${timeStr}\n`;
+    csvContent += `Periode Laporan:,${getPeriodLabel()}\n`;
+    csvContent += `Dicetak oleh:,Super Admin\n\n`;
 
     switch (reportType) {
       case "domains":
-        csvContent += `LAPORAN DOMAIN PER OPD\n\n`;
+        csvContent += `========================================\n`;
+        csvContent += `LAPORAN DOMAIN PER OPD\n`;
+        csvContent += `========================================\n\n`;
         csvContent += `No,Nama OPD,Jumlah Domain\n`;
+        csvContent += `----------------------------------------\n`;
         reportData.domains.byOpd.forEach((item, index) => {
           csvContent += `${index + 1},"${item.opd}",${item.count}\n`;
         });
-        csvContent += `\nTotal Domain Keseluruhan:,${reportData.domains.total}\n`;
-        csvContent += `Domain Aktif:,${reportData.domains.active}\n`;
-        csvContent += `Domain Tidak Aktif:,${reportData.domains.inactive}\n`;
+        csvContent += `----------------------------------------\n`;
+        csvContent += `TOTAL,,${reportData.domains.total}\n\n`;
+        csvContent += `========================================\n`;
+        csvContent += `RINGKASAN STATUS DOMAIN\n`;
+        csvContent += `========================================\n`;
+        csvContent += `Status,Jumlah,Persentase\n`;
+        csvContent += `----------------------------------------\n`;
+        csvContent += `Aktif,${reportData.domains.active},${((reportData.domains.active / reportData.domains.total) * 100).toFixed(1)}%\n`;
+        csvContent += `Tidak Aktif,${reportData.domains.inactive},${((reportData.domains.inactive / reportData.domains.total) * 100).toFixed(1)}%\n`;
+        csvContent += `Kadaluarsa,${reportData.domains.expired},${((reportData.domains.expired / reportData.domains.total) * 100).toFixed(1)}%\n`;
+        csvContent += `----------------------------------------\n`;
+        csvContent += `TOTAL,${reportData.domains.total},100.0%\n\n`;
+        csvContent += `\n========================================\n`;
+        csvContent += `Dokumen ini dicetak dari Domain Manager\n`;
+        csvContent += `Diskominfo Provinsi Kalimantan Barat\n`;
+        csvContent += `========================================\n`;
         filename = `laporan-domain-${dateStr}.csv`;
         break;
 
@@ -318,57 +341,113 @@ function SuperAdminReportsContent() {
         break;
 
       case "hosting":
-        csvContent += `LAPORAN APLIKASI HOSTING PER FRAMEWORK\n\n`;
-        csvContent += `No,Framework/Platform,Jumlah Aplikasi\n`;
+        csvContent += `========================================\n`;
+        csvContent += `LAPORAN APLIKASI HOSTING PER FRAMEWORK\n`;
+        csvContent += `========================================\n\n`;
+        csvContent += `No,Framework/Platform,Jumlah Aplikasi,Persentase\n`;
+        csvContent += `----------------------------------------\n`;
         reportData.hosting.byFramework.forEach((item, index) => {
-          csvContent += `${index + 1},"${item.framework}",${item.count}\n`;
+          const percentage = ((item.count / reportData.hosting.total) * 100).toFixed(1);
+          csvContent += `${index + 1},"${item.framework}",${item.count},${percentage}%\n`;
         });
-        csvContent += `\nRingkasan:\n`;
-        csvContent += `Total Aplikasi Hosting:,${reportData.hosting.total}\n`;
-        csvContent += `Permohonan Disetujui:,${reportData.hosting.approved}\n`;
-        csvContent += `Permohonan Ditolak:,${reportData.hosting.rejected}\n`;
-        csvContent += `Tingkat Persetujuan:,${reportData.hosting.approvalRate.toFixed(
-          2
-        )}%\n`;
+        csvContent += `----------------------------------------\n`;
+        csvContent += `TOTAL,,${reportData.hosting.total},100.0%\n\n`;
+        csvContent += `========================================\n`;
+        csvContent += `RINGKASAN PERMOHONAN HOSTING\n`;
+        csvContent += `========================================\n`;
+        csvContent += `Kategori,Jumlah,Persentase\n`;
+        csvContent += `----------------------------------------\n`;
+        csvContent += `Total Aplikasi,${reportData.hosting.total},100.0%\n`;
+        csvContent += `Disetujui,${reportData.hosting.approved},${reportData.hosting.approvalRate.toFixed(1)}%\n`;
+        csvContent += `Pending,${reportData.hosting.pending},${((reportData.hosting.pending / reportData.hosting.total) * 100).toFixed(1)}%\n`;
+        csvContent += `Ditolak,${reportData.hosting.rejected},${((reportData.hosting.rejected / reportData.hosting.total) * 100).toFixed(1)}%\n`;
+        csvContent += `----------------------------------------\n\n`;
+        csvContent += `\n========================================\n`;
+        csvContent += `Dokumen ini dicetak dari Domain Manager\n`;
+        csvContent += `Diskominfo Provinsi Kalimantan Barat\n`;
+        csvContent += `========================================\n`;
         filename = `laporan-hosting-${dateStr}.csv`;
         break;
 
       case "opd":
-        csvContent += `LAPORAN AKTIVITAS OPD\n\n`;
-        csvContent += `No,Nama OPD,Total Permohonan\n`;
+        csvContent += `========================================\n`;
+        csvContent += `LAPORAN AKTIVITAS OPD\n`;
+        csvContent += `(Top 5 OPD Paling Aktif)\n`;
+        csvContent += `========================================\n\n`;
+        csvContent += `Peringkat,Nama OPD,Total Permohonan,Persentase\n`;
+        csvContent += `----------------------------------------\n`;
+        const totalRequests = reportData.opd.mostActive.reduce((sum, item) => sum + item.totalRequests, 0);
         reportData.opd.mostActive.forEach((item, index) => {
-          csvContent += `${index + 1},"${item.opd}",${item.totalRequests}\n`;
+          const percentage = ((item.totalRequests / totalRequests) * 100).toFixed(1);
+          csvContent += `${index + 1},"${item.opd}",${item.totalRequests},${percentage}%\n`;
         });
-        csvContent += `\nTotal OPD Aktif:,${reportData.opd.totalOpds}\n`;
+        csvContent += `----------------------------------------\n`;
+        csvContent += `TOTAL,,${totalRequests},100.0%\n\n`;
+        csvContent += `========================================\n`;
+        csvContent += `RINGKASAN ORGANISASI\n`;
+        csvContent += `========================================\n`;
+        csvContent += `Metrik,Nilai\n`;
+        csvContent += `----------------------------------------\n`;
+        csvContent += `Total OPD Terdaftar,${reportData.opd.totalOpds}\n`;
+        csvContent += `OPD Aktif (dengan permohonan),${reportData.opd.mostActive.length}\n`;
+        csvContent += `Rata-rata Permohonan per OPD,${(totalRequests / reportData.opd.mostActive.length).toFixed(1)}\n`;
+        csvContent += `----------------------------------------\n\n`;
+        csvContent += `\n========================================\n`;
+        csvContent += `Dokumen ini dicetak dari Domain Manager\n`;
+        csvContent += `Diskominfo Provinsi Kalimantan Barat\n`;
+        csvContent += `========================================\n`;
         filename = `laporan-aktivitas-opd-${dateStr}.csv`;
         break;
 
       default: // overview
-        csvContent += `LAPORAN OVERVIEW - RINGKASAN SISTEM\n\n`;
-        csvContent += `Kategori,Metrik,Nilai\n`;
-        csvContent += `\nDOMAIN\n`;
-        csvContent += `,"Total Domain",${reportData.domains.total}\n`;
-        csvContent += `,"Domain Aktif",${reportData.domains.active}\n`;
-        csvContent += `,"Domain Tidak Aktif",${reportData.domains.inactive}\n`;
-        csvContent += `,"Domain Kadaluarsa",${reportData.domains.expired}\n`;
-        csvContent += `\nPERMOHONAN DOMAIN\n`;
-        csvContent += `,"Total Permohonan",${reportData.applications.total}\n`;
-        csvContent += `,"Pending",${reportData.applications.pending}\n`;
-        csvContent += `,"Disetujui",${reportData.applications.approved}\n`;
-        csvContent += `,"Ditolak",${reportData.applications.rejected}\n`;
-        csvContent += `,"Tingkat Persetujuan",${reportData.applications.approvalRate.toFixed(
-          2
-        )}%\n`;
-        csvContent += `\nAPLIKASI HOSTING\n`;
-        csvContent += `,"Total Aplikasi",${reportData.hosting.total}\n`;
-        csvContent += `,"Pending",${reportData.hosting.pending}\n`;
-        csvContent += `,"Disetujui",${reportData.hosting.approved}\n`;
-        csvContent += `,"Ditolak",${reportData.hosting.rejected}\n`;
-        csvContent += `,"Tingkat Persetujuan",${reportData.hosting.approvalRate.toFixed(
-          2
-        )}%\n`;
-        csvContent += `\nORGANISASI\n`;
-        csvContent += `,"Total OPD Aktif",${reportData.opd.totalOpds}\n`;
+        csvContent += `========================================\n`;
+        csvContent += `LAPORAN OVERVIEW\n`;
+        csvContent += `RINGKASAN SISTEM DOMAIN MANAGER\n`;
+        csvContent += `========================================\n\n`;
+        csvContent += `========================================\n`;
+        csvContent += `1. STATISTIK DOMAIN\n`;
+        csvContent += `========================================\n`;
+        csvContent += `Metrik,Jumlah,Persentase\n`;
+        csvContent += `----------------------------------------\n`;
+        csvContent += `Total Domain,${reportData.domains.total},100.0%\n`;
+        csvContent += `Domain Aktif,${reportData.domains.active},${((reportData.domains.active / reportData.domains.total) * 100).toFixed(1)}%\n`;
+        csvContent += `Domain Tidak Aktif,${reportData.domains.inactive},${((reportData.domains.inactive / reportData.domains.total) * 100).toFixed(1)}%\n`;
+        csvContent += `Domain Kadaluarsa,${reportData.domains.expired},${((reportData.domains.expired / reportData.domains.total) * 100).toFixed(1)}%\n`;
+        csvContent += `----------------------------------------\n\n`;
+        csvContent += `========================================\n`;
+        csvContent += `2. PERMOHONAN DOMAIN\n`;
+        csvContent += `========================================\n`;
+        csvContent += `Metrik,Jumlah,Persentase\n`;
+        csvContent += `----------------------------------------\n`;
+        csvContent += `Total Permohonan,${reportData.applications.total},100.0%\n`;
+        csvContent += `Disetujui,${reportData.applications.approved},${reportData.applications.approvalRate.toFixed(1)}%\n`;
+        csvContent += `Pending,${reportData.applications.pending},${((reportData.applications.pending / reportData.applications.total) * 100).toFixed(1)}%\n`;
+        csvContent += `Ditolak,${reportData.applications.rejected},${((reportData.applications.rejected / reportData.applications.total) * 100).toFixed(1)}%\n`;
+        csvContent += `----------------------------------------\n`;
+        csvContent += `Tingkat Persetujuan,,${reportData.applications.approvalRate.toFixed(1)}%\n\n`;
+        csvContent += `========================================\n`;
+        csvContent += `3. APLIKASI HOSTING\n`;
+        csvContent += `========================================\n`;
+        csvContent += `Metrik,Jumlah,Persentase\n`;
+        csvContent += `----------------------------------------\n`;
+        csvContent += `Total Aplikasi,${reportData.hosting.total},100.0%\n`;
+        csvContent += `Disetujui,${reportData.hosting.approved},${reportData.hosting.approvalRate.toFixed(1)}%\n`;
+        csvContent += `Pending,${reportData.hosting.pending},${((reportData.hosting.pending / reportData.hosting.total) * 100).toFixed(1)}%\n`;
+        csvContent += `Ditolak,${reportData.hosting.rejected},${((reportData.hosting.rejected / reportData.hosting.total) * 100).toFixed(1)}%\n`;
+        csvContent += `----------------------------------------\n`;
+        csvContent += `Tingkat Persetujuan,,${reportData.hosting.approvalRate.toFixed(1)}%\n\n`;
+        csvContent += `========================================\n`;
+        csvContent += `4. ORGANISASI PERANGKAT DAERAH\n`;
+        csvContent += `========================================\n`;
+        csvContent += `Metrik,Nilai\n`;
+        csvContent += `----------------------------------------\n`;
+        csvContent += `Total OPD Terdaftar,${reportData.opd.totalOpds}\n`;
+        csvContent += `Total OPD Aktif,${reportData.opd.mostActive.length}\n`;
+        csvContent += `----------------------------------------\n\n`;
+        csvContent += `\n========================================\n`;
+        csvContent += `Dokumen ini dicetak dari Domain Manager\n`;
+        csvContent += `Diskominfo Provinsi Kalimantan Barat\n`;
+        csvContent += `========================================\n`;
         filename = `laporan-overview-${dateStr}.csv`;
     }
 
@@ -388,49 +467,95 @@ function SuperAdminReportsContent() {
   const handleExportPDF = () => {
     const doc = new jsPDF();
     const dateStr = new Date().toISOString().split("T")[0];
+    const timeStr = new Date().toLocaleTimeString("id-ID");
     let filename = "";
 
     // Set font
     doc.setFont("helvetica");
 
-    // Header
-    doc.setFontSize(16);
+    // Header dengan border profesional
+    doc.setDrawColor(41, 128, 185);
+    doc.setLineWidth(0.5);
+    doc.rect(10, 8, 190, 32);
+    
+    // Logo placeholder (bisa diganti dengan logo sebenarnya)
+    doc.setDrawColor(41, 128, 185);
+    doc.setFillColor(240, 248, 255);
+    doc.rect(14, 12, 20, 24, 'FD');
+    doc.setFontSize(8);
+    doc.setTextColor(41, 128, 185);
+    doc.text("LOGO", 24, 24, { align: "center" });
+    
+    // Header text
+    doc.setTextColor(0, 0, 0);
+    doc.setFontSize(18);
     doc.setFont("helvetica", "bold");
-    doc.text("LAPORAN DOMAIN MANAGER", 105, 15, { align: "center" });
+    doc.text("LAPORAN DOMAIN MANAGER", 105, 18, { align: "center" });
     doc.setFontSize(12);
-    doc.text("Pemerintah Provinsi Kalimantan Barat", 105, 22, {
+    doc.text("Pemerintah Provinsi Kalimantan Barat", 105, 25, {
       align: "center",
     });
-
     doc.setFontSize(10);
     doc.setFont("helvetica", "normal");
-    doc.text(`Tanggal Export: ${getFormattedDate()}`, 14, 32);
-    doc.text(`Periode: ${getPeriodLabel()}`, 14, 38);
+    doc.text("Dinas Komunikasi dan Informatika", 105, 31, { align: "center" });
 
-    doc.setDrawColor(200, 200, 200);
-    doc.line(14, 42, 196, 42);
+    // Info box
+    doc.setFillColor(245, 245, 245);
+    doc.rect(10, 44, 190, 16, 'F');
+    doc.setFontSize(9);
+    doc.setFont("helvetica", "bold");
+    doc.text(`Tanggal Export:`, 14, 50);
+    doc.text(`Waktu Export:`, 14, 55);
+    doc.setFont("helvetica", "normal");
+    doc.text(`${dateStr}`, 50, 50);
+    doc.text(`${timeStr}`, 50, 55);
+    doc.setFont("helvetica", "bold");
+    doc.text(`Periode Laporan:`, 110, 50);
+    doc.text(`Dicetak oleh:`, 110, 55);
+    doc.setFont("helvetica", "normal");
+    doc.text(`${getPeriodLabel()}`, 145, 50);
+    doc.text(`Super Admin`, 145, 55);
+
+    doc.setDrawColor(41, 128, 185);
+    doc.setLineWidth(0.3);
+    doc.line(10, 63, 200, 63);
 
     switch (reportType) {
       case "domains":
         doc.setFontSize(14);
         doc.setFont("helvetica", "bold");
-        doc.text("Laporan Domain per OPD", 14, 50);
+        doc.setTextColor(41, 128, 185);
+        doc.text("Laporan Domain per OPD", 14, 72);
+        doc.setTextColor(0, 0, 0);
 
         autoTable(doc, {
-          startY: 55,
+          startY: 77,
           head: [["No", "Nama OPD", "Jumlah Domain"]],
           body: reportData.domains.byOpd.map((item, index) => [
             (index + 1).toString(),
             item.opd,
             item.count.toString(),
           ]),
-          theme: "grid",
-          headStyles: { fillColor: [41, 128, 185], fontStyle: "bold" },
-          styles: { fontSize: 9, cellPadding: 3 },
+          theme: "striped",
+          headStyles: { 
+            fillColor: [41, 128, 185], 
+            fontStyle: "bold",
+            fontSize: 10,
+            halign: "center"
+          },
+          styles: { 
+            fontSize: 9, 
+            cellPadding: 4,
+            lineColor: [220, 220, 220],
+            lineWidth: 0.1
+          },
+          alternateRowStyles: {
+            fillColor: [245, 248, 250]
+          },
           columnStyles: {
-            0: { cellWidth: 15, halign: "center" },
+            0: { cellWidth: 15, halign: "center", fontStyle: "bold" },
             1: { cellWidth: 130 },
-            2: { cellWidth: 35, halign: "center" },
+            2: { cellWidth: 35, halign: "center", fontStyle: "bold" },
           },
         });
 
@@ -457,10 +582,12 @@ function SuperAdminReportsContent() {
       case "applications":
         doc.setFontSize(14);
         doc.setFont("helvetica", "bold");
-        doc.text("Laporan Permohonan Domain per OPD", 14, 50);
+        doc.setTextColor(41, 128, 185);
+        doc.text("Laporan Permohonan Domain per OPD", 14, 72);
+        doc.setTextColor(0, 0, 0);
 
         autoTable(doc, {
-          startY: 55,
+          startY: 77,
           head: [
             ["No", "Nama OPD", "Pending", "Disetujui", "Ditolak", "Total"],
           ],
@@ -472,45 +599,73 @@ function SuperAdminReportsContent() {
             item.rejected.toString(),
             (item.pending + item.approved + item.rejected).toString(),
           ]),
-          theme: "grid",
-          headStyles: { fillColor: [41, 128, 185], fontStyle: "bold" },
-          styles: { fontSize: 8, cellPadding: 2 },
+          theme: "striped",
+          headStyles: { 
+            fillColor: [41, 128, 185], 
+            fontStyle: "bold",
+            fontSize: 9,
+            halign: "center"
+          },
+          styles: { 
+            fontSize: 8, 
+            cellPadding: 3,
+            lineColor: [220, 220, 220],
+            lineWidth: 0.1
+          },
+          alternateRowStyles: {
+            fillColor: [245, 248, 250]
+          },
           columnStyles: {
-            0: { cellWidth: 12, halign: "center" },
+            0: { cellWidth: 12, halign: "center", fontStyle: "bold" },
             1: { cellWidth: 90 },
             2: { cellWidth: 20, halign: "center" },
-            3: { cellWidth: 22, halign: "center" },
-            4: { cellWidth: 20, halign: "center" },
-            5: { cellWidth: 20, halign: "center" },
+            3: { cellWidth: 22, halign: "center", fontStyle: "bold", textColor: [0, 128, 0] },
+            4: { cellWidth: 20, halign: "center", textColor: [200, 0, 0] },
+            5: { cellWidth: 20, halign: "center", fontStyle: "bold" },
           },
         });
 
         const finalY2 = (doc as any).lastAutoTable.finalY + 10;
-        doc.setFontSize(10);
+        
+        // Ringkasan dengan box
+        doc.setDrawColor(41, 128, 185);
+        doc.setFillColor(245, 248, 250);
+        doc.rect(14, finalY2 - 3, 180, 28, 'FD');
+        
+        doc.setFontSize(11);
         doc.setFont("helvetica", "bold");
-        doc.text("Ringkasan:", 14, finalY2);
+        doc.setTextColor(41, 128, 185);
+        doc.text("RINGKASAN:", 18, finalY2 + 3);
+        
+        doc.setFontSize(9);
+        doc.setTextColor(0, 0, 0);
         doc.setFont("helvetica", "normal");
+        doc.text(`Total Permohonan:`, 18, finalY2 + 9);
+        doc.setFont("helvetica", "bold");
+        doc.text(`${reportData.applications.total}`, 65, finalY2 + 9);
+        
+        doc.setFont("helvetica", "normal");
+        doc.text(`Disetujui:`, 18, finalY2 + 15);
+        doc.setFont("helvetica", "bold");
+        doc.setTextColor(0, 128, 0);
+        doc.text(`${reportData.applications.approved}`, 65, finalY2 + 15);
+        
+        doc.setTextColor(0, 0, 0);
+        doc.setFont("helvetica", "normal");
+        doc.text(`Ditolak:`, 18, finalY2 + 21);
+        doc.setFont("helvetica", "bold");
+        doc.setTextColor(200, 0, 0);
+        doc.text(`${reportData.applications.rejected}`, 65, finalY2 + 21);
+        
+        doc.setTextColor(41, 128, 185);
+        doc.setFont("helvetica", "normal");
+        doc.text(`Tingkat Persetujuan:`, 110, finalY2 + 9);
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(12);
         doc.text(
-          `Total Permohonan: ${reportData.applications.total}`,
-          14,
-          finalY2 + 6
-        );
-        doc.text(
-          `Disetujui: ${reportData.applications.approved}`,
-          14,
-          finalY2 + 12
-        );
-        doc.text(
-          `Ditolak: ${reportData.applications.rejected}`,
-          14,
-          finalY2 + 18
-        );
-        doc.text(
-          `Tingkat Persetujuan: ${reportData.applications.approvalRate.toFixed(
-            2
-          )}%`,
-          14,
-          finalY2 + 24
+          `${reportData.applications.approvalRate.toFixed(1)}%`,
+          170,
+          finalY2 + 15
         );
 
         filename = `laporan-permohonan-domain-${dateStr}.pdf`;
@@ -519,23 +674,38 @@ function SuperAdminReportsContent() {
       case "hosting":
         doc.setFontSize(14);
         doc.setFont("helvetica", "bold");
-        doc.text("Laporan Aplikasi Hosting per Framework", 14, 50);
+        doc.setTextColor(41, 128, 185);
+        doc.text("Laporan Aplikasi Hosting per Framework", 14, 72);
+        doc.setTextColor(0, 0, 0);
 
         autoTable(doc, {
-          startY: 55,
+          startY: 77,
           head: [["No", "Framework/Platform", "Jumlah Aplikasi"]],
           body: reportData.hosting.byFramework.map((item, index) => [
             (index + 1).toString(),
             item.framework,
             item.count.toString(),
           ]),
-          theme: "grid",
-          headStyles: { fillColor: [41, 128, 185], fontStyle: "bold" },
-          styles: { fontSize: 9, cellPadding: 3 },
+          theme: "striped",
+          headStyles: { 
+            fillColor: [41, 128, 185], 
+            fontStyle: "bold",
+            fontSize: 10,
+            halign: "center"
+          },
+          styles: { 
+            fontSize: 9, 
+            cellPadding: 4,
+            lineColor: [220, 220, 220],
+            lineWidth: 0.1
+          },
+          alternateRowStyles: {
+            fillColor: [245, 248, 250]
+          },
           columnStyles: {
-            0: { cellWidth: 15, halign: "center" },
+            0: { cellWidth: 15, halign: "center", fontStyle: "bold" },
             1: { cellWidth: 130 },
-            2: { cellWidth: 35, halign: "center" },
+            2: { cellWidth: 35, halign: "center", fontStyle: "bold" },
           },
         });
 
@@ -571,36 +741,61 @@ function SuperAdminReportsContent() {
       case "opd":
         doc.setFontSize(14);
         doc.setFont("helvetica", "bold");
-        doc.text("Laporan Aktivitas OPD", 14, 50);
+        doc.setTextColor(41, 128, 185);
+        doc.text("Laporan Aktivitas OPD", 14, 72);
+        doc.setFontSize(10);
+        doc.setFont("helvetica", "normal");
+        doc.setTextColor(100, 100, 100);
+        doc.text("(Top 5 OPD Paling Aktif)", 14, 78);
+        doc.setTextColor(0, 0, 0);
 
         autoTable(doc, {
-          startY: 55,
-          head: [["No", "Nama OPD", "Total Permohonan"]],
+          startY: 83,
+          head: [["Peringkat", "Nama OPD", "Total Permohonan"]],
           body: reportData.opd.mostActive.map((item, index) => [
             (index + 1).toString(),
             item.opd,
             item.totalRequests.toString(),
           ]),
-          theme: "grid",
-          headStyles: { fillColor: [41, 128, 185], fontStyle: "bold" },
-          styles: { fontSize: 9, cellPadding: 3 },
+          theme: "striped",
+          headStyles: { 
+            fillColor: [41, 128, 185], 
+            fontStyle: "bold",
+            fontSize: 10,
+            halign: "center"
+          },
+          styles: { 
+            fontSize: 9, 
+            cellPadding: 4,
+            lineColor: [220, 220, 220],
+            lineWidth: 0.1
+          },
+          alternateRowStyles: {
+            fillColor: [245, 248, 250]
+          },
           columnStyles: {
-            0: { cellWidth: 15, halign: "center" },
-            1: { cellWidth: 130 },
-            2: { cellWidth: 35, halign: "center" },
+            0: { cellWidth: 25, halign: "center", fontStyle: "bold", fillColor: [255, 215, 0] },
+            1: { cellWidth: 120 },
+            2: { cellWidth: 35, halign: "center", fontStyle: "bold" },
           },
         });
 
         const finalY4 = (doc as any).lastAutoTable.finalY + 10;
+        
+        // Ringkasan dengan box
+        doc.setDrawColor(41, 128, 185);
+        doc.setFillColor(245, 248, 250);
+        doc.rect(14, finalY4 - 3, 180, 12, 'FD');
+        
         doc.setFontSize(10);
         doc.setFont("helvetica", "bold");
-        doc.text("Ringkasan:", 14, finalY4);
+        doc.setTextColor(41, 128, 185);
+        doc.text("RINGKASAN:", 18, finalY4 + 3);
+        doc.setTextColor(0, 0, 0);
         doc.setFont("helvetica", "normal");
-        doc.text(
-          `Total OPD Aktif: ${reportData.opd.totalOpds}`,
-          14,
-          finalY4 + 6
-        );
+        doc.text(`Total OPD Terdaftar:`, 80, finalY4 + 3);
+        doc.setFont("helvetica", "bold");
+        doc.text(`${reportData.opd.totalOpds}`, 140, finalY4 + 3);
 
         filename = `laporan-aktivitas-opd-${dateStr}.pdf`;
         break;
@@ -608,121 +803,269 @@ function SuperAdminReportsContent() {
       default: // overview
         doc.setFontSize(14);
         doc.setFont("helvetica", "bold");
-        doc.text("Laporan Overview - Ringkasan Sistem", 14, 50);
+        doc.setTextColor(41, 128, 185);
+        doc.text("Laporan Overview - Ringkasan Sistem", 14, 72);
+        doc.setTextColor(0, 0, 0);
 
-        // Domain Statistics
+        // Domain Statistics dengan card style
         doc.setFontSize(11);
-        doc.text("DOMAIN", 14, 60);
+        doc.setFont("helvetica", "bold");
+        doc.setTextColor(41, 128, 185);
+        doc.text("1. STATISTIK DOMAIN", 14, 82);
+        doc.setTextColor(0, 0, 0);
+        
         autoTable(doc, {
-          startY: 63,
-          head: [["Metrik", "Nilai"]],
+          startY: 85,
+          head: [["Metrik", "Jumlah", "Persentase"]],
           body: [
-            ["Total Domain", reportData.domains.total.toString()],
-            ["Domain Aktif", reportData.domains.active.toString()],
-            ["Domain Tidak Aktif", reportData.domains.inactive.toString()],
-            ["Domain Kadaluarsa", reportData.domains.expired.toString()],
+            [
+              "Total Domain", 
+              reportData.domains.total.toString(),
+              "100%"
+            ],
+            [
+              "Domain Aktif", 
+              reportData.domains.active.toString(),
+              `${((reportData.domains.active / reportData.domains.total) * 100).toFixed(1)}%`
+            ],
+            [
+              "Domain Tidak Aktif", 
+              reportData.domains.inactive.toString(),
+              `${((reportData.domains.inactive / reportData.domains.total) * 100).toFixed(1)}%`
+            ],
+            [
+              "Domain Kadaluarsa", 
+              reportData.domains.expired.toString(),
+              `${((reportData.domains.expired / reportData.domains.total) * 100).toFixed(1)}%`
+            ],
           ],
-          theme: "grid",
-          headStyles: { fillColor: [52, 152, 219], fontStyle: "bold" },
-          styles: { fontSize: 9, cellPadding: 3 },
+          theme: "striped",
+          headStyles: { 
+            fillColor: [41, 128, 185], 
+            fontStyle: "bold",
+            fontSize: 9,
+            halign: "center"
+          },
+          styles: { 
+            fontSize: 9, 
+            cellPadding: 3,
+            lineColor: [220, 220, 220],
+            lineWidth: 0.1
+          },
+          alternateRowStyles: {
+            fillColor: [245, 248, 250]
+          },
           columnStyles: {
-            0: { cellWidth: 100 },
-            1: { cellWidth: 80, halign: "center" },
+            0: { cellWidth: 80 },
+            1: { cellWidth: 50, halign: "center", fontStyle: "bold" },
+            2: { cellWidth: 50, halign: "center" },
           },
         });
 
         // Application Statistics
-        let yPos = (doc as any).lastAutoTable.finalY + 10;
+        let yPos = (doc as any).lastAutoTable.finalY + 8;
         doc.setFontSize(11);
         doc.setFont("helvetica", "bold");
-        doc.text("PERMOHONAN DOMAIN", 14, yPos);
+        doc.setTextColor(41, 128, 185);
+        doc.text("2. PERMOHONAN DOMAIN", 14, yPos);
+        doc.setTextColor(0, 0, 0);
+        
         autoTable(doc, {
           startY: yPos + 3,
-          head: [["Metrik", "Nilai"]],
+          head: [["Metrik", "Jumlah", "Persentase"]],
           body: [
-            ["Total Permohonan", reportData.applications.total.toString()],
-            ["Pending", reportData.applications.pending.toString()],
-            ["Disetujui", reportData.applications.approved.toString()],
-            ["Ditolak", reportData.applications.rejected.toString()],
             [
-              "Tingkat Persetujuan",
-              `${reportData.applications.approvalRate.toFixed(2)}%`,
+              "Total Permohonan", 
+              reportData.applications.total.toString(),
+              "100%"
+            ],
+            [
+              "Disetujui", 
+              reportData.applications.approved.toString(),
+              `${reportData.applications.approvalRate.toFixed(1)}%`
+            ],
+            [
+              "Pending", 
+              reportData.applications.pending.toString(),
+              `${((reportData.applications.pending / reportData.applications.total) * 100).toFixed(1)}%`
+            ],
+            [
+              "Ditolak", 
+              reportData.applications.rejected.toString(),
+              `${((reportData.applications.rejected / reportData.applications.total) * 100).toFixed(1)}%`
             ],
           ],
-          theme: "grid",
-          headStyles: { fillColor: [52, 152, 219], fontStyle: "bold" },
-          styles: { fontSize: 9, cellPadding: 3 },
+          theme: "striped",
+          headStyles: { 
+            fillColor: [41, 128, 185], 
+            fontStyle: "bold",
+            fontSize: 9,
+            halign: "center"
+          },
+          styles: { 
+            fontSize: 9, 
+            cellPadding: 3,
+            lineColor: [220, 220, 220],
+            lineWidth: 0.1
+          },
+          alternateRowStyles: {
+            fillColor: [245, 248, 250]
+          },
           columnStyles: {
-            0: { cellWidth: 100 },
-            1: { cellWidth: 80, halign: "center" },
+            0: { cellWidth: 80 },
+            1: { cellWidth: 50, halign: "center", fontStyle: "bold" },
+            2: { cellWidth: 50, halign: "center" },
           },
         });
 
         // Hosting Statistics
-        yPos = (doc as any).lastAutoTable.finalY + 10;
+        yPos = (doc as any).lastAutoTable.finalY + 8;
         doc.setFontSize(11);
         doc.setFont("helvetica", "bold");
-        doc.text("APLIKASI HOSTING", 14, yPos);
+        doc.setTextColor(41, 128, 185);
+        doc.text("3. APLIKASI HOSTING", 14, yPos);
+        doc.setTextColor(0, 0, 0);
+        
         autoTable(doc, {
           startY: yPos + 3,
-          head: [["Metrik", "Nilai"]],
+          head: [["Metrik", "Jumlah", "Persentase"]],
           body: [
-            ["Total Aplikasi", reportData.hosting.total.toString()],
-            ["Pending", reportData.hosting.pending.toString()],
-            ["Disetujui", reportData.hosting.approved.toString()],
-            ["Ditolak", reportData.hosting.rejected.toString()],
             [
-              "Tingkat Persetujuan",
-              `${reportData.hosting.approvalRate.toFixed(2)}%`,
+              "Total Aplikasi", 
+              reportData.hosting.total.toString(),
+              "100%"
+            ],
+            [
+              "Disetujui", 
+              reportData.hosting.approved.toString(),
+              `${reportData.hosting.approvalRate.toFixed(1)}%`
+            ],
+            [
+              "Pending", 
+              reportData.hosting.pending.toString(),
+              `${((reportData.hosting.pending / reportData.hosting.total) * 100).toFixed(1)}%`
+            ],
+            [
+              "Ditolak", 
+              reportData.hosting.rejected.toString(),
+              `${((reportData.hosting.rejected / reportData.hosting.total) * 100).toFixed(1)}%`
             ],
           ],
-          theme: "grid",
-          headStyles: { fillColor: [52, 152, 219], fontStyle: "bold" },
-          styles: { fontSize: 9, cellPadding: 3 },
+          theme: "striped",
+          headStyles: { 
+            fillColor: [41, 128, 185], 
+            fontStyle: "bold",
+            fontSize: 9,
+            halign: "center"
+          },
+          styles: { 
+            fontSize: 9, 
+            cellPadding: 3,
+            lineColor: [220, 220, 220],
+            lineWidth: 0.1
+          },
+          alternateRowStyles: {
+            fillColor: [245, 248, 250]
+          },
           columnStyles: {
-            0: { cellWidth: 100 },
-            1: { cellWidth: 80, halign: "center" },
+            0: { cellWidth: 80 },
+            1: { cellWidth: 50, halign: "center", fontStyle: "bold" },
+            2: { cellWidth: 50, halign: "center" },
           },
         });
 
         // OPD Statistics
-        yPos = (doc as any).lastAutoTable.finalY + 10;
+        yPos = (doc as any).lastAutoTable.finalY + 8;
         doc.setFontSize(11);
         doc.setFont("helvetica", "bold");
-        doc.text("ORGANISASI", 14, yPos);
+        doc.setTextColor(41, 128, 185);
+        doc.text("4. ORGANISASI PERANGKAT DAERAH", 14, yPos);
+        doc.setTextColor(0, 0, 0);
+        
         autoTable(doc, {
           startY: yPos + 3,
           head: [["Metrik", "Nilai"]],
-          body: [["Total OPD Aktif", reportData.opd.totalOpds.toString()]],
-          theme: "grid",
-          headStyles: { fillColor: [52, 152, 219], fontStyle: "bold" },
-          styles: { fontSize: 9, cellPadding: 3 },
+          body: [
+            ["Total OPD Terdaftar", reportData.opd.totalOpds.toString()],
+            ["OPD Aktif (dengan permohonan)", reportData.opd.mostActive.length.toString()]
+          ],
+          theme: "striped",
+          headStyles: { 
+            fillColor: [41, 128, 185], 
+            fontStyle: "bold",
+            fontSize: 9,
+            halign: "center"
+          },
+          styles: { 
+            fontSize: 9, 
+            cellPadding: 3,
+            lineColor: [220, 220, 220],
+            lineWidth: 0.1
+          },
+          alternateRowStyles: {
+            fillColor: [245, 248, 250]
+          },
           columnStyles: {
-            0: { cellWidth: 100 },
-            1: { cellWidth: 80, halign: "center" },
+            0: { cellWidth: 130 },
+            1: { cellWidth: 50, halign: "center", fontStyle: "bold" },
           },
         });
 
         filename = `laporan-overview-${dateStr}.pdf`;
     }
 
-    // Footer
+    // Footer dengan border dan informasi lengkap
     const pageCount = doc.getNumberOfPages();
     for (let i = 1; i <= pageCount; i++) {
       doc.setPage(i);
+      
+      // Footer border
+      const pageHeight = doc.internal.pageSize.height;
+      doc.setDrawColor(41, 128, 185);
+      doc.setLineWidth(0.3);
+      doc.line(10, pageHeight - 20, 200, pageHeight - 20);
+      
+      // Footer content
       doc.setFontSize(8);
       doc.setFont("helvetica", "normal");
+      doc.setTextColor(100, 100, 100);
+      
+      // Left side - Document info
+      doc.text(
+        `Dokumen: ${filename}`,
+        14,
+        pageHeight - 15
+      );
+      doc.text(
+        `Dicetak: ${dateStr} ${timeStr}`,
+        14,
+        pageHeight - 11
+      );
+      
+      // Center - Page number
+      doc.setFont("helvetica", "bold");
+      doc.setTextColor(41, 128, 185);
       doc.text(
         `Halaman ${i} dari ${pageCount}`,
         105,
-        doc.internal.pageSize.height - 10,
+        pageHeight - 13,
         { align: "center" }
       );
+      
+      // Right side - Organization
+      doc.setFont("helvetica", "normal");
+      doc.setTextColor(100, 100, 100);
       doc.text(
-        `Dicetak dari Domain Manager - Diskominfo Kalbar`,
-        105,
-        doc.internal.pageSize.height - 6,
-        { align: "center" }
+        `Domain Manager System`,
+        196,
+        pageHeight - 15,
+        { align: "right" }
+      );
+      doc.text(
+        `Diskominfo Prov. Kalbar`,
+        196,
+        pageHeight - 11,
+        { align: "right" }
       );
     }
 

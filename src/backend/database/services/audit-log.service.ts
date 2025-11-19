@@ -94,18 +94,16 @@ export class AuditLogService {
 
       const logs = await query<AuditLogRow>(logsSql, [...params, paginationLimit, offset]);
 
-      // Convert to AuditLog format
+      // Convert to AuditLog format - mengembalikan format database asli
       const formattedLogs: AuditLog[] = logs.map(log => ({
-        id: log.id.toString(),
-        userId: log.user_id.toString(),
+        id: log.id,
+        user_id: log.user_id,
+        application_id: log.application_id,
         action: log.action,
-        resourceType: log.application_id ? 'Application' : 'System',
-        resourceId: log.application_id?.toString() || '',
-        description: log.details || log.action,
+        details: log.details || log.action,
         timestamp: log.timestamp.toISOString(),
-        user: log.username || log.email,
-        userRole: (log as any).role,
-        details: log.details
+        username: log.username || log.email || 'System',
+        user_role: (log as any).role || 'Unknown'
       }));
 
       return {

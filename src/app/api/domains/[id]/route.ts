@@ -32,11 +32,30 @@ export async function PATCH(
 
   try {
     const body = await request.json();
-    const { status, action } = body;
+    const { status, action, expiryDate, activationDate, reason } = body;
 
     // Get current user role from query params or headers
     const searchParams = request.nextUrl.searchParams;
     const currentUserRole = searchParams.get('role') as any || 'Super Admin';
+
+    // Handle reactivate action with expiry date update
+    if (action === 'reactivate') {
+      const result = await activateDomain(id, currentUserRole);
+      if (!result.success) {
+        return NextResponse.json({ message: result.message }, { status: 403 });
+      }
+
+      // Update expiry date if provided
+      if (expiryDate) {
+        const { updateDomain } = await import('@/backend/actions/domains');
+        await updateDomain(id, { 
+          expires_at: new Date(expiryDate),
+          status: 'Active'
+        });
+      }
+
+      return NextResponse.json({ message: result.message });
+    }
 
     // Handle activate/deactivate actions
     if (action === 'activate' || status === 'active') {

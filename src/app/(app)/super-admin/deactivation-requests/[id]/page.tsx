@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { use, useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import {
   Card,
@@ -54,9 +54,10 @@ interface DeactivationRequest {
 export default function DeactivationRequestDetailPage({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
   const router = useRouter();
+  const resolvedParams = use(params);
   const [request, setRequest] = useState<DeactivationRequest | null>(null);
   const [loading, setLoading] = useState(true);
   const [processing, setProcessing] = useState(false);
@@ -67,12 +68,12 @@ export default function DeactivationRequestDetailPage({
 
   useEffect(() => {
     fetchRequest();
-  }, [params.id]);
+  }, [resolvedParams.id]);
 
   const fetchRequest = async () => {
     setLoading(true);
     try {
-      const response = await fetch(`/api/deactivation-requests/${params.id}`);
+      const response = await fetch(`/api/deactivation-requests/${resolvedParams.id}`);
       if (response.ok) {
         const data = await response.json();
         setRequest(data);
@@ -101,7 +102,7 @@ export default function DeactivationRequestDetailPage({
       // TODO: Get current user ID from session
       const currentUserId = 1; // Placeholder
 
-      const response = await fetch(`/api/deactivation-requests/${params.id}`, {
+      const response = await fetch(`/api/deactivation-requests/${resolvedParams.id}`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
@@ -117,7 +118,7 @@ export default function DeactivationRequestDetailPage({
         const data = await response.json();
         setSuccess(data.message);
         setTimeout(() => {
-          router.push("/super-admin/deactivation-requests");
+          router.push("/super-admin/deactivation-requests?role=Super Admin");
         }, 2000);
       } else {
         const data = await response.json();
@@ -183,14 +184,19 @@ export default function DeactivationRequestDetailPage({
     <div className="container mx-auto py-6 space-y-6">
       {/* Header */}
       <div className="flex items-center gap-4">
-        <Link href="/super-admin/deactivation-requests">
+        <Link href="/super-admin/deactivation-requests?role=Super Admin">
           <Button variant="ghost" size="sm">
             <ArrowLeft className="h-4 w-4 mr-2" />
             Kembali
           </Button>
         </Link>
         <div className="flex-1">
-          <h1 className="text-3xl font-bold">Detail Permohonan Deaktivasi</h1>
+          <div className="flex items-center gap-2">
+            <h1 className="text-3xl font-bold">Detail Permohonan Deaktivasi</h1>
+            <Badge variant="outline" className="text-xs">
+              Super Admin
+            </Badge>
+          </div>
           <p className="text-muted-foreground mt-1">
             ID Permohonan: #{request.id}
           </p>
@@ -440,7 +446,7 @@ export default function DeactivationRequestDetailPage({
                   </>
                 )}
               </Button>
-              <Link href="/super-admin/deactivation-requests">
+              <Link href="/super-admin/deactivation-requests?role=Super Admin">
                 <Button variant="outline" disabled={processing}>
                   Batal
                 </Button>

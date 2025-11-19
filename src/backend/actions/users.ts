@@ -3,6 +3,7 @@
 import { ChangeUserStatusRequest, User, UserRole } from '@/backend/models/types';
 import { auditService } from '@/backend/services/audit.service';
 import { UserService } from '@/backend/database/services/user.service';
+import { OPDRepository } from '@/backend/database/repositories/opd.repository';
 
 // Initialize MySQL User Service
 const userService = new UserService();
@@ -49,8 +50,14 @@ export async function createUser(data: {
   opd?: string;
 }) {
   try {
-    // Check if email already exists (TODO: add getUserByEmail to service)
-    const allUsers = await userService.getUsers(1, 1000, { search: data.email });
+    console.log('=== CREATE USER START ===');
+    console.log('Input data:', JSON.stringify(data, null, 2));
+    
+    // Check if email already exists - only check ACTIVE users (allow reuse of deleted user emails)
+    const allUsers = await userService.getUsers(1, 1000, { 
+      search: data.email,
+      is_active: true // Only check active users
+    });
     const existingUser = allUsers.users.find(u => u.email === data.email);
     
     if (existingUser) {
@@ -60,14 +67,59 @@ export async function createUser(data: {
       };
     }
 
+    // Check if username already exists - only check ACTIVE users (allow reuse of deleted usernames)
+    const usernameCheck = await userService.getUsers(1, 1000, { 
+      search: data.name,
+      is_active: true // Only check active users
+    });
+    const existingUsername = usernameCheck.users.find(u => u.name === data.name || (u as any).username === data.name);
+    
+    if (existingUsername) {
+      return {
+        success: false,
+        message: `Username ${data.name} sudah digunakan.`,
+      };
+    }
+
+    // Get OPD ID if OPD name is provided
+    let opdId: number | undefined;
+    let opdName = data.opd;
+    
+    // If role is Super Admin, automatically set OPD to Diskominfo
+    if (data.role === 'Super Admin') {
+      opdName = 'Dinas Komunikasi dan Informatika';
+      console.log('Super Admin detected, auto-setting OPD to:', opdName);
+    }
+    
+    if (opdName) {
+      console.log('Looking for OPD:', opdName);
+      const opd = await OPDRepository.findByName(opdName);
+      if (!opd) {
+        console.log('OPD not found!');
+        return {
+          success: false,
+          message: `OPD "${opdName}" tidak ditemukan.`,
+        };
+      }
+      opdId = opd.id;
+      console.log('Found OPD ID:', opdId);
+    } else {
+      console.log('No OPD provided');
+    }
+
     // Create user
-    const userId = await userService.createUser({
+    const createUserData = {
       username: data.name,
       email: data.email,
       role: data.role,
-      opd_id: data.opd ? parseInt(data.opd) : undefined,
+      opd_id: opdId,
       is_active: true
-    });
+    };
+    console.log('Creating user with data:', JSON.stringify(createUserData, null, 2));
+    
+    const userId = await userService.createUser(createUserData);
+    
+    console.log('User created with ID:', userId);
 
     // Log the audit
     await auditService.createAuditLog({
@@ -105,8 +157,11 @@ export async function updateUser(
 
     // Check if email is being changed and if new email is already in use
     if (data.email !== existingUser.email) {
-      const allUsers = await userService.getUsers(1, 1000, { search: data.email });
-      const emailInUse = allUsers.users.find(u => u.email === data.email && u.id !== parseInt(id));
+      const allUsers = await userService.getUsers(1, 1000, { 
+        search: data.email,
+        is_active: true // Only check active users
+      });
+      const emailInUse = allUsers.users.find(u => u.email === data.email && u.id !== id);
       
       if (emailInUse) {
         return {
@@ -116,17 +171,17 @@ export async function updateUser(
       }
     }
 
-    // Parse OPD ID - it could be either an ID string or OPD name
+    // Get OPD ID if OPD name is provided
     let opdId: number | undefined;
     if (data.opd) {
-      const parsedOpd = parseInt(data.opd);
-      if (!isNaN(parsedOpd)) {
-        opdId = parsedOpd;
-      } else {
-        // If it's a name, try to find the OPD ID
-        // For now, just use undefined if it's not a number
-        opdId = undefined;
+      const opd = await OPDRepository.findByName(data.opd);
+      if (!opd) {
+        return {
+          success: false,
+          message: `OPD "${data.opd}" tidak ditemukan.`,
+        };
       }
+      opdId = opd.id;
     }
 
     await userService.updateUser(parseInt(id), {
