@@ -253,14 +253,14 @@ export default function DeactivationRequestsPage() {
                       <TableCell>{formatDate(request.requested_at)}</TableCell>
                       <TableCell>{getStatusBadge(request.status)}</TableCell>
                       <TableCell className="text-right">
-                        <Link
-                          href={`/super-admin/deactivation-requests/${request.id}`}
-                        >
-                          <Button variant="outline" size="sm">
+                        <Button variant="outline" size="sm" asChild>
+                          <Link
+                            href={`/super-admin/deactivation-requests/${request.id}?role=Super Admin`}
+                          >
                             <Eye className="h-4 w-4 mr-2" />
                             Detail
-                          </Button>
-                        </Link>
+                          </Link>
+                        </Button>
                       </TableCell>
                     </TableRow>
                   ))}

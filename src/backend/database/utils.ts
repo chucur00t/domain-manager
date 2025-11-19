@@ -2,7 +2,7 @@ import { db } from './config';
 
 export class DatabaseError extends Error {
   constructor(message: string, public cause?: Error) {
-    super(message);
+    super(message + (cause ? `: ${cause.message}` : ''));
     this.name = 'DatabaseError';
   }
 }

@@ -118,7 +118,7 @@ export default function DeactivationRequestDetailPage({
         const data = await response.json();
         setSuccess(data.message);
         setTimeout(() => {
-          router.push("/super-admin/deactivation-requests");
+          router.push("/super-admin/deactivation-requests?role=Super Admin");
         }, 2000);
       } else {
         const data = await response.json();
@@ -184,14 +184,19 @@ export default function DeactivationRequestDetailPage({
     <div className="container mx-auto py-6 space-y-6">
       {/* Header */}
       <div className="flex items-center gap-4">
-        <Link href="/super-admin/deactivation-requests">
+        <Link href="/super-admin/deactivation-requests?role=Super Admin">
           <Button variant="ghost" size="sm">
             <ArrowLeft className="h-4 w-4 mr-2" />
             Kembali
           </Button>
         </Link>
         <div className="flex-1">
-          <h1 className="text-3xl font-bold">Detail Permohonan Deaktivasi</h1>
+          <div className="flex items-center gap-2">
+            <h1 className="text-3xl font-bold">Detail Permohonan Deaktivasi</h1>
+            <Badge variant="outline" className="text-xs">
+              Super Admin
+            </Badge>
+          </div>
           <p className="text-muted-foreground mt-1">
             ID Permohonan: #{request.id}
           </p>
@@ -441,7 +446,7 @@ export default function DeactivationRequestDetailPage({
                   </>
                 )}
               </Button>
-              <Link href="/super-admin/deactivation-requests">
+              <Link href="/super-admin/deactivation-requests?role=Super Admin">
                 <Button variant="outline" disabled={processing}>
                   Batal
                 </Button>

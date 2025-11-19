@@ -184,7 +184,7 @@ export class ApplicationService {
         offset,
       ]);
 
-      // Convert to application format
+      // Convert to application format with compatibility aliases
       const formattedApplications: Application[] = applications.map((app) => ({
         id: app.id,
         application_type: app.application_type as ApplicationType,
@@ -198,13 +198,14 @@ export class ApplicationService {
         last_updated_by: app.last_updated_by,
         opd: app.opd_name,
         submitter_username: app.submitter_name,
-        domainName: app.opd_name
+        // Compatibility aliases untuk frontend
+        domainName: app.requested_domain_name || (app.opd_name
           ? `${app.opd_name
               .toLowerCase()
               .replace(/\s+/g, "-")}.kalbarprov.go.id`
-          : "",
-        submittedDate: app.submitted_at.toISOString().split("T")[0],
-        submissionDate: app.submitted_at.toISOString().split("T")[0],
+          : ""),
+        submittedDate: app.submitted_at.toISOString(),
+        submissionDate: app.submitted_at.toISOString(),
       }));
 
       return {
@@ -249,7 +250,7 @@ export class ApplicationService {
 
       const app = applications[0];
       
-      // Base data for all applications
+      // Base data for all applications with compatibility aliases
       const baseData = {
         id: app.id,
         application_type: app.application_type as ApplicationType,
@@ -263,8 +264,9 @@ export class ApplicationService {
         last_updated_by: app.last_updated_by,
         opd: app.opd_name,
         submitter_username: app.submitter_name,
-        submittedDate: app.submitted_at.toISOString().split("T")[0],
-        submissionDate: app.submitted_at.toISOString().split("T")[0],
+        // Compatibility aliases untuk frontend
+        submittedDate: app.submitted_at.toISOString(),
+        submissionDate: app.submitted_at.toISOString(),
       };
 
       // If it's a hosting application, try to get hosting-specific data

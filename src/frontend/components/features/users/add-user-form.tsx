@@ -38,6 +38,7 @@ import { Loader2, PlusCircle } from 'lucide-react';
 import { useSearchParams } from 'next/navigation';
 import type { User } from '@/backend/models/types';
 import React from 'react';
+import { MOCK_USERS } from '@/backend/utils/mock-data';
 
 const formSchema = z.object({
   name: z.string().min(3, { message: 'Nama minimal 3 karakter.' }),
@@ -70,7 +71,11 @@ function AddUserFormContent({ allOpds, allUsers, onUserAdded }: AddUserFormProps
   const [isOpen, setIsOpen] = useState(false);
   const currentUserRole = searchParams.get('role') as User['role'];
   
-  const currentUser = useMemo(() => allUsers.find(u => u.role === currentUserRole), [allUsers, currentUserRole]);
+  // Get current logged-in user from MOCK_USERS (same as users-table.tsx)
+  const currentUser = useMemo(
+    () => MOCK_USERS.find((u) => u.role === currentUserRole),
+    [currentUserRole]
+  );
   
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -242,6 +247,12 @@ function AddUserFormContent({ allOpds, allUsers, onUserAdded }: AddUserFormProps
                   </FormItem>
                 )}
               />
+            )}
+            {selectedRole === 'Super Admin' && (
+              <div className="text-sm text-muted-foreground bg-blue-50 border border-blue-200 p-3 rounded-md">
+                <p className="font-medium text-blue-900">OPD: Dinas Komunikasi dan Informatika</p>
+                <p className="text-xs mt-1">Super Admin otomatis terdaftar di Diskominfo</p>
+              </div>
             )}
             <DialogFooter>
                 <DialogClose asChild>
