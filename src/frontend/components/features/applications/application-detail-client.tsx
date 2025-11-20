@@ -380,18 +380,47 @@ function ApplicationDetailContent({
                       Memuat dokumen...
                     </p>
                   ) : documents && documents.length > 0 ? (
-                    documents.map((doc: any) => (
-                      <Button
-                        key={doc.id}
-                        variant="outline"
-                        className="justify-start max-w-xs gap-2"
-                        onClick={() => window.open(doc.url, '_blank')}
-                      >
-                        <FileText className="h-4 w-4" />
-                        <span className="truncate">{doc.name}</span>
-                        <Download className="h-4 w-4 ml-auto" />
-                      </Button>
-                    ))
+                    documents.map((doc: any) => {
+                      console.log('Document:', doc); // Debug log
+                      return (
+                        <Button
+                          key={doc.id}
+                          variant="outline"
+                          className="justify-start max-w-xs gap-2"
+                          onClick={() => {
+                            console.log('Clicked document:', doc);
+                            console.log('Document URL:', doc.url);
+                            console.log('Document file_path:', doc.file_path);
+                            
+                            // Try different URL fields
+                            const url = doc.url || doc.file_path || doc.document_url;
+                            
+                            if (url) {
+                              // If URL is absolute (starts with http/https), open directly
+                              if (url.startsWith('http://') || url.startsWith('https://')) {
+                                window.open(url, '_blank');
+                              } 
+                              // If URL is relative or a path, try to construct proper URL
+                              else {
+                                // Try to open as relative path from API
+                                const constructedUrl = url.startsWith('/') ? url : `/${url}`;
+                                window.open(constructedUrl, '_blank');
+                              }
+                            } else {
+                              toast({
+                                title: "Dokumen Tidak Tersedia",
+                                description: "URL dokumen tidak ditemukan. Dokumen mungkin belum diunggah.",
+                                variant: "destructive",
+                              });
+                            }
+                          }}
+                        >
+                          <FileText className="h-4 w-4" />
+                          <span className="truncate">{doc.name || doc.file_name || 'Dokumen'}</span>
+                          <Download className="h-4 w-4 ml-auto" />
+                        </Button>
+                      );
+                    })
                   ) : (
                     <p className="text-sm text-muted-foreground">
                       Tidak ada dokumen

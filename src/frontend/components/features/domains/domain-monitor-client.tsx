@@ -29,7 +29,7 @@ import {
 } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import type { Domain, User } from '@/backend/models/types';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, useRouter } from 'next/navigation';
 import React, { Suspense, useEffect, useState } from 'react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
@@ -52,6 +52,7 @@ const chartConfig = {
 
 function DomainMonitorContent({ domain }: { domain: Domain }) {
   const searchParams = useSearchParams();
+  const router = useRouter();
   const currentUserRole = searchParams.get('role') as User['role'];
   const roleQuery = `?role=${currentUserRole || ''}`;
 
@@ -110,12 +111,15 @@ function DomainMonitorContent({ domain }: { domain: Domain }) {
   return (
     <div className="flex flex-col gap-8">
       <div className="flex items-center gap-4">
-        <Link href={`/domains/${domain.id}${roleQuery}`}>
-            <Button variant="outline" size="icon" className="h-7 w-7">
-                <ArrowLeft className="h-4 w-4" />
-                <span className="sr-only">Kembali</span>
-            </Button>
-        </Link>
+        <Button 
+          variant="outline" 
+          size="icon" 
+          className="h-7 w-7"
+          onClick={() => router.back()}
+        >
+          <ArrowLeft className="h-4 w-4" />
+          <span className="sr-only">Kembali</span>
+        </Button>
         <div className="flex-1">
             <h1 className="text-xl font-semibold tracking-tight">
                 Monitoring: {domain.domain_name}

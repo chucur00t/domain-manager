@@ -131,6 +131,14 @@ function HostingPageContent() {
               Lihat dan kelola semua permohonan hosting aplikasi
             </CardDescription>
           </div>
+          {(role === "Admin Daerah" || isManagementRole) && (
+            <Link href={`/hosting/new?role=${role}`}>
+              <Button className="gap-2">
+                <PlusCircle className="h-4 w-4" />
+                Ajukan Hosting
+              </Button>
+            </Link>
+          )}
         </div>
         <div className="flex flex-col sm:flex-row items-center gap-4 pt-4 flex-wrap">
           <div className="relative w-full sm:max-w-xs">
