@@ -144,18 +144,12 @@ export function AdminDaerahDashboard({ role, userOpd }: Props) {
     },
   ].filter((item) => item.value > 0);
 
-  // Calculate countdown days
+  // Calculate countdown days using expires_at from database
   const calculateCountdown = (
-    activationDate: string
+    expiresAt: string
   ): { days: number; isExpired: boolean } => {
-    const activation = new Date(activationDate);
+    const expiryDate = new Date(expiresAt);
     const now = new Date();
-    const year = activation.getFullYear();
-    const isLeapYear = (year % 4 === 0 && year % 100 !== 0) || year % 400 === 0;
-    const daysInYear = isLeapYear ? 366 : 365;
-
-    const expiryDate = new Date(activation);
-    expiryDate.setDate(expiryDate.getDate() + daysInYear);
 
     const diffTime = expiryDate.getTime() - now.getTime();
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
@@ -166,13 +160,16 @@ export function AdminDaerahDashboard({ role, userOpd }: Props) {
     };
   };
 
-  // Active domains with activation dates for countdown
+  // Active domains with expires_at for countdown
   const activeDomainsWithCountdown = opdDomains
-    .filter((d) => d.status === "Active" && d.activationDate)
-    .map((domain) => ({
-      ...domain,
-      countdown: calculateCountdown(domain.activationDate!),
-    }))
+    .filter((d) => d.status === "Active" && (d.expires_at || d.expiryDate))
+    .map((domain) => {
+      const expiresAt = domain.expires_at || domain.expiryDate;
+      return {
+        ...domain,
+        countdown: expiresAt ? calculateCountdown(expiresAt) : { days: 0, isExpired: true },
+      };
+    })
     .sort((a, b) => a.countdown.days - b.countdown.days);
 
   if (isLoading) {

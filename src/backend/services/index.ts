@@ -136,7 +136,40 @@ export const updateApplicationStatus = async (
 
 export const getDomains = async () => {
   const result = await domainService.getDomains(1, 100);
-  return result.domains;
+  
+  // Check for expired domains and update status to Suspended
+  const now = new Date();
+  const domainsWithUpdatedStatus = await Promise.all(
+    result.domains.map(async (domain) => {
+      if (domain.expires_at && domain.status === 'Active') {
+        const expiryDate = new Date(domain.expires_at);
+        if (expiryDate < now) {
+          // Domain has expired, update status to Suspended in database
+          console.log(`Domain ${domain.domain_name || domain.hostname} expired on ${expiryDate.toISOString()}, updating status to Suspended`);
+          
+          try {
+            // Update the database
+            await domainService.updateDomain(domain.id, { status: 'Suspended' });
+            
+            return {
+              ...domain,
+              status: 'Suspended' as const
+            };
+          } catch (error) {
+            console.error(`Error updating expired domain ${domain.id}:`, error);
+            // Return with updated status even if DB update fails
+            return {
+              ...domain,
+              status: 'Suspended' as const
+            };
+          }
+        }
+      }
+      return domain;
+    })
+  );
+  
+  return domainsWithUpdatedStatus;
 };
 
 export const getDomainById = async (id: string) => {

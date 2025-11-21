@@ -165,6 +165,12 @@ function DomainsTableContent({ domains, currentUser }: DomainsTableProps) {
                   ? calculateCountdown(expiresDate)
                   : null;
                 
+                // Determine actual status based on expiry
+                let displayStatus = domain.status;
+                if (domain.status === "Active" && countdown?.isExpired) {
+                  displayStatus = "Expired";
+                }
+                
                 return (
                   <TableRow key={domain.id}>
                     <TableCell className="font-medium align-middle">
@@ -174,10 +180,10 @@ function DomainsTableContent({ domains, currentUser }: DomainsTableProps) {
                     </TableCell>
                     <TableCell className="align-middle">
                       <Badge
-                        variant={getStatusConfig(domain.status).variant}
-                        className={cn(getStatusConfig(domain.status).className)}
+                        variant={getStatusConfig(displayStatus).variant}
+                        className={cn(getStatusConfig(displayStatus).className)}
                       >
-                        {getStatusConfig(domain.status).text}
+                        {getStatusConfig(displayStatus).text}
                       </Badge>
                     </TableCell>
                     <TableCell className="text-sm align-middle">
