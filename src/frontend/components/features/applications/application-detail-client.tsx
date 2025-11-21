@@ -195,8 +195,22 @@ function ApplicationDetailContent({
   const isAdministrator = false; // Role removed
 
   const renderActionButtons = () => {
+    console.log('[renderActionButtons]', {
+      originalStatus: application.status,
+      normalizedStatus,
+      isSuperAdmin,
+      currentUserRole
+    });
+    
+    // Only show action buttons for pending status (not approved or rejected)
+    if (normalizedStatus === "approved" || normalizedStatus === "rejected") {
+      console.log('[renderActionButtons] Status is approved/rejected, hiding buttons');
+      return null;
+    }
+
     // Super Admin can approve/reject Pending applications
     if (isSuperAdmin && normalizedStatus === "pending") {
+      console.log('[renderActionButtons] Showing approve/reject buttons for Super Admin');
       return (
         <>
           <Button

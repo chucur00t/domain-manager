@@ -32,7 +32,6 @@ import { useToast } from "@/hooks/use-toast";
 import {
   updateUser,
   deleteUser,
-  updateUserStatus,
 } from "@/backend/actions/users";
 import {
   Dialog,
@@ -53,11 +52,10 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import type { User } from "@/backend/models/types";
-import { Loader2, Trash2, ToggleLeft, ToggleRight } from "lucide-react";
+import { Loader2, Trash2 } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import React from "react";
 import { cn } from "@/utils/utils";
-import { Separator } from "@/components/ui/separator";
 
 const formSchema = z
   .object({
@@ -105,7 +103,6 @@ function EditUserFormContent({
   const searchParams = useSearchParams();
   const [isUpdating, startUpdateTransition] = useTransition();
   const [isDeleting, startDeleteTransition] = useTransition();
-  const [isStatusUpdating, startStatusUpdateTransition] = useTransition();
   const [isAlertOpen, setIsAlertOpen] = useState(false);
 
   const currentUserRole = currentUser?.role;
@@ -208,29 +205,7 @@ function EditUserFormContent({
     });
   };
 
-  const handleToggleStatus = () => {
-    if (!user) return;
-    startStatusUpdateTransition(async () => {
-      const currentStatus = user.is_active ? "active" : "inactive";
-      const newStatus = currentStatus === "active" ? "inactive" : "active";
-      const result = await updateUserStatus(String(user.id), newStatus);
-      if (result.success) {
-        toast({
-          title: "Status Diperbarui",
-          description: result.message,
-        });
-        onFormAction();
-      } else {
-        toast({
-          title: "Error",
-          description: result.message,
-          variant: "destructive",
-        });
-      }
-    });
-  };
-
-  const isProcessing = isUpdating || isDeleting || isStatusUpdating;
+  const isProcessing = isUpdating || isDeleting;
 
   return (
     <>
@@ -242,28 +217,13 @@ function EditUserFormContent({
               Perbarui detail untuk pengguna {user.username || user.name}.
             </DialogDescription>
           </DialogHeader>
-          <div className="flex flex-col sm:flex-row gap-4 py-4">
-            <div className="w-full sm:w-1/2 flex flex-col gap-4">
-              <Button
-                variant={(user.is_active ?? user.status === "active") ? "outline" : "default"}
-                onClick={handleToggleStatus}
-                disabled={isProcessing}
-              >
-                {isStatusUpdating ? (
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                ) : (user.is_active ?? user.status === "active") ? (
-                  <ToggleLeft className="mr-2 h-4 w-4" />
-                ) : (
-                  <ToggleRight className="mr-2 h-4 w-4" />
-                )}
-                {(user.is_active ?? user.status === "active")
-                  ? "Nonaktifkan Akun"
-                  : "Aktifkan Akun"}
-              </Button>
+          <div className="flex flex-col gap-4 py-4">
+            <div className="w-full mb-4">
               <Button
                 variant="destructive"
                 onClick={() => setIsAlertOpen(true)}
                 disabled={isProcessing}
+                className="w-full"
               >
                 {isDeleting ? (
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -273,12 +233,7 @@ function EditUserFormContent({
                 Hapus Pengguna
               </Button>
             </div>
-            <Separator
-              orientation="vertical"
-              className="hidden sm:block h-auto"
-            />
-            <Separator orientation="horizontal" className="sm:hidden w-full" />
-            <div className="w-full sm:w-1/2">
+            <div className="w-full">
               <Form {...form}>
                 <form
                   onSubmit={form.handleSubmit(onUpdateSubmit)}

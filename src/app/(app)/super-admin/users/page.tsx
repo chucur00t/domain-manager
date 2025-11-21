@@ -106,17 +106,17 @@ function SuperAdminUsersPageContent() {
 
         {/* Statistik Info */}
         <div className="grid grid-cols-2 gap-4 pt-4">
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-            <div className="text-sm text-blue-600 font-medium">
+          <div className="rounded-lg p-4" style={{ backgroundColor: '#16181d' }}>
+            <div className="text-sm text-white font-medium">
               Total Pengguna
             </div>
-            <div className="text-2xl font-bold text-blue-900 mt-1">
+            <div className="text-2xl font-bold text-white mt-1">
               {stats.totalUsers}
             </div>
           </div>
-          <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-            <div className="text-sm text-green-600 font-medium">Total OPD</div>
-            <div className="text-2xl font-bold text-green-900 mt-1">
+          <div className="rounded-lg p-4" style={{ backgroundColor: '#16181d' }}>
+            <div className="text-sm text-white font-medium">Total OPD</div>
+            <div className="text-2xl font-bold text-white mt-1">
               {stats.totalOpds}
             </div>
           </div>

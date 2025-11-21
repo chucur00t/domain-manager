@@ -209,7 +209,20 @@ function ApplicationsTableContent({ applications }: ApplicationsTableProps) {
                 currentApplications.map((app) => (
                   <TableRow key={app.id}>
                     <TableCell className="font-medium">
-                      {app.requested_domain_name || app.domainName || "-"}
+                      {(() => {
+                        const domain = app.requested_domain_name || app.domainName || "-";
+                        console.log('[ApplicationsTable] Domain:', { 
+                          id: app.id, 
+                          requested: app.requested_domain_name, 
+                          domainName: app.domainName, 
+                          final: domain,
+                          hasDot: domain.includes('.')
+                        });
+                        if (domain === "-") return domain;
+                        const result = domain.includes('.') ? domain : `${domain}.kalbarprov.go.id`;
+                        console.log('[ApplicationsTable] Result:', result);
+                        return result;
+                      })()}
                     </TableCell>
                     <TableCell>{app.submittedDate}</TableCell>
                     <TableCell>

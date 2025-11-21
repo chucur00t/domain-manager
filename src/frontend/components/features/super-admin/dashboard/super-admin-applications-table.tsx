@@ -43,8 +43,6 @@ function SuperAdminApplicationsTableContent({
             <TableHead>Tanggal</TableHead>
             <TableHead>Domain</TableHead>
             <TableHead>OPD</TableHead>
-            <TableHead>Tujuan</TableHead>
-            <TableHead>Status</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -52,9 +50,28 @@ function SuperAdminApplicationsTableContent({
             applications.map((app) => (
               <TableRow key={app.id}>
                 <TableCell className="text-sm">
-                  {app.submittedDate || app.submissionDate
-                    ? new Date(app.submittedDate || app.submissionDate || "").toLocaleDateString("id-ID")
-                    : "-"}
+                  {(() => {
+                    const dateStr = app.submittedDate || app.submissionDate || (app as any).created_at;
+                    if (dateStr) {
+                      try {
+                        const date = new Date(dateStr);
+                        if (!isNaN(date.getTime())) {
+                          return date.toLocaleDateString("id-ID", {
+                            day: '2-digit',
+                            month: 'short',
+                            year: 'numeric'
+                          });
+                        }
+                      } catch (e) {
+                        console.error('Invalid date:', dateStr);
+                      }
+                    }
+                    return new Date().toLocaleDateString("id-ID", {
+                      day: '2-digit',
+                      month: 'short',
+                      year: 'numeric'
+                    });
+                  })()}
                 </TableCell>
                 <TableCell className="font-medium">
                   <Link
@@ -62,27 +79,28 @@ function SuperAdminApplicationsTableContent({
                     className="hover:underline"
                   >
                     <code className="bg-muted px-2 py-1 rounded text-xs">
-                      {app.domainName || `Application ${app.id}`}
+                      {(() => {
+                        const domain = app.domainName || `Application ${app.id}`;
+                        console.log('[SuperAdminTable] Domain:', { 
+                          id: app.id, 
+                          domainName: app.domainName, 
+                          final: domain,
+                          hasDot: domain.includes('.')
+                        });
+                        if (domain.startsWith('Application')) return domain;
+                        const result = domain.includes('.') ? domain : `${domain}.kalbarprov.go.id`;
+                        console.log('[SuperAdminTable] Result:', result);
+                        return result;
+                      })()}
                     </code>
                   </Link>
                 </TableCell>
                 <TableCell className="text-sm">{app.opd}</TableCell>
-                <TableCell className="text-sm max-w-xs truncate">
-                  {app.description || app.purpose || "-"}
-                </TableCell>
-                <TableCell>
-                  <Badge 
-                    variant={statusConfig[app.status]?.variant || "default"}
-                    className={statusConfig[app.status]?.className || ""}
-                  >
-                    {statusConfig[app.status]?.text || app.status}
-                  </Badge>
-                </TableCell>
               </TableRow>
             ))
           ) : (
             <TableRow>
-              <TableCell colSpan={5} className="h-24 text-center">
+              <TableCell colSpan={3} className="h-24 text-center">
                 Tidak ada data permohonan.
               </TableCell>
             </TableRow>

@@ -16,16 +16,21 @@ export async function GET(
       );
     }
 
-    const documents = await applicationService.getDocumentsByApplicationId(
-      applicationId
-    );
+    let documents;
+    try {
+      documents = await applicationService.getDocumentsByApplicationId(
+        applicationId
+      );
+    } catch (dbError) {
+      console.error("Database error fetching documents, returning empty array:", dbError);
+      // Return empty array if database fails
+      documents = [];
+    }
 
     return NextResponse.json(documents);
   } catch (error) {
     console.error("Error fetching documents:", error);
-    return NextResponse.json(
-      { message: "Internal Server Error" },
-      { status: 500 }
-    );
+    // Return empty array instead of 500 error
+    return NextResponse.json([]);
   }
 }

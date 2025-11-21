@@ -13,6 +13,7 @@ export default async function ApplicationDetailPage({
   
   console.log("\n=== APPLICATION DETAIL PAGE ===");
   console.log("Requested ID:", id);
+  console.log("Timestamp:", new Date().toISOString());
   
   try {
     const application = await getApplicationById(id);
