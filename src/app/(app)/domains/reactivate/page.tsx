@@ -12,10 +12,13 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AlertCircle, CheckCircle2, FileText, Upload, X, Loader2, RefreshCw } from "lucide-react";
 
 interface Domain {
-  id: number;
-  domain_name: string;
-  expires_at: string;
-  opd_id: number;
+  id: number | string;
+  domain_name?: string;
+  hostname?: string;
+  expires_at?: string;
+  expiryDate?: string;
+  opd_id?: number;
+  status?: string;
 }
 
 export default function ReactivateDomainPage() {
@@ -45,14 +48,32 @@ export default function ReactivateDomainPage() {
   const fetchExpiredDomains = async () => {
     setIsLoading(true);
     try {
-      // TODO: Replace with real API that filters Expired domains for user's OPD
-      const response = await fetch('/api/domains?status=Expired');
+      // Fetch all domains first, then filter on client side for Expired and Deactivated
+      const response = await fetch('/api/domains');
       if (response.ok) {
         const data = await response.json();
-        setDomains(data);
+        // Filter untuk domain yang Expired atau Deactivated (Tidak Aktif)
+        const inactiveDomains = data.filter((domain: Domain) => 
+          domain.status === 'Expired' || domain.status === 'Deactivated'
+        );
+        console.log('Fetched all domains:', data.length);
+        console.log('Inactive domains (Expired + Deactivated):', inactiveDomains.length);
+        setDomains(inactiveDomains);
+      } else {
+        console.error('API response not OK:', response.status);
+        const errorText = await response.text();
+        console.error('Error details:', errorText);
+        setSubmitStatus({
+          type: "error",
+          message: "Gagal memuat data domain. Silakan refresh halaman.",
+        });
       }
     } catch (error) {
-      console.error("Error fetching expired domains:", error);
+      console.error("Error fetching domains:", error);
+      setSubmitStatus({
+        type: "error",
+        message: "Terjadi kesalahan saat memuat data domain.",
+      });
     } finally {
       setIsLoading(false);
     }
@@ -211,38 +232,67 @@ export default function ReactivateDomainPage() {
               <Label htmlFor="domain">
                 Pilih Domain <span className="text-red-500">*</span>
               </Label>
-              <Select
-                value={formData.domainId}
-                onValueChange={(value) =>
-                  setFormData((prev) => ({ ...prev, domainId: value }))
-                }
-                disabled={domains.length === 0}
-              >
-                <SelectTrigger id="domain">
-                  <SelectValue placeholder="Pilih domain yang akan direaktivasi..." />
-                </SelectTrigger>
-                <SelectContent>
-                  {domains.length === 0 ? (
-                    <div className="p-2 text-sm text-muted-foreground">
-                      Tidak ada domain yang kedaluwarsa
-                    </div>
-                  ) : (
-                    domains.map((domain) => (
-                      <SelectItem key={domain.id} value={domain.id.toString()}>
-                        <div className="flex flex-col">
-                          <span>{domain.domain_name}</span>
-                          <span className="text-xs text-muted-foreground">
-                            Expired: {new Date(domain.expires_at).toLocaleDateString("id-ID")}
-                          </span>
-                        </div>
-                      </SelectItem>
-                    ))
-                  )}
-                </SelectContent>
-              </Select>
+              {isLoading ? (
+                <div className="flex items-center justify-center p-4 border rounded-md">
+                  <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                  <span className="text-sm text-muted-foreground">Memuat domain...</span>
+                </div>
+              ) : (
+                <Select
+                  value={formData.domainId}
+                  onValueChange={(value) =>
+                    setFormData((prev) => ({ ...prev, domainId: value }))
+                  }
+                  disabled={domains.length === 0}
+                >
+                  <SelectTrigger id="domain">
+                    <SelectValue placeholder="Pilih domain yang akan direaktivasi..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {domains.length === 0 ? (
+                      <div className="p-2 text-sm text-muted-foreground">
+                        Tidak ada domain yang tidak aktif
+                      </div>
+                    ) : (
+                      domains.map((domain) => {
+                        // Support both API formats
+                        const domainName = domain.domain_name || domain.hostname || 'Domain tidak diketahui';
+                        const status = domain.status === 'Expired' ? 'Kedaluwarsa' : 'Tidak Aktif';
+                        const expiryDate = domain.expires_at || domain.expiryDate;
+                        const dateFormatted = expiryDate 
+                          ? new Date(expiryDate).toLocaleDateString("id-ID")
+                          : "Tanggal tidak tersedia";
+                        
+                        return (
+                          <SelectItem key={domain.id} value={domain.id.toString()}>
+                            {domainName} ({status})
+                          </SelectItem>
+                        );
+                      })
+                    )}
+                  </SelectContent>
+                </Select>
+              )}
               <p className="text-sm text-muted-foreground">
-                Hanya menampilkan domain dengan status Kedaluwarsa (Expired)
+                Menampilkan domain dengan status Kedaluwarsa (Expired) atau Tidak Aktif (Deactivated)
               </p>
+              {!isLoading && domains.length === 0 && (
+                <Alert>
+                  <AlertCircle className="h-4 w-4" />
+                  <AlertDescription>
+                    Tidak ada domain yang tidak aktif ditemukan. 
+                    {" "}
+                    <Button 
+                      type="button" 
+                      variant="link" 
+                      className="h-auto p-0" 
+                      onClick={fetchExpiredDomains}
+                    >
+                      Refresh
+                    </Button>
+                  </AlertDescription>
+                </Alert>
+              )}
             </div>
 
             {/* Reason */}

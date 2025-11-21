@@ -2,10 +2,6 @@
 import { NextResponse } from 'next/server';
 import { getDomainById } from '@/backend/services';
 
-type Params = {
-  id: string;
-};
-
 // Mock data untuk monitoring - di dunia nyata, ini akan berasal dari API pihak ketiga seperti UptimeRobot
 const mockMonitoringData = {
     currentStatus: 'Online',
@@ -27,8 +23,8 @@ const mockMonitoringData = {
 };
 
 
-export async function GET(request: Request, context: { params: Params }) {
-  const { id } = context.params;
+export async function GET(request: Request, { params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
   const apiKey = process.env.UPTIMEROBOT_API_KEY;
 
   try {

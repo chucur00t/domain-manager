@@ -15,12 +15,6 @@ import Link from "next/link";
 import { Eye, Loader2 } from "lucide-react";
 import { DomainActions } from "./domain-actions";
 import { useState, Suspense, useEffect } from "react";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 
 import { activateDomain, deactivateDomain } from "@/backend/actions/domains";
 import { useToast } from "@/hooks/use-toast";
@@ -130,108 +124,123 @@ function DomainsTableContent({ domains, currentUser }: DomainsTableProps) {
   const currentDomains = domains.slice(startIndex, endIndex);
 
   return (
-    <TooltipProvider>
-      <div className="border rounded-lg">
-        <div className="relative w-full overflow-auto">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Hostname</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Tgl Dibuat</TableHead>
-                {isAdminDaerah && <TableHead>Masa Berlaku</TableHead>}
-                <TableHead className="text-center">Aksi</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {currentDomains.length > 0 ? (
-                currentDomains.map((domain) => {
-                  // Handle both new (hostname/activationDate) and old (domain_name/activated_at) formats
-                  const domainName = domain.domain_name || domain.hostname || '-';
-                  const activatedDate = domain.activated_at || domain.activationDate || null;
-                  const expiresDate = domain.expires_at || domain.expiryDate || null;
-                  
-                  const countdown = domain.status === "Active" && expiresDate
-                    ? calculateCountdown(expiresDate)
-                    : null;
-                  
-                  return (
-                    <TableRow key={domain.id}>
-                      <TableCell className="font-medium">
+    <div className="border rounded-lg">
+      <div className="relative w-full overflow-auto">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead className="w-[35%]">Hostname</TableHead>
+              <TableHead className="w-[15%]">Status</TableHead>
+              <TableHead className="w-[15%]">Tgl Dibuat</TableHead>
+              {isAdminDaerah && <TableHead className="w-[15%]">Masa Berlaku</TableHead>}
+              <TableHead className="w-[20%] text-right">Aksi</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {currentDomains.length > 0 ? (
+              currentDomains.map((domain) => {
+                // Handle both new (hostname/activationDate) and old (domain_name/activated_at) formats
+                const domainName = domain.domain_name || domain.hostname || '-';
+                const activatedDate = domain.activated_at || domain.activationDate || null;
+                const expiresDate = domain.expires_at || domain.expiryDate || null;
+                
+                // Format dates properly
+                const formattedActivatedDate = activatedDate 
+                  ? new Date(activatedDate).toLocaleDateString("id-ID", {
+                      year: 'numeric',
+                      month: 'short',
+                      day: 'numeric'
+                    })
+                  : '-';
+                
+                const formattedExpiresDate = expiresDate
+                  ? new Date(expiresDate).toLocaleDateString("id-ID", {
+                      year: 'numeric',
+                      month: 'short',
+                      day: 'numeric'
+                    })
+                  : null;
+                
+                const countdown = domain.status === "Active" && expiresDate
+                  ? calculateCountdown(expiresDate)
+                  : null;
+                
+                return (
+                  <TableRow key={domain.id}>
+                    <TableCell className="font-medium align-middle">
+                      <code className="text-sm bg-muted px-2 py-1 rounded">
                         {domainName}
-                      </TableCell>
-                      <TableCell>
-                        <Badge
-                          variant={getStatusConfig(domain.status).variant}
-                          className={cn(getStatusConfig(domain.status).className)}
-                        >
-                          {getStatusConfig(domain.status).text}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>{activatedDate || '-'}</TableCell>
-                      {isAdminDaerah && (
-                        <TableCell>
-                          {countdown ? (
-                            <div className="flex items-center gap-2">
+                      </code>
+                    </TableCell>
+                    <TableCell className="align-middle">
+                      <Badge
+                        variant={getStatusConfig(domain.status).variant}
+                        className={cn(getStatusConfig(domain.status).className)}
+                      >
+                        {getStatusConfig(domain.status).text}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="text-sm align-middle">
+                      {formattedActivatedDate}
+                    </TableCell>
+                    {isAdminDaerah && (
+                      <TableCell className="align-middle">
+                        {formattedExpiresDate ? (
+                          <div className="flex flex-col gap-1">
+                            <span className="text-sm font-medium">
+                              {formattedExpiresDate}
+                            </span>
+                            {countdown && (
                               <span
                                 className={cn(
-                                  "font-semibold",
-                                  countdown.days <= 30
+                                  "text-xs font-semibold",
+                                  countdown.isExpired
+                                    ? "text-red-600"
+                                    : countdown.days <= 30
                                     ? "text-red-600"
                                     : countdown.days <= 90
                                     ? "text-amber-600"
                                     : "text-green-600"
                                 )}
                               >
-                                {countdown.isExpired ? "Expired" : `${countdown.days} hari`}
+                                {countdown.isExpired ? "⚠️ Expired" : `${countdown.days} hari lagi`}
                               </span>
-                              {countdown.days <= 30 && !countdown.isExpired && (
-                                <Badge variant="destructive" className="text-xs">
-                                  Segera Expired
-                                </Badge>
-                              )}
-                            </div>
-                          ) : (
-                            <span className="text-muted-foreground">-</span>
-                          )}
-                        </TableCell>
-                      )}
-                      <TableCell>
-                        <div className="flex items-center justify-between gap-2">
-                          <Tooltip>
-                            <TooltipTrigger asChild>
-                              <Link href={`/domains/${domain.id}${roleQuery}`}>
-                                <Button variant="outline" size="icon">
-                                  <Eye className="h-4 w-4" />
-                                  <span className="sr-only">Lihat Detail</span>
-                                </Button>
-                              </Link>
-                            </TooltipTrigger>
-                            <TooltipContent>
-                              <p>Lihat Detail</p>
-                            </TooltipContent>
-                          </Tooltip>
-
-                          <DomainActions
-                            domain={domain}
-                            currentUser={currentUser}
-                            onAction={() => router.refresh()}
-                          />
-                        </div>
+                            )}
+                          </div>
+                        ) : (
+                          <span className="text-sm text-muted-foreground">Tidak ada data</span>
+                        )}
                       </TableCell>
-                    </TableRow>
-                  );
-                })
-              ) : (
-                <TableRow>
-                  <TableCell colSpan={isAdminDaerah ? 5 : 4} className="h-24 text-center">
-                    Tidak ada hasil yang ditemukan.
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        </div>
+                    )}
+                    <TableCell className="align-middle">
+                      <div className="flex items-center justify-end gap-2">
+                        <Link href={`/domains/${domain.id}${roleQuery}`}>
+                          <Button variant="outline" size="sm">
+                            <Eye className="h-4 w-4 mr-2" />
+                            Detail
+                          </Button>
+                        </Link>
+
+                        <DomainActions
+                          domain={domain}
+                          currentUser={currentUser}
+                          onAction={() => router.refresh()}
+                        />
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                );
+              })
+            ) : (
+              <TableRow>
+                <TableCell colSpan={isAdminDaerah ? 5 : 4} className="h-24 text-center">
+                  Tidak ada hasil yang ditemukan.
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+      </div>
         {totalPages > 1 && (
           <div className="flex items-center justify-end space-x-2 p-4 border-t">
             <span className="text-sm text-muted-foreground">
@@ -258,9 +267,8 @@ function DomainsTableContent({ domains, currentUser }: DomainsTableProps) {
           </div>
         )}
       </div>
-    </TooltipProvider>
-  );
-}
+    );
+  }
 
 export function DomainsTable({ domains, currentUser }: DomainsTableProps) {
   return (

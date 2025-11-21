@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getHostingApplications } from "@/backend/services";
+import { getHostingApplications, createHostingApplication } from "@/backend/services";
 import { applicationService } from "@/backend/database/services/application.service";
 
 export async function GET() {
@@ -18,31 +18,26 @@ export async function GET() {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
+    
+    console.log('=== API RECEIVED DATA ===');
+    console.log('Body:', JSON.stringify(body, null, 2));
+    
     const {
       applicationName,
       applicantName,
       opd,
       description,
-      framework,
       purpose,
       domainName,
-      expectedUsers,
-      storage,
-      bandwidth,
+      technicalSpecs,
       documents = [],
     } = body;
 
-    // Validate required fields
-    if (
-      !applicationName ||
-      !applicantName ||
-      !opd ||
-      !description ||
-      !framework ||
-      !purpose
-    ) {
+    // Validate only critical fields
+    if (!applicationName || !applicantName || !opd) {
+      console.log('Validation failed:', { applicationName, applicantName, opd });
       return NextResponse.json(
-        { message: "Field wajib tidak boleh kosong" },
+        { message: "Field wajib tidak boleh kosong: Nama Aplikasi, Nama Pemohon, dan OPD" },
         { status: 400 }
       );
     }
@@ -58,22 +53,36 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Note: ApplicationService doesn't have create method, using getHostingApplications service instead
-    // This should ideally create via proper hosting service
-    const application = await getHostingApplications();
+    // Create hosting application in database
+    const applicationData = {
+      userId: '1', // Default user ID, atau bisa diambil dari session
+      applicationName: applicationName,
+      framework: technicalSpecs?.databaseType || 'mysql',
+      opd: opd,
+      description: description || purpose,
+      purpose: purpose || description,
+      domainName: domainName || applicationName.toLowerCase().replace(/\s+/g, '-'),
+      expectedUsers: technicalSpecs?.estimatedUsers || '',
+      storage: technicalSpecs?.storageNeeds || '',
+      bandwidth: '100GB',
+      documents: documents,
+    };
 
-    // TODO: Implement proper hosting application creation
-    // For now, return success response
+    console.log('Creating hosting application with data:', applicationData);
+
+    const applicationId = await applicationService.createHostingApplication(applicationData);
+
+    console.log('Hosting application created with ID:', applicationId);
+
     return NextResponse.json(
       {
-        message: "Hosting application submitted successfully",
+        message: "Pengajuan hosting berhasil diajukan",
+        applicationId,
         applicationName,
         status: "pending",
       },
       { status: 201 }
     );
-
-    return NextResponse.json(application, { status: 201 });
   } catch (error) {
     console.error("Error creating hosting application:", error);
     if (error instanceof Error) {

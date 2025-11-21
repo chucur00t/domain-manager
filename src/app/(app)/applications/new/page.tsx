@@ -402,19 +402,20 @@ export default function NewApplicationPage() {
                           type="button"
                           variant="outline"
                           className="mt-2"
+                          onClick={() => document.getElementById('file-upload')?.click()}
                         >
                           Pilih File
                         </Button>
-                        <input
-                          id="file-upload"
-                          name="file-upload"
-                          type="file"
-                          className="sr-only"
-                          multiple
-                          accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
-                          onChange={handleFileUpload}
-                        />
                       </label>
+                      <input
+                        id="file-upload"
+                        name="file-upload"
+                        type="file"
+                        className="sr-only"
+                        multiple
+                        accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
+                        onChange={handleFileUpload}
+                      />
                     </div>
                   </div>
                 </div>

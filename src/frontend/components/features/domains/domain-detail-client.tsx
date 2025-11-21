@@ -113,8 +113,9 @@ function DomainDetailContent({ domain }: { domain: Domain }) {
   const isAdministrator = currentUserRole === 'Admin Daerah';
 
   const ActionButton = () => {
-    // Only Super Admin and Admin Daerah can manage domain status
-    if (!isSuperAdmin && !isAdministrator) return null;
+    // Only Super Admin can manage domain status
+    // Admin Daerah should use the reactivation flow instead
+    if (!isSuperAdmin) return null;
 
     // Show Deactivate button only when domain is Active
     if (domain.status === 'Active') {
